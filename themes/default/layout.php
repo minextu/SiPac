@@ -6,7 +6,7 @@ $chat_layout = "
 	<ul id='chat_channels_ul'></ul>
 	</div>
 	
-	<div id='chat_conversation'><||t20||></div><!-- end: chat_conversations -->
+	<div id='chat_conversation'></div><!-- end: chat_conversations -->
 	<div id='chat_userlist'></div><!-- end: chat_userlist -->
 	<div id='chat_user_area'>
 		<div id='left'>
