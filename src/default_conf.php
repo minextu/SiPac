@@ -1,6 +1,12 @@
 <?php
 
-/* GLOBAL CONFIG */
+/* GLOBAL CONFIG 
+
+Please don't change anything here. 
+If you want to change theese settings, use "$chat_settings[setting_name_here] = setting;" like in the sample index.php
+
+*/
+
 
 date_default_timezone_set('Europe/Berlin');
 $chat_default_settings = array(
