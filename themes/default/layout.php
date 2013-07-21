@@ -10,12 +10,11 @@ $chat_layout = "
 	<div class='chat_user_area'>
 		<div class='chat_left'>
 		<div class='chat_top'>
-			<button class='functions_button' onclick='chat_functions_menu();'>Chat Funktionen</button><!-- end: functions_button -->
+			<button class='functions_button' onclick='chat_functions_menu();'>Functions</button><!-- end: functions_button -->
 			<div class='functions_box' style='display: none;' onclick='chat_functions_menu()'>
 				<ul>
 					<li><a href='javascript:void(null)' id='chat_afk_button' onclick='chat_insert_command(\"afk\");'>Loading...</a></li>
 					<li><a href='javascript:void(null)' id='chat_sound_button' onclick='chat_sound_status(); chat_layout_check_sound_text(this)'>Chat-Sound deaktivieren</a></li>
-					<li><a href='#'>Eigenen Nutzernamen ändern</a></li>
 				</ul>
 			</div><!-- end: functions_box -->
 		</div><!-- end: chat_top -->

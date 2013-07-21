@@ -462,7 +462,7 @@ function proxy_log($message, $extra, $chat_user, $chat_time, $highlight)
     
     $log_folder = $log_folder . date("Y", time());
     
-    if (is_dir($log_folder) == false OR substr(decoct(fileperms($log_folder)), -3) == 777)
+    if (is_dir($log_folder) == false OR is_writable($log_folder))
     {
       if (!isset($_SERVER['HTTP_X_FORWARDED_FOR']))
         $ip = $_SERVER['REMOTE_ADDR'];

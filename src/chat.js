@@ -330,12 +330,15 @@ Chat.prototype.handle_chat_tasks = function (answer)
   catch (e)
   {};
 
-  if (this.is_writing)
-    document.getElementById(this.id + "_" + this.active_channel + "_user_" + this.username_key)
-      .getElementsByClassName("chat_speech_bubble")[0].style.width = this.speech_bubble_width;
-  else
-    document.getElementById(this.id + "_" + this.active_channel + "_user_" + this.username_key)
-      .getElementsByClassName("chat_speech_bubble")[0].style.width = "0px";
+  try
+  {
+    if (this.is_writing)
+      document.getElementById(this.id + "_" + this.active_channel + "_user_" + this.username_key).getElementsByClassName("chat_speech_bubble")[0].style.width = this.speech_bubble_width;
+    else
+      document.getElementById(this.id + "_" + this.active_channel + "_user_" + this.username_key).getElementsByClassName("chat_speech_bubble")[0].style.width = "0px";
+   }
+  catch(e){}
+  
 };
 
 Chat.prototype.handle_userlist = function (userlist_arr, channel)
@@ -353,9 +356,13 @@ Chat.prototype.handle_userlist = function (userlist_arr, channel)
     for (var i = 0; i < userlist_arr['add_user'].length; i++)
     {
       chat_userlist.innerHTML += "<span id='" + this.id + "_" + channel + "_user_" + userlist_arr['add_user_id'][i] + "'>" + userlist_arr['add_user'][i] + "</span>";
-
+    }
+    
+    for (var i = 0; i < userlist_arr['users'].length; i++)
+    {
       if (userlist_arr['users'][i] == this.username)
-        this.username_key = i;
+	this.username_key = i;
+      console.debug(userlist_arr['users'][i] + " and " + this.username); 
     }
   }
   if (userlist_arr['change_user'] != undefined)
