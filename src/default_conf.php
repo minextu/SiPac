@@ -53,9 +53,9 @@ $chat_default_settings = array(
   "can_rename_others" => true,
   "can_see_ip" => true,
   "user_infos" => array(
-    "Informationen",
-    "Mehr Informationen",
-    "Oder so"
+    "Info",
+    "More Infp",
+    "Or something"
   ),
   "replace_commands" => array(
     '/link:#1#,#2#' => "<a href='#1#' target='_blank'>#2#</a>",
