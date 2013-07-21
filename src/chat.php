@@ -12,7 +12,7 @@ Header("Content-Type: text/html");
 
 
 /* MAIN FUNCTIONS */
-$chat_version = "0.0.2.1";
+$chat_version = "0.0.2.2";
 
 function check_chat($id=0, $client_num=0, $channels=0, $active_channel=0)
 {
