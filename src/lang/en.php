@@ -1,8 +1,8 @@
 <?php
 $chat_text = array(
 "%1 is now %2",														//0
-"%1 has left the Chat",
-"%1 has joined the Chat",
+"%1 has left",
+"%1 has joined",
 "Write to %1",
 "You can use the following Commands",
 "Command Syntax",													//5
@@ -20,7 +20,7 @@ $chat_text = array(
 "%1 to %2:",
 "is now away",
 "is back again",
-"Loading the Chat. Please wait...",				//20
+"Loading the Room. Please wait...",				//20
 "User %1 will be kicked",
 "no reason",
 "You were kicked! Reason: %1",

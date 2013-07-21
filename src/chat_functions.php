@@ -7,6 +7,7 @@ function draw_chat($id)
 		global $chat_text;
 		global $chat_debug;
 		global $chat_settings;
+		global $chat_layout;
 		
 		$chat_id = "chat_".$id;
 		$chat_client_num = "n".time().mt_rand(0, 10000);
@@ -24,33 +25,46 @@ function draw_chat($id)
 		//delete the userlist session
 		$_SESSION[$chat_id]['chat_userlist'][$chat_client_num] = array();
 		
+		$_SESSION[$chat_id][$chat_client_num]['old_channels'] = array();
+		
 		$_SESSION[$chat_id]['debug_shown'] = array();
 		
 
-		require_once(dirname(__FILE__)."/../themes/".$chat_settings['design']."/layout.php");
-		$chat_html = "
-		<span class='chat_speech_bubble' style='display: none;'></span>
-		<script type='text/javascript' class='chatengine_script'>
+		require(dirname(__FILE__)."/../themes/".$chat_settings['design']."/layout.php");
+		
+		$chat_id_css = "#$chat_id";
+		$chat_css_file = str_replace("\n", " ", file_get_contents(dirname(__FILE__)."/../themes/".$chat_settings['design']."/chat.css"));
+		
+		
+		$chat_css_file_parts = explode("}", $chat_css_file);
+		
+		$chat_new_css = "";
+		foreach ($chat_css_file_parts as $key => $part)
+		{
+			$chat_new_css = $chat_new_css.$part."}";
+			if ($key == count($chat_css_file_parts)-2)
+			{
+				break;
+			}
+
+			if ($key != 0)
+				$chat_new_css = $chat_new_css.$chat_id_css;
+			
+		}
+		
+		$chat_html = chat_translate(str_replace('"chat_main"', '"chat_main" id="'.$chat_id.'"',str_replace("'chat_main'", "'chat_main' id='$chat_id'",$chat_layout)))
+		."<script type='text/javascript' class='chatengine_script'>
 		var style_obj = document.createElement('style');
-		var text_obj = document.createTextNode('@import url(".$chat_html_path."themes/".$chat_settings['design']."/chat.css);');
+		var text_obj = document.createTextNode('$chat_new_css');
 		style_obj.appendChild(text_obj);
 		document.getElementsByTagName('body')[0].appendChild(style_obj);
-		</script>".
-		chat_translate($chat_layout)
-		."<script class='chatengine_script' type='text/javascript'>html_path = '".$chat_html_path."';chat_design = '".$chat_settings['design']."'; chat_id = '".$chat_id."'; chat_client_num = '".$chat_client_num."';";
+		document.getElementById('$chat_id').innerHTML += \"<span class='chat_speech_bubble' style='display: none;'></span>\";
+		</script>
+		<script class='chatengine_script' type='text/javascript' src='".$chat_html_path."src/chat.js'></script><script class='chatengine_script' type='text/javascript'>add_chat('$chat_html_path','".$chat_settings['design']."','$chat_id', '$chat_client_num',";
 		
-		if (!empty($chat_deactivate_afk))
-		{
-			$chat_html = $chat_html." chat_deactivate_afk = true;";
-			$_SESSION[$chat_id]['theme_no_afk'] = true;
-		}
-		else
-		{
-			$chat_html = $chat_html." chat_deactivate_afk = false;";
-			$_SESSION[$chat_id]['theme_no_afk'] = false;
-		}
+
 		
-		$chat_html = $chat_html."chat_channels = new Array(";
+		$chat_html = $chat_html."new Array(";
 		foreach($chat_settings['channels'] as $key => $channel)
 		{
 			
@@ -60,7 +74,7 @@ function draw_chat($id)
 			
 		}
 		
-		$chat_html = $chat_html."); chat_text = new Array(";
+		$chat_html = $chat_html."), new Array(";
 		foreach($chat_text as $key => $text)
 		{
 			
@@ -71,30 +85,36 @@ function draw_chat($id)
 		}
 		
 		
-		$chat_html = $chat_html.");</script><script class='chatengine_script' type='text/javascript' src='".$chat_html_path."src/chat.js'></script>";
+		$chat_html = $chat_html."));</script></div>";
 		
 		
-			$chat_smileys = "";
-			if ($chat_settings['smiley_width'] == "!!AUTO!!")
-      	$width = "";
-      else
-      	$width = " width='".$chat_settings['smiley_width']."px'";
-      if ($chat_settings['smiley_height'] == "!!AUTO!!")
-      	$height = "";
-      else
-      	$height = " width='".$chat_settings['smiley_height']."px'";
-      foreach($chat_settings['smileys'] as $smiley_code => $smiley_url)
-      	{
-      		if (strpos($smiley_url,"http://") === false)
-      			$smiley_url = $chat_html_path."themes/".$chat_settings['design']."/smileys/".$smiley_url;
-      		$smiley_code = htmlentities(str_replace('"', 'lol', addslashes($smiley_code)), ENT_QUOTES);
-      		$chat_smileys = $chat_smileys."<span style='margin-right: 3px;' onclick='add_smiley(\" ".$smiley_code."\");'><img$width$height src='".$smiley_url."' title='".$smiley_code."' alt='".$smiley_code."'></span>";
-        }
+		
+		$chat_smileys = "";
+		if ($chat_settings['smiley_width'] == "!!AUTO!!")
+      $width = "";
+    else
+    	$width = " width='".$chat_settings['smiley_width']."px'";
+    if ($chat_settings['smiley_height'] == "!!AUTO!!" AND $chat_settings['smiley_width'] == "!!AUTO!!" AND isset($default_smiley_height))
+      $height = " height='".$default_smiley_height."'";
+    else if ($chat_settings['smiley_height'] == "!!AUTO!!")
+      $height = "";
+    else
+      $height = " width='".$chat_settings['smiley_height']."px'";
+    foreach($chat_settings['smileys'] as $smiley_code => $smiley_url)
+    {
+    	if (strpos($smiley_url,"http://") === false)
+      	$smiley_url = $chat_html_path."themes/".$chat_settings['design']."/smileys/".$smiley_url;
+      $smiley_code = htmlentities(str_replace('"', 'lol', addslashes($smiley_code)), ENT_QUOTES);
+      $chat_smileys = $chat_smileys."<span style='margin-right: 3px;' onclick='chat_objects[chat_objects_id[\"$chat_id\"]].add_smiley(\" ".$smiley_code."\");'><img$width$height src='".$smiley_url."' title='".$smiley_code."' alt='".$smiley_code."'></span>";
+    }
     
     $chat_html = str_replace("!!SMILEYS!!", $chat_smileys, $chat_html);
+    $chat_html = str_replace("!!ID!!", $chat_id, $chat_html);
     $chat_html = str_replace("!!USER_NUM!!", "<span id='chat_user_num'>?</span>", $chat_html);
     
+   	unset($GLOBALS['chat_settings']);
 		return $chat_html;
+
 	}
 function handle_replace_commands($chat_message)
 {
@@ -277,7 +297,9 @@ function get_messages($last_id)
   	global $chat_debug;
   	global $chat_channels;
 		global $chat_client_num;
+		global $chat_new_channels;
 		
+
   	/* Delete all messages from the db, which are more than $chat_settings['max_messages']'*/	
   	if ($last_id == "undefined")
   	{
@@ -299,6 +321,7 @@ function get_messages($last_id)
 						}
 			  }
 		}
+		$old_last_id = $last_id;
 		
   	$array = array();
    	$array['actions'] = array();
@@ -315,17 +338,27 @@ function get_messages($last_id)
     }
 
    	$max_show_messages = 50;
-   	
-
+   
     while($into = mysql_fetch_object($chat_mysql))
     {
-    	if (array_search($into->channel, $chat_channels) !== false AND $into->id > $last_id AND $i[$into->channel] < $max_show_messages OR
-    			array_search($into->channel, $chat_channels) !== false AND $i[$into->channel] < $max_show_messages AND !isset($_SESSION[$chat_id]['chat_userlist'][$chat_client_num][$channel]))
+    	if (array_search($into->channel, $chat_channels) !== false AND $into->id > $last_id AND $i[$into->channel] < $max_show_messages)
+    	{
+    		$chat_continue = true;
+    		$array['last_id'] = $into->id;
+    	}
+    	else if ($last_id != "none" AND array_search($into->channel, $chat_channels) !== false AND $i[$into->channel] < $max_show_messages AND array_search($into->channel, $chat_new_channels) !== false)
+    	{
+    		$chat_continue = true;
+    	}
+    	else
+    		$chat_continue = false;
+    		
+    	if ($chat_continue)
     		{
     			$i[$into->channel]++;
     			if ($last_id != "none" OR $i > $max_show_messages - $chat_settings['max_messages'])
     				{
-		  			$array['last_id'] = $into->id;
+		  			
 		  			
 		  			if ($chat_settings['time_24_hours'])
 		  				$date = date("H:i", $into->time);
@@ -405,20 +438,23 @@ function get_messages($last_id)
 					if ($into->extra != 1)
 						$array['messages_user'][$into->channel][] = $into->user;
 					}
-					else if (isset($_SESSION[$chat_id]['chat_userlist'][$chat_client_num][$channel]))
-						$new_last_id = $into->id;
+						
       	}
     }
     
 
-    
-    if (isset($new_last_id))
-    	$last_id = $new_last_id;
-    if (count($array['messages']) != 0)
-    	$chat_debug['all'][] = count($array['messages'])." new Entries (id:".$array['last_id'].")";
-    	
     if (!isset($array['last_id']))
     	$array['last_id'] = $last_id;
+    	
+    if (count($array['messages']) != 0)
+    {
+    	$chat_new_entries = 0;
+    	foreach ($array['messages'] as $channel_messages)
+    	{
+    		$chat_new_entries = $chat_new_entries + count ($channel_messages);
+    	}
+    	$chat_debug['all'][] = $chat_new_entries." new Entries (id:".$array['last_id']."; old_id:".$old_last_id.")";
+    }
     
     $array['userlist'] = get_save_user($chat_settings['max_ping_remove']);
     if (isset($array['userlist']['actions']))
@@ -446,6 +482,7 @@ function get_save_user()
 		global $chat_client_num;
 		global $chat_channels;
 		global $chat_active_channel;
+		global $chat_num;
 		
 		if (!isset($_SERVER['HTTP_X_FORWARDED_FOR'])) 
 			$user_ip = $_SERVER['REMOTE_ADDR'];
@@ -474,7 +511,8 @@ function get_save_user()
 						}
 					else
 						{
-							$tmp_entry = "<div onmouseover=\"ui_dropdown_sign('".addslashes($get_user->name)."_".addslashes($get_user->channel)."_dropdown_info', 'show');\" onmouseout=\"ui_dropdown_sign('".addslashes($get_user->name)."_".addslashes($get_user->channel)."_dropdown_info', 'hide');\" onclick=\"user_info('".addslashes($get_user->name)."_".addslashes($get_user->channel)."_user_info');\" class='";
+							$chat_user_info_id = addslashes($get_user->name)."_".addslashes($get_user->chat_id)."_".addslashes($get_user->channel);
+							$tmp_entry = "<div onmouseover=\"chat_objects[$chat_num].ui_dropdown_sign('".$chat_user_info_id."_dropdown_info', 'show');\" onmouseout=\"chat_objects[$chat_num].ui_dropdown_sign('".$chat_user_info_id."_dropdown_info', 'hide');\" onclick=\"chat_objects[$chat_num].user_info('".$chat_user_info_id."_user_info');\" class='";
 						
 							$chat_user_style_array = explode("|", $get_user->style);
 						
@@ -505,7 +543,7 @@ function get_save_user()
 							else
 								$tmp_entry = $tmp_entry.$get_user->name."&nbsp;<span class='user_afk_status'>[<||t28||>]"; //afk
 								
-							$tmp_entry = $tmp_entry."</span><span id=\"".addslashes($get_user->name)."_".addslashes($get_user->channel)."_dropdown_info\"></span></div><div id=\"".addslashes($get_user->name)."_".addslashes($get_user->channel)."_user_info\" class='user_info_box'>";
+							$tmp_entry = $tmp_entry."</span><span id=\"".$chat_user_info_id."_dropdown_info\"></span></div><div id=\"".$chat_user_info_id."_user_info\" class='user_info_box'>";
 						
 							$user_info_tmp = $get_user->info;
 							if ($chat_settings['can_see_ip'])
@@ -560,14 +598,16 @@ function get_save_user()
 							
 							$user_entry[] = chat_translate($tmp_entry);	
 							
+							$chat_user_writing[] = $get_user->writing;
+							$array[$channel]['users'][] = $get_user->name;
+							
 							$_SESSION[$chat_id]['chat_users'][] = $get_user->name;
 							$_SESSION[$chat_id]['chat_users_afk'][] = $get_user->afk;
 							
-							$array[$channel]['user_writing'][] = $get_user->writing;
+							
 						}
-					if ($channel == $chat_active_channel)
-						$array['users'][] = $get_user->name;
 						
+					
 				}
 
 			if (isset($_SESSION[$chat_id]['chat_userlist'][$chat_client_num][$channel]) AND count($_SESSION[$chat_id]['chat_userlist'][$chat_client_num][$channel]) > count($user_entry))
@@ -595,6 +635,7 @@ function get_save_user()
 							$_SESSION[$chat_id]['chat_userlist'][$chat_client_num][$channel][$key] = $user_entry[$key];
 							$chat_debug['all'][] = "User '".$_SESSION[$chat_id]['chat_users'][$key]."' changed";
 						}
+					$array[$channel]['user_writing'][$key] = $chat_user_writing[$key];
 				}
 		
 		

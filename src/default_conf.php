@@ -3,12 +3,10 @@
 /* GLOBAL CONFIG */
 
 date_default_timezone_set('Europe/Berlin');
-
-$chat_settings['default_user_infos'] = array(
-"<a href='#' onclick=\"chat_answer('".addslashes($_SESSION[$chat_id]['chat_username'])."');\"><||t3|".$_SESSION[$chat_id]['chat_username']."||></a>" //Write to %1
-);
-		
 $chat_default_settings = array(
+		"default_user_infos" => array(
+																	"<a href='#' onclick=\"chat_answer('".addslashes($_SESSION[$chat_id]['chat_username'])."');\"><||t3|".$_SESSION[$chat_id]['chat_username']."||></a>" //Write to %1
+		),
 		"language" => "en",
 		"log_language" => "en",
 		"html_path" => "!!AUTO!!",
@@ -29,8 +27,8 @@ $chat_default_settings = array(
 											":/" => "worried.png",
 											"*?*" => "question.png"
 		),
-		"smiley_width" => "25px", 
-		"smiley_height" => "25px",
+		"smiley_width" => "!!AUTO!!", 
+		"smiley_height" => "!!AUTO!!",
 		"time_24_hours" => true, 
 		"date_format" => "d.m.y", 
 		"channels" => array(
@@ -75,7 +73,7 @@ $chat_default_settings = array(
 
 /* !!!!!!!!!!!!!!!!!!!!!! chat command functions !!!!!!!!!!!!!!!!!!!!*/
 
-$chat_settings["default_special_commands"] = array(
+$chat_default_settings["default_special_commands"] = array(
 '/help command' => "command_help('#1#');",
 '/me message,user' => "command_me('#1#', '#2#');",
 '/afk {on,off}' => "command_afk('#1#');",
@@ -122,7 +120,7 @@ function command_help($command_syntax=false)
 function command_me($text, $user=0)
 	{
 		global $chat_settings;
-		global $chat_acrive_channel;
+		global $chat_active_channel;
 		global $chat_id;
 		$message = $text;
 		if(empty($message)){
@@ -309,7 +307,7 @@ function command_ban($user, $time=0, $reason=0)
 function command_about()
 {
 	global $chat_version;
-  return array("info_type" => "info", "info_text" => "<i>SiPac v$chat_version</i> was developed by
+   return array("info_type" => "info", "info_text" => "<i>SiPac v$chat_version</i> was developed by
   <a href='http://finastry.next-play.de/index.php?page=profile&user=Kim'>Kim Westesen</a> and <a href='http://nexttrex.de/Profil/Jan.html'>Jan Houben</a>, to have a highly customizable PHP and AJAX chat.<p>Thanks to <a href='http://www.famfamfam.com/'>famfamfam</a>
 for the <a href='http://www.famfamfam.com/lab/icons/silk/'>Silk-Icons</a>.</p>
   If you have any questions, contact <a href='matilo:SiPac@next-game.de'>SiPac@next-game.de</a> ;-)", "info_nohide" => true);
@@ -343,13 +341,14 @@ function command_debug($type)
 /*!!!!!!!!!!!!!!!!!!!!!!!!! Proxy functions  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
 
-$chat_settings["default_proxy"] = array(
+$chat_default_settings["default_proxy"] = array(
 'proxy_log'
 );
 function proxy_log($message, $extra, $chat_user, $chat_time, $highlight)
 {
 	global $chat_settings;
 	global $chat_id;
+	global $chat_debug;
 	
 	
 	$log_date = date("d.m.Y",time());
@@ -359,55 +358,66 @@ function proxy_log($message, $extra, $chat_user, $chat_time, $highlight)
 	
 	$log_folder = "../log/";
 	
-	if ($chat_settings['own_log_folder_for_chat_id'] == true)
-		$log_folder = $log_folder.$chat_id."/";
-	else
-		$log_folder = $log_folder."global/";
+	if (substr(decoct(fileperms($log_folder)), -3) == 777)
+	{
+		if ($chat_settings['own_log_folder_for_chat_id'] == true)
+			$log_folder = $log_folder.$chat_id."/";
+		else
+			$log_folder = $log_folder."global/";
 		
-	if (is_dir($log_folder) == false)
-		mkdir ($log_folder, 0777 );
+		if (is_dir($log_folder) == false)
+			mkdir ($log_folder, 0777 );
 		
-	$log_folder = $log_folder.date("Y",time());
-	
-	if (!isset($_SERVER['HTTP_X_FORWARDED_FOR'])) 
-		$ip = $_SERVER['REMOTE_ADDR'];
-	else 
-		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 
-	if ($extra == 0)
-		$extra_name = "<||t13||>"; //Message
-	else if ($extra == 1)
-		$extra_name = "<||t14||>"; //Info
-	else if ($extra == 2)
-		$extra_name = "<||t15||>"; //System Message
-	else if ($extra == 3)
-		$extra_name = "<||t16||>"; //Highlight
-	else if ($extra == 4)
-		$extra_name = "me";
-	else
-		$extra_name = "?";
-	
-	if (is_dir($log_folder) == false)
-		mkdir ($log_folder, 0777 );
-		      
-	$chat_log_file = fopen($log_folder.'/'.$log_filename.'.log',"a+");
-	$chat_log = "\n".$extra_name." | ";
-	
-	if (!empty($highlight) AND $highlight != "none")
-		$chat_log = $chat_log."<||t17|$chat_user|$highlight||> "; //%1 to %2
-	else
-		$chat_log = $chat_log.$chat_user.": ";
+		$log_folder = $log_folder.date("Y",time());
 		
-	$chat_log = $chat_log.html_entity_decode($message)."		|$log_date, $log_time		$ip";
-	fwrite($chat_log_file, chat_translate($chat_log, $chat_settings['log_language']));
-	fclose($chat_log_file);
+		if (is_dir($log_folder) == false OR substr(decoct(fileperms($log_folder)), -3) == 777)
+		{
+			if (!isset($_SERVER['HTTP_X_FORWARDED_FOR'])) 
+				$ip = $_SERVER['REMOTE_ADDR'];
+			else 
+				$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+
+			if ($extra == 0)
+				$extra_name = "<||t13||>"; //Message
+			else if ($extra == 1)
+				$extra_name = "<||t14||>"; //Info
+			else if ($extra == 2)
+				$extra_name = "<||t15||>"; //System Message
+			else if ($extra == 3)
+				$extra_name = "<||t16||>"; //Highlight
+			else if ($extra == 4)
+				$extra_name = "me";
+			else
+				$extra_name = "?";
 	
+			if (is_dir($log_folder) == false)
+				mkdir ($log_folder, 0777 );
+						  
+			$chat_log_file = fopen($log_folder.'/'.$log_filename.'.log',"a+");
+			$chat_log = "\n".$extra_name." | ";
+	
+			if (!empty($highlight) AND $highlight != "none")
+				$chat_log = $chat_log."<||t17|$chat_user|$highlight||> "; //%1 to %2
+			else
+				$chat_log = $chat_log.$chat_user.": ";
+		
+			$chat_log = $chat_log.html_entity_decode($message)."		|$log_date, $log_time		$ip";
+			fwrite($chat_log_file, chat_translate($chat_log, $chat_settings['log_language']));
+			fclose($chat_log_file);
+		}
+	else
+		$chat_debug['warn_once'][] = "Error: Wrong Permissions in Folder \"$log_folder\". Please change it to 777!";
+	}
+	else
+		$chat_debug['warn_once'][] = "Error: Wrong Permissions in Folder \"log\". Please change it to 777!";
+		
 	return $message;
 }
 
 
 
-$chat_settings["default_afterproxy"] = array(
+$chat_default_settings["default_afterproxy"] = array(
 'afterproxy_linker',
 'afterproxy_smileys'
 );
