@@ -30,6 +30,16 @@ function add_chat(html_path, theme, id, client_num, channels, texts)
   chat_html_path = html_path;
   chat_objects_id[id] = chat_objects.length;
   chat_objects[chat_objects.length] = new Chat(theme, id, client_num, channels, texts);
+  
+  if (chat_layout_init != undefined)
+  {
+    chat_objects[chat_objects.length-1].layout_init = chat_layout_init;
+    chat_objects[chat_objects.length-1].layout_init();
+  }
+  if (chat_layout_tasks != undefined)
+  {
+    chat_objects[chat_objects.length-1].layout_tasks = chat_layout_tasks;
+  }
 }
 
 function chat_ajax()
@@ -178,6 +188,8 @@ function Chat(theme, id, client_num, channels, texts)
 
   this.info_hide_timeout;
 
+  this.alert_status = 2;
+  
   this.messages_to_send = new Array();
 
   var element = this.chat.getElementsByClassName('chat_speech_bubble')[0];
@@ -198,6 +210,10 @@ function Chat(theme, id, client_num, channels, texts)
     this.new_post_audio.src = chat_html_path + "themes/" + this.theme + "/sound/new_post.mp3";
   }
 
+  this.init();
+}
+Chat.prototype.init = function()
+{
   var chat_num = this.num;
   this.chat.getElementsByClassName('chat_message')[0].addEventListener("keydown", function (e)
   {
@@ -208,15 +224,10 @@ function Chat(theme, id, client_num, channels, texts)
     chat_objects[chat_num].send_message()
   }, false);
   this.chat.addEventListener("mousemove", new_messages_status, false);
-
-  try
-  {
-    this.layout_init();
-  }
-  catch (e)
-  {}
-}
-
+  
+  scroll(this.chat, "chat_debug_box", 0, true);
+  scroll(this.chat, "chat_conversation", 0, true);
+};
 Chat.prototype.send_message = function (chat_message)
 {
   if (chat_message == undefined)
@@ -225,10 +236,6 @@ Chat.prototype.send_message = function (chat_message)
     this.chat.getElementsByClassName('chat_message')[0].value = "";
   }
   chat_message = encodeURIComponent(chat_message);
-
-  /*this.ajax_text = "send_message=" + chat_message;
-
-  return this.ajax_text;*/
 
   this.messages_to_send[this.messages_to_send.length] = chat_message;
 
@@ -317,18 +324,10 @@ Chat.prototype.handle_chat_tasks = function (answer)
 
   try
   {
-    document.getElementById('chat_user_num')
-      .innerHTML = answer['get']['userlist']['users'].length;
+    document.getElementById('chat_user_num').innerHTML = answer['get']['userlist']['users'].length;
   }
   catch (e)
   {}
-
-  try
-  {
-    this.chat_layout_tasks()
-  }
-  catch (e)
-  {};
 
   try
   {
@@ -339,6 +338,7 @@ Chat.prototype.handle_chat_tasks = function (answer)
    }
   catch(e){}
   
+  this.layout_tasks();
 };
 
 Chat.prototype.handle_userlist = function (userlist_arr, channel)
@@ -362,7 +362,6 @@ Chat.prototype.handle_userlist = function (userlist_arr, channel)
     {
       if (userlist_arr['users'][i] == this.username)
 	this.username_key = i;
-      console.debug(userlist_arr['users'][i] + " and " + this.username); 
     }
   }
   if (userlist_arr['change_user'] != undefined)
@@ -497,7 +496,7 @@ Chat.prototype.handle_server_actions = function (actions)
     var action_parts = actions[i].split("|");
 
     if (action_parts[0] == "message" || action_parts[0] == "kick")
-      chat_alert(action_parts[1]);
+      this.alert(action_parts[1]);
     if (action_parts[0] == "join")
     {
       this.add_channel(action_parts[1]);
@@ -592,25 +591,21 @@ Chat.prototype.ui_dropdown_sign = function (id, action)
   id = addslashes(id);
 
   if (action == "show")
-    document.getElementById(id)
-      .innerHTML = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/arrow_down.png'>";
+    document.getElementById(id).innerHTML = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/arrow_down.png'>";
   else if (action == "hide")
-    document.getElementById(id)
-      .innerHTML = "";
+    document.getElementById(id).innerHTML = "";
 };
 Chat.prototype.user_info = function (box_id)
 {
   box_id = addslashes(box_id);
   if (this.user_info_status[box_id] == undefined || this.user_info_status[box_id] == "closed")
   {
-    document.getElementById(box_id)
-      .style.display = "block";
+    document.getElementById(box_id).style.display = "block";
     this.user_info_status[box_id] = "opened";
   }
   else
   {
-    document.getElementById(box_id)
-      .style.display = "none";
+    document.getElementById(box_id).style.display = "none";
     this.user_info_status[box_id] = "closed";
   }
 
@@ -623,8 +618,7 @@ Chat.prototype.restore_user_info = function ()
     {
       try
       {
-        document.getElementById(key)
-          .style.display = "none";
+        document.getElementById(key).style.display = "none";
       }
       catch (e)
       {
@@ -635,8 +629,7 @@ Chat.prototype.restore_user_info = function ()
     {
       try
       {
-        document.getElementById(key)
-          .style.display = "block";
+        document.getElementById(key).style.display = "block";
       }
       catch (e)
       {
@@ -645,6 +638,66 @@ Chat.prototype.restore_user_info = function ()
     }
   }
 };
+
+Chat.prototype.insert_command = function(command, auto_send)
+{
+  if (auto_send)
+    this.send_message("/" + command);
+  else
+    this.chat.getElementsByClassName('chat_message')[0].value = "/" + command;
+};
+
+Chat.prototype.alert = function(text, action)
+{
+  if (action == "close")
+  {
+    this.alert_status = 2;
+    try
+    {
+      this.chat.getElementsByClassName('chatalertcontent')[0].parentNode.removeChild(this.chat.getElementsByClassName('chatalertcontent')[0]);
+      this.chat.getElementsByClassName('chatalertbg')[0].parentNode.removeChild(this.chat.getElementsByClassName('chatalertbg')[0]);
+    }catch(e){}
+  }
+  else
+  {
+    this.alert(undefined, "close");
+    var chat_message = "<div class='chatalertbg'></div><div class='chatalertcontent'>";
+    if (action != "noclose")
+      chat_message += "<span style='float:right;'><img class='link' onclick='chat_objects[" + this.num + "].alert(undefined, \"close\")' src='" + chat_html_path + "themes/" + this.theme + "/icons/delete.png' alt='close'></span><br>";
+
+    chat_message+= "<div class='chat_alert'>" + text;
+    chat_message += "</div><br></div>";
+    this.chat.innerHTML += chat_message;
+    
+    this.init();
+    
+    this.alert_status = 1;
+  }	
+};
+Chat.prototype.prompt = function(text, id, action, button_text)
+{
+  var alert_text = text;
+  alert_text += "<p><input type='text' onkeydown='if (event.keyCode == 13) { " + action + " chat_objects[" + this.num + "].alert(undefined, \"close\");}' id='" + id + "'></p><button onclick='" + action + " chat_objects[" + this.num + "].chat_alert(undefined, \"close\");'>" + button_text + "</button></p>";
+  this.alert(alert_text)
+};
+
+Chat.prototype.kick_user = function(user)
+{
+  this.prompt("Reason for the kick:", "chat_kick_reason", "chat_objects[" + this.num + "].insert_command(\"kick " + user + ",\" + document.getElementById(\"chat_kick_reason\").value, true);", "kick user");
+}
+
+Chat.prototype.sound_status = function(status)
+{
+  if (this.enable_sound == false && status == undefined || status == true)
+  {
+    this.enable_sound = true;
+  }
+  else
+  {
+    this.enable_sound = false;
+  }
+};
+
 Chat.prototype.check_return = function (e)
 {
   if (e.keyCode == 13)

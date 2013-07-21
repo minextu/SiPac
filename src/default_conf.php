@@ -11,7 +11,7 @@ If you want to change theese settings, use "$chat_settings[setting_name_here] = 
 date_default_timezone_set('Europe/Berlin');
 $chat_default_settings = array(
   "default_user_infos" => array(
-    "<a href='#' onclick=\"chat_answer('" . addslashes($_SESSION[$chat_id]['chat_username']) . "');\"><||t3|" . $_SESSION[$chat_id]['chat_username'] . "||></a>" //Write to %1
+    "<a href='#' onclick=\"alert('Will be added soon'); chat_answer('" . addslashes($_SESSION[$chat_id]['chat_username']) . "');\"><||t3|" . $_SESSION[$chat_id]['chat_username'] . "||></a>" //Write to %1
   ),
   "language" => "en",
   "log_language" => "en",
@@ -40,7 +40,7 @@ $chat_default_settings = array(
   "channels" => array(
     "Main"
   ),
-  "can_join_channels" => false,
+  "can_join_channels" => true,
   "max_ping_remove" => 30,
   "username_var" => "!!AUTO!!",
   "custom_status" => "!!AUTO!!",

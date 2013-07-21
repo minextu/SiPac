@@ -359,7 +359,7 @@ function chat_send_message($message)
 function get_chat($var)
 {
   global $chat_settings;
-  
+  global $chat_channels;
   global $chat_id;
   
   if ($chat_settings['deactivate_afk'] == false)

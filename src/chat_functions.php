@@ -550,7 +550,7 @@ function get_save_user()
           $user_info_tmp = "IP:" . $get_user->ip . "|||" . $user_info_tmp;
         
         if ($chat_settings['can_kick'])
-          $user_info_tmp = "<a href='javascript:void(null);' onclick='chat_insert_command(\"kick\", \"" . addslashes($get_user->name) . "\");'><||t26|" . $get_user->name . "||></a>|||" . $user_info_tmp;
+          $user_info_tmp = "<a href='javascript:void(null);' onclick='chat_objects[$chat_num].kick_user(\"".addslashes($get_user->name) . "\");'><||t26|" . $get_user->name . "||></a>|||" . $user_info_tmp;
         
         $user_info = "";
         foreach (explode("|||", $user_info_tmp) as $info)

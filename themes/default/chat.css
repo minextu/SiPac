@@ -466,7 +466,7 @@
 }
 
 /* alert style */
-#chatalertbg
+.chatalertbg
 {
     bottom: 0px;
     left: 0px;
@@ -476,7 +476,7 @@
     opacity: 0.7;
     position: relative;
 }
-#chatalertcontent
+.chatalertcontent
 {
 		color: white;
     text-align:center;
