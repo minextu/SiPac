@@ -247,6 +247,14 @@ else if ($_GET['task'] == "get_chat")
           require_once(dirname(__FILE__) . "/chat_functions.php");
           require_once(dirname(__FILE__) . "/../conf/custom_functions.php");
           
+          $chat_json_array = array();
+          
+          if (!empty($chat_settings['include_file']))
+	  {
+	    $chat_include = true;
+	    include_once($chat_settings['include_file']);
+	  }
+	  
           if (!empty($chat_variables['first_start']) AND $chat_variables['first_start'] != "false")
           {
             //Check all in use Language packs
@@ -262,6 +270,8 @@ else if ($_GET['task'] == "get_chat")
               if (count($chat_text) != count($chat_orginal_text))
                 $chat_debug['warn_once'][] = "The " . $chat_settings['log_language'] . " Language Pack is outdate!";
             }
+            //delete the userlist session
+	    $_SESSION[$chat_id]['chat_userlist'][$chat_client_num] = array();
           }
           
           chat_check_name();
@@ -278,7 +288,7 @@ else if ($_GET['task'] == "get_chat")
           }
           
           $get_chat_answer = get_chat($chat_variables);
-          $json_answer[]   = array_merge($json_answer_post, $get_chat_answer);
+          $json_answer[]   = array_merge(array_merge($json_answer_post, $get_chat_answer), $chat_json_array);
           
           unset($chat_variables);
         }
@@ -308,6 +318,7 @@ function chat_check_name()
 {
   global $chat_id;
   global $chat_settings;
+  global $chat_channels;
   
   /* FIRST START OR USERNAME CHANGE*/
   if (!isset($_SESSION[$chat_id]['chat_ready']) OR isset($_SESSION[$chat_id]['chat_old_username_var']) AND $_SESSION[$chat_id]['chat_old_username_var'] != $chat_settings['username_var'] OR isset($_SESSION[$chat_id]['chat_custom_name']) AND $_SESSION[$chat_id]['chat_custom_name'] != $_SESSION[$chat_id]['chat_username'])

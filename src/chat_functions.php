@@ -49,10 +49,10 @@ function draw_chat($id)
   $_SESSION[$chat_id]['debug_shown'] = array();
   
   
-  require(dirname(__FILE__) . "/../themes/" . $chat_settings['design'] . "/layout.php");
+  require(dirname(__FILE__) . "/../themes/" . $chat_settings['theme'] . "/layout.php");
   
   $chat_id_css   = "#$chat_id";
-  $chat_css_file = str_replace("\n", " ", file_get_contents(dirname(__FILE__) . "/../themes/" . $chat_settings['design'] . "/chat.css"));
+  $chat_css_file = str_replace("\n", " ", file_get_contents(dirname(__FILE__) . "/../themes/" . $chat_settings['theme'] . "/chat.css"));
   
   
   $chat_css_file_parts = explode("}", $chat_css_file);
@@ -70,15 +70,17 @@ function draw_chat($id)
       $chat_new_css = $chat_new_css . $chat_id_css;
     
   }
+  $chat_js_file = file_get_contents(dirname(__FILE__) . "/chat.js");
   
-  $chat_html = chat_translate(str_replace('"chat_main"', '"chat_main" id="' . $chat_id . '"', str_replace("'chat_main'", "'chat_main' id='$chat_id'", $chat_layout))) . "<script type='text/javascript' class='chatengine_script'>
+  $chat_html = chat_translate(str_replace('"chat_main"', '"chat_main" id="' . $chat_id . '"', str_replace("'chat_main'", "'chat_main' id='$chat_id'", $chat_layout))) . "
+		<script class='chatengine_script' type='text/javascript'>
+		".$chat_js_file."
 		var style_obj = document.createElement('style');
 		var text_obj = document.createTextNode('$chat_new_css');
 		style_obj.appendChild(text_obj);
-		document.getElementsByTagName('body')[0].appendChild(style_obj);
+		document.getElementById('$chat_id').appendChild(style_obj);
 		document.getElementById('$chat_id').innerHTML += \"<span class='chat_speech_bubble' style='display: none;'></span>\";
-		</script>
-		<script class='chatengine_script' type='text/javascript' src='" . $chat_html_path . "src/chat.js'></script><script class='chatengine_script' type='text/javascript'>add_chat('$chat_html_path','" . $chat_settings['design'] . "','$chat_id', '$chat_client_num',";
+		add_chat('$chat_html_path','" . $chat_settings['theme'] . "','$chat_id', '$chat_client_num',";
   
   
   
@@ -121,7 +123,7 @@ function draw_chat($id)
   foreach ($chat_settings['smileys'] as $smiley_code => $smiley_url)
   {
     if (strpos($smiley_url, "http://") === false)
-      $smiley_url = $chat_html_path . "themes/" . $chat_settings['design'] . "/smileys/" . $smiley_url;
+      $smiley_url = $chat_html_path . "themes/" . $chat_settings['theme'] . "/smileys/" . $smiley_url;
     $smiley_code  = htmlentities(str_replace('"', 'lol', addslashes($smiley_code)), ENT_QUOTES);
     $chat_smileys = $chat_smileys . "<span style='margin-right: 3px;' onclick='chat_objects[chat_objects_id[\"$chat_id\"]].add_smiley(\" " . $smiley_code . "\");'><img$width$height src='" . $smiley_url . "' title='" . $smiley_code . "' alt='" . $smiley_code . "'></span>";
   }
@@ -552,7 +554,7 @@ function get_save_user()
         
         $tmp_entry = $tmp_entry . "'>";
         
-        $tmp_entry = $tmp_entry . "<span class='chat_speech_bubble'><img src='" . $chat_html_path . "themes/" . $chat_settings['design'] . "/speech_bubble.gif' alt='writing' title='writing'></span>";
+        $tmp_entry = $tmp_entry . "<span class='chat_speech_bubble'><img src='" . $chat_html_path . "themes/" . $chat_settings['theme'] . "/speech_bubble.gif' alt='writing' title='writing'></span>";
         
         
         if ($chat_user_custom_status != "!!AUTO!!")

@@ -33,7 +33,7 @@ $chat_default_settings = array(
   "language" => "en",
   "log_language" => "en",
   "html_path" => "!!AUTO!!",
-  "design" => "default",
+  "theme" => "default",
   "rows" => '1',
   "replace_own_username" => false,
   "deactivate_afk" => false,
@@ -87,7 +87,7 @@ $chat_default_settings = array(
   
   
   
-  
+  "include_file" => false,
   "user_afk_class" => "!!AUTO!!",
   "user_online_class" => "!!AUTO!!"
 );
@@ -539,7 +539,7 @@ function afterproxy_smileys($message, $extra, $chat_user, $chat_time, $highlight
     foreach ($chat_settings['smileys'] as $smiley_code => $smiley_url)
     {
       if (strpos($smiley_url, "http://") === false)
-        $smiley_url = $chat_html_path . "themes/" . $chat_settings['design'] . "/smileys/" . $smiley_url;
+        $smiley_url = $chat_html_path . "themes/" . $chat_settings['theme'] . "/smileys/" . $smiley_url;
       
       $smiley_code_html = addslashes(htmlentities($smiley_code, ENT_QUOTES));
       $smiley_code      = str_replace("|", "&#x007C;", " " . htmlentities($smiley_code));

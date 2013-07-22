@@ -31,7 +31,9 @@ function chat_init()
   chat_is_ajax = false;
   old_title = document.title;
   new_messages = 0;
-
+  
+  chat_extra_send = "";
+  
   old_title = document.title;
   chat_ajax();
 }
@@ -49,15 +51,15 @@ function add_chat(html_path, theme, id, client_num, channels, texts)
   chat_objects_id[id] = chat_objects.length;
   chat_objects[chat_objects.length] = new Chat(theme, id, client_num, channels, texts);
   
-  if (chat_layout_init != undefined)
+  try
   {
     chat_objects[chat_objects.length-1].layout_init = chat_layout_init;
     chat_objects[chat_objects.length-1].layout_init();
-  }
-  if (chat_layout_tasks != undefined)
+  }catch(e){}
+  try
   {
     chat_objects[chat_objects.length-1].layout_tasks = chat_layout_tasks;
-  }
+  }catch(e){}
 }
 
 function chat_ajax()
@@ -132,8 +134,11 @@ function chat_ajax()
     }
     httpobject.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
-
-    httpobject.send("chat_string=" + encodeURIComponent(chat_ajax_text));
+    var chat_ajax_text_comp = "chat_string=" + encodeURIComponent(chat_ajax_text);
+    if (chat_extra_send != undefined)
+      chat_ajax_text_comp += "&" + chat_extra_send;
+    
+    httpobject.send(chat_ajax_text_comp);
 
   }
   else if (chat_objects.length == 0)
@@ -161,14 +166,14 @@ function chat_error(error, clear)
   var old_chat_error_text = chat_error_text;
   var old_chat_error_information_text = chat_error_information_text;
 
-  chat_error_text = "Verbindung zum Server verloren";
+  chat_error_text = "Connection lost";
   if (error != undefined)
     chat_error_text += " (" + error + ")";
   else
     chat_error_text += " (Timeout)";
 
   chat_error_information_text = chat_error_text + ". " + chat_error_num + ". Versuch...";
-
+  console.error(chat_error_text);
   for (var i = 0; i < chat_objects.length; i++)
   {
     if (old_chat_error_information_text != chat_error_information_text)
@@ -300,7 +305,7 @@ Chat.prototype.handle_chat_tasks = function (answer)
   if (answer['get']['username'] != undefined && this.username != answer['get']['username'] && this.first_start != true || this.first_start == true)
   {
     if (this.first_start != true)
-      this.information("Du hei&szlig;t jetzt: \"" + answer['get']['username'] + "\"", "info");
+      this.information("You are now: \"" + answer['get']['username'] + "\"", "info");
 
     try
     {
@@ -361,7 +366,7 @@ Chat.prototype.handle_chat_tasks = function (answer)
    }
   catch(e){}
   
-  this.layout_tasks();
+  try{this.layout_tasks();}catch(e){}
 };
 
 Chat.prototype.handle_userlist = function (userlist_arr, channel)
@@ -475,11 +480,15 @@ Chat.prototype.add_channel = function (channel, noadd)
   }
   else if (channel != undefined)
   {
-    this.chat.getElementsByClassName("chat_channels_ul")[0].innerHTML += "<li id='" + this.id + "_channel_" + channel + "'><a href='javascript:void(0);' onclick='chat_objects[" + this.num + "].change_channel(this.innerHTML)'>" + channel + "</a></li>";
+    if (this.chat.getElementsByClassName("chat_channels_ul")[0] != undefined)
+      this.chat.getElementsByClassName("chat_channels_ul")[0].innerHTML += "<li id='" + this.id + "_channel_" + channel + "'><a href='javascript:void(0);' onclick='chat_objects[" + this.num + "].change_channel(this.innerHTML)'>" + channel + "</a></li>";
+    else
+      this.add_debug_entries(new Array("<div class='chat_debug_entry'><span class='debug_warn'>Missing chat_channels_ul in theme!</span></debug>"));
+    
     this.chat.getElementsByClassName("chat_conversation")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative;' class='chat_conversation_channel_" + channel + "'></div>";
     this.chat.getElementsByClassName("chat_userlist")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative;' class='chat_userlist_channel_" + channel + "'></div>";
 
-    this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].innerHTML = "Blaba Chat wird geladen... und so";
+    this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].innerHTML = "Loading the Chat...";
 
     this.new_channels[channel] = true;
 
@@ -495,16 +504,14 @@ Chat.prototype.change_channel = function (channel)
   {
     if (this.channels[i] == channel)
     {
-      document.getElementById(this.id + "_channel_" + this.channels[i])
-        .className = "chat_channel_selected";
+      try{document.getElementById(this.id + "_channel_" + this.channels[i]).className = "chat_channel_selected";}catch(e){}
       this.chat.getElementsByClassName("chat_conversation_channel_" + this.channels[i])[0].style.display = "block";
       this.chat.getElementsByClassName("chat_userlist_channel_" + this.channels[i])[0].style.display = "block";
       this.active_channel = this.channels[i];
     }
     else
     {
-      document.getElementById(this.id + "_channel_" + this.channels[i])
-        .className = "";
+      try{document.getElementById(this.id + "_channel_" + this.channels[i]).className = "";}catch(e){}
       this.chat.getElementsByClassName("chat_conversation_channel_" + this.channels[i])[0].style.display = "none";
       this.chat.getElementsByClassName("chat_userlist_channel_" + this.channels[i])[0].style.display = "none";
     }
@@ -575,11 +582,11 @@ Chat.prototype.information = function (info, type, nohide, onlyhide, noclose)
     if (type == "info")
       info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/information.png' alt='I'> Info:" + info;
     else if (type == "error")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/exclamation.png' alt='I'> Fehler:" + info;
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/exclamation.png' alt='I'> Error:" + info;
     else if (type == "warn")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/error.png' alt='I'> Warnung:" + info;
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/error.png' alt='I'> Warning:" + info;
     else if (type == "success")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/check.png' alt='I'> Erfolgreich!" + info;
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/check.png' alt='I'> Success!" + info;
 
     info_msg_element_sub.innerHTML = info;
     var chat_num = this.num;
