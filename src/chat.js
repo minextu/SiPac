@@ -208,6 +208,7 @@ function Chat(theme, id, client_num, channels, texts)
 
   this.alert_status = 2;
   
+  this.old_message = "";
   this.messages_to_send = new Array();
 
   var element = this.chat.getElementsByClassName('chat_speech_bubble')[0];
@@ -262,9 +263,13 @@ Chat.prototype.send_message = function (chat_message)
 
 Chat.prototype.get_chat = function ()
 {
-  if (this.chat.getElementsByClassName('chat_message')[0].value != "")
+  if (this.chat.getElementsByClassName('chat_message')[0].value != "" && this.chat.getElementsByClassName('chat_message')[0].value != this.old_message)
   {
     this.is_writing = true;
+    var num = this.num;
+    var value = chat_objects[num].chat.getElementsByClassName('chat_message')[0].value;
+    
+    window.setTimeout(function() { chat_objects[num].old_message = value }, 5000)
     new_messages_status(true);
   }
   else
