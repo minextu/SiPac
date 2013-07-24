@@ -99,7 +99,7 @@ $chat_default_settings = array(
 $chat_default_settings["default_special_commands"] = array(
   '/help command' => "command_help('#1#');",
   '/me message,user' => "command_me('#1#', '#2#');",
-  '/afk {on,off}' => "command_afk('#1#');",
+  '/afk reason' => "command_afk('#1#');",
   '/name new name,user' => "command_name('#1#', '#2#');",
   "/join channel" => "command_join('#1#');",
   '/systemmessage message' => "command_systemmessage('#1#');",
@@ -175,18 +175,25 @@ function command_me($text, $user = 0)
       'info_text' => "<||t8||>"
     ); //no permissions
 }
-function command_afk($status)
+function command_afk($reason=0)
 {
   global $chat_settings;
   global $chat_id;
   
   if ($chat_settings['deactivate_afk'] == false)
   {
-    if ($status == "on" OR $status != "off" AND $_SESSION[$chat_id]['chat_afk'] == false)
+    if ($_SESSION[$chat_id]['chat_afk'] == false)
+    {
       $_SESSION[$chat_id]['chat_new_afk'] = true;
-    else if ($status == "off" OR $_SESSION[$chat_id]['chat_afk'] == true)
+      $_SESSION[$chat_id]['afk_reason'] = $reason;
+      return true;
+    }
+    else if ($_SESSION[$chat_id]['chat_afk'] == true)
+    {
       $_SESSION[$chat_id]['chat_new_afk'] = false;
-    return true;
+      if (!empty($reason))
+	return array('info_type' => "warn",'info_text' => "You can't give a reason for not being afk!");
+    }
   }
   else
     return array(
