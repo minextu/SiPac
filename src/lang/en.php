@@ -51,7 +51,8 @@ $chat_text = array(
 "Set status to afk",												//30
 "Deactivate sound",
 "Activate sound",
-"Privat Message"
+"Privat Message",
+"Please enter a message..."
 
 
 );
