@@ -179,7 +179,7 @@ function chat_error(error, clear)
     if (old_chat_error_information_text != chat_error_information_text)
       chat_objects[i].information(chat_error_information_text, "error", true, undefined, true);
     if (old_chat_error_text != chat_error_text)
-      chat_objects[i].add_debug_entries(new Array("<div class='chat_debug_entry'><span class='debug_warn'>" + chat_error_text + "</span></div>"));
+      chat_objects[i].add_debug_entry("error", chat_error_text);
   }
 
   if (error == undefined)
@@ -249,7 +249,6 @@ Chat.prototype.init = function()
   }, false);
   this.chat.addEventListener("mousemove", new_messages_status, false);
   
-  scroll(this.chat, "chat_debug_box", 0, true);
   scroll(this.chat, "chat_conversation", 0, true);
 };
 Chat.prototype.send_message = function (chat_message)
@@ -483,7 +482,7 @@ Chat.prototype.add_channel = function (channel, noadd)
     if (this.chat.getElementsByClassName("chat_channels_ul")[0] != undefined)
       this.chat.getElementsByClassName("chat_channels_ul")[0].innerHTML += "<li id='" + this.id + "_channel_" + channel + "'><a href='javascript:void(0);' onclick='chat_objects[" + this.num + "].change_channel(this.innerHTML)'>" + channel + "</a></li>";
     else
-      this.add_debug_entries(new Array("<div class='chat_debug_entry'><span class='debug_warn'>Missing chat_channels_ul in theme!</span></debug>"));
+      this.add_debug_entry("warn", "Missing chat_channels_ul in theme!");
     
     this.chat.getElementsByClassName("chat_conversation")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative;' class='chat_conversation_channel_" + channel + "'></div>";
     this.chat.getElementsByClassName("chat_userlist")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative;' class='chat_userlist_channel_" + channel + "'></div>";
@@ -543,7 +542,7 @@ Chat.prototype.handle_server_actions = function (actions)
     }
 
     if (action_parts[0] != "message" && action_parts[0] != "kick" && action_parts[0] != "join")
-      this.add_debug_entries(new Array("<div class='chat_debug_entry'><span class='debug_warn'>Unknown Action!</span></debug>"));
+      this.add_debug_entries(new Array("warn", "Unknown Action!"));
   }
 }
 
@@ -603,17 +602,32 @@ Chat.prototype.add_smiley = function (code)
   this.chat.getElementsByClassName("chat_message")[0].focus();
 
 };
-
 Chat.prototype.add_debug_entries = function (debug_entries)
 {
-  if (debug_entries != undefined && debug_entries.length > 0)
-  {
-    var debug_box = this.chat.getElementsByClassName("chat_debug_box")[0];
-    for (var i = 0; i < debug_entries.length; i++)
+  if (debug_entries != undefined)
     {
-      debug_box.innerHTML += debug_entries[i];
-    }
-    scroll(this.chat, "chat_debug_box", 20, true);
+      console.debug(debug_entries.length);
+      for (var i in debug_entries)
+      {
+	this.add_debug_entry(debug_entries[i]['type'], debug_entries[i]['text']);
+      }
+    } 
+}
+Chat.prototype.add_debug_entry = function (type, text)
+{
+  var time = new Date();
+  this.chat.getElementsByClassName('chat_conversation_channel_' + this.active_channel)[0].innerHTML += "<div class='chat_system_message'><span class='chat_entry_user'>" + type + ": </span><span class='chat_entry_message'>" + text + "</span><span class='chat_entry_date'>" + time.getHours() + ":" + time.getMinutes() + "</span></div>";
+  scroll(this.chat, "chat_conversation", 20, true);
+  switch(type)
+  {
+    case "warn":
+      console.warn(text);
+      break;
+    case "error":
+       console.error(text);
+    default:
+       console.debug(text);
+       break;
   }
 };
 Chat.prototype.ui_dropdown_sign = function (id, action)

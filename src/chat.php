@@ -407,7 +407,11 @@ function get_chat($var)
       $_SESSION[$chat_id]['chat_afk'] = true;
       foreach ($chat_channels as $channel)
       {
-        save_message("<||t18||>", $channel, 4); //is now away
+	if (!empty( $_SESSION[$chat_id]['afk_reason']))
+	  $reason =  " (".$_SESSION[$chat_id]['afk_reason'].")";
+	else
+	  $reason = "";
+        save_message("<||t18||>".$reason, $channel, 4); //is now away
       }
     }
     unset($_SESSION[$chat_id]['chat_new_afk']);
