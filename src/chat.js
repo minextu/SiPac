@@ -239,14 +239,14 @@ function Chat(theme, id, client_num, channels, texts)
 Chat.prototype.init = function()
 {
   var chat_num = this.num;
-  this.chat.getElementsByClassName('chat_message')[0].addEventListener("keydown", function (e)
-  {
-    chat_objects[chat_num].check_return(e)
-  }, false);
-  this.chat.getElementsByClassName('chat_send_button')[0].addEventListener("click", function ()
-  {
-    chat_objects[chat_num].send_message()
-  }, false);
+  try{
+    this.chat.getElementsByClassName('chat_message')[0].addEventListener("keydown", function (e) { chat_objects[chat_num].check_return(e)}, false);
+  }catch(e){
+    this.add_debug_entry("warn", "Missing chat_message in this theme!");
+  }try{
+    this.chat.getElementsByClassName('chat_send_button')[0].addEventListener("click", function () { chat_objects[chat_num].send_message() }, false);
+  }catch(e){
+    this.add_debug_entry("warn", "Missing chat_send_button in this theme!");}
   this.chat.addEventListener("mousemove", new_messages_status, false);
   
   scroll(this.chat, "chat_conversation", 0, true);
@@ -267,7 +267,7 @@ Chat.prototype.send_message = function (chat_message)
 
 Chat.prototype.get_chat = function ()
 {
-  if (this.chat.getElementsByClassName('chat_message')[0].value != "" && this.chat.getElementsByClassName('chat_message')[0].value != this.old_message)
+  if (this.chat.getElementsByClassName('chat_message') != undefined && this.chat.getElementsByClassName('chat_message')[0].value != "" && this.chat.getElementsByClassName('chat_message')[0].value != this.old_message)
   {
     this.is_writing = true;
     var num = this.num;
@@ -616,8 +616,10 @@ Chat.prototype.add_debug_entries = function (debug_entries)
 Chat.prototype.add_debug_entry = function (type, text)
 {
   var time = new Date();
-  this.chat.getElementsByClassName('chat_conversation_channel_' + this.active_channel)[0].innerHTML += "<div class='chat_system_message'><span class='chat_entry_user'>" + type + ": </span><span class='chat_entry_message'>" + text + "</span><span class='chat_entry_date'>" + time.getHours() + ":" + time.getMinutes() + "</span></div>";
-  scroll(this.chat, "chat_conversation", 20, true);
+  try{
+    this.chat.getElementsByClassName('chat_conversation_channel_' + this.active_channel)[0].innerHTML += "<div class='chat_system_message'><span class='chat_entry_user'>" + type + ": </span><span class='chat_entry_message'>" + text + "</span><span class='chat_entry_date'>" + time.getHours() + ":" + time.getMinutes() + "</span></div>";
+  }catch(e){}
+    scroll(this.chat, "chat_conversation", 20, true);
   switch(type)
   {
     case "warn":
