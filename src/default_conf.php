@@ -561,6 +561,8 @@ function afterproxy_bbcode($message, $extra, $chat_user, $chat_time, $highlight)
   $message = preg_replace('#\[b\](.*)\[/b\]#isU', "<b>$1</b>", $message);
   $message = preg_replace('#\[i\](.*)\[/i\]#isU', "<i>$1</i>", $message);
   $message = preg_replace('#\[u\](.*)\[/u\]#isU', "<u>$1</u>", $message);
+  $message = preg_replace('#\[color=(.*)\](.*)\[/color\]#isU', "<span style=\"color: $1\">$2</span>", $message);
+  
   return	$message;
 }
 function afterproxy_smileys($message, $extra, $chat_user, $chat_time, $highlight)
