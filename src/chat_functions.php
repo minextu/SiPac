@@ -720,14 +720,14 @@ function handle_debug()
     {
       foreach ($chat_debug['all'] as $debug)
       {
-        $array[] = "<div class='chat_debug_entry'><span class='debug_all'>$debug</span></div>";
+        $array[] = array("text"=>$debug, "type" => "debug");
       }
       
       foreach ($chat_debug['all_once'] as $debug)
       {
         if (array_search($debug, $_SESSION[$chat_id]['debug_shown']) === false)
         {
-          $array[]                             = "<div class='chat_debug_entry'><span class='debug_all'>$debug</span></div>";
+          $array[] = array("text"=>$debug, "type" => "debug");
           $_SESSION[$chat_id]['debug_shown'][] = $debug;
         }
       }
@@ -736,13 +736,13 @@ function handle_debug()
     
     foreach ($chat_debug['warn'] as $debug)
     {
-      $array[] = "<div class='chat_debug_entry'><span class='debug_warn'>$debug</span></div>";
+      $array[] = array("text"=>$debug, "type" => "warn");
     }
     foreach ($chat_debug['warn_once'] as $debug)
     {
       if (array_search($debug, $_SESSION[$chat_id]['debug_shown']) === false)
       {
-        $array[]                             = "<div class='chat_debug_entry'><span class='debug_warn'>$debug</span></div>";
+	$array[] = array("text"=>$debug, "type" => "warn");
         $_SESSION[$chat_id]['debug_shown'][] = $debug;
       }
     }
