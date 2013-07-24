@@ -579,13 +579,13 @@ Chat.prototype.information = function (info, type, nohide, onlyhide, noclose)
     info = "<br>" + info;
 
     if (type == "info")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/information.png' alt='I'> Info:" + info;
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/information.png' alt='I'> " + this.texts[37] + info; //Info:
     else if (type == "error")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/exclamation.png' alt='I'> Error:" + info;
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/exclamation.png' alt='I'> " + this.texts[38] + info; //Error:
     else if (type == "warn")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/error.png' alt='I'> Warning:" + info;
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/error.png' alt='I'> " + this.texts[39] + info; //Warning: 
     else if (type == "success")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/check.png' alt='I'> Success!" + info;
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/check.png' alt='I'> " + this.texts[40] + info; //Success:
 
     info_msg_element_sub.innerHTML = info;
     var chat_num = this.num;
@@ -728,8 +728,8 @@ Chat.prototype.prompt = function(text, id, action, button_text)
 };
 
 Chat.prototype.kick_user = function(user)
-{
-  this.prompt("Reason for the kick:", "chat_kick_reason", "chat_objects[" + this.num + "].insert_command(\"kick " + user + ",\" + document.getElementById(\"chat_kick_reason\").value, true);", "kick user");
+{			//Reason for the Kick:																																		kick user
+  this.prompt(this.texts[35], "chat_kick_reason", "chat_objects[" + this.num + "].insert_command(\"kick " + user + ",\" + document.getElementById(\"chat_kick_reason\").value, true);", this.texts[36]);
 }
 
 Chat.prototype.sound_status = function(status)
