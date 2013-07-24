@@ -534,9 +534,35 @@ function proxy_log($message, $extra, $chat_user, $chat_time, $highlight)
 
 $chat_default_settings["default_afterproxy"] = array(
   'afterproxy_linker',
+  'afterproxy_bbcode',
   'afterproxy_smileys'
 );
 
+//transform a url into a a tag link
+function afterproxy_linker($message, $extra, $chat_user, $chat_time, $highlight)
+{
+  if (strpos($message, "<a href") === false)
+  {
+    $message = str_replace("https://www.", "www.", $message);
+    $message = str_replace("http://www.", "www.", $message);
+    $message = str_replace("www.", "http://www.", $message);
+    $message = preg_replace("/ ([\w]+:\/\/[\w-?+:,&%;#~!=\.\/\@]+[\w\/])/i", " <a href=\"$1\" target=\"_blank\">$1</a>", $message);
+    $message = preg_replace("/([\w]+:\/\/[\w-?+:,&%;#~!=\.\/\@]+[\w\/]) /i", " <a href=\"$1\" target=\"_blank\">$1</a> ", $message);
+    
+    if (strpos($message, "http://") === 0 AND strrpos($message, "http://") === 0 OR strpos($message, "https://") === 0 AND strrpos($message, "https://") === 0)
+      $message = preg_replace("/([\w]+:\/\/[\w-?+:,&%;#~!=\.\/\@]+[\w\/])/i", "<a href=\"$1\" target=\"_blank\">$1</a>", $message);
+    
+    $message = preg_replace("/([\w-?+:,&;#~=\.\/]+\@(\[?)[a-zA-Z0-9\-\.]+\.([a-zA-Z]{2,3}|[0-9]{1,3})(\]?))/i", "<a href=\"mailto:$1\">$1</a>", $message);
+  }
+  return $message;
+}
+function afterproxy_bbcode($message, $extra, $chat_user, $chat_time, $highlight)
+{
+  $message = preg_replace('#\[b\](.*)\[/b\]#isU', "<b>$1</b>", $message);
+  $message = preg_replace('#\[i\](.*)\[/i\]#isU', "<i>$1</i>", $message);
+  $message = preg_replace('#\[u\](.*)\[/u\]#isU', "<u>$1</u>", $message);
+  return	$message;
+}
 function afterproxy_smileys($message, $extra, $chat_user, $chat_time, $highlight)
 {
   global $chat_settings;
@@ -554,24 +580,6 @@ function afterproxy_smileys($message, $extra, $chat_user, $chat_time, $highlight
       $message = str_replace($smiley_code, "<img style='max-height: 20px;margin-right: 3px;' src='" . $smiley_url . "' title='" . $smiley_code_html . "' alt='" . $smiley_code_html . "'>", " " . $message);
       $message = trim($message);
     }
-  }
-  return $message;
-}
-//transform a url into a a tag link
-function afterproxy_linker($message, $extra, $chat_user, $chat_time, $highlight)
-{
-  if (strpos($message, "<a href") === false)
-  {
-    $message = str_replace("https://www.", "www.", $message);
-    $message = str_replace("http://www.", "www.", $message);
-    $message = str_replace("www.", "http://www.", $message);
-    $message = preg_replace("/ ([\w]+:\/\/[\w-?+:,&%;#~!=\.\/\@]+[\w\/])/i", " <a href=\"$1\" target=\"_blank\">$1</a>", $message);
-    $message = preg_replace("/([\w]+:\/\/[\w-?+:,&%;#~!=\.\/\@]+[\w\/]) /i", " <a href=\"$1\" target=\"_blank\">$1</a> ", $message);
-    
-    if (strpos($message, "http://") === 0 AND strrpos($message, "http://") === 0 OR strpos($message, "https://") === 0 AND strrpos($message, "https://") === 0)
-      $message = preg_replace("/([\w]+:\/\/[\w-?+:,&%;#~!=\.\/\@]+[\w\/])/i", "<a href=\"$1\" target=\"_blank\">$1</a>", $message);
-    
-    $message = preg_replace("/([\w-?+:,&;#~=\.\/]+\@(\[?)[a-zA-Z0-9\-\.]+\.([a-zA-Z]{2,3}|[0-9]{1,3})(\]?))/i", "<a href=\"mailto:$1\">$1</a>", $message);
   }
   return $message;
 }
