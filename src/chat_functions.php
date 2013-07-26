@@ -19,7 +19,7 @@
  */
  
 /*all chat functions*/
-
+$chat_num = 0;
 function draw_chat($id)
 {
   global $chat_html_path;
@@ -27,6 +27,8 @@ function draw_chat($id)
   global $chat_debug;
   global $chat_settings;
   global $chat_layout;
+  global $chat_num;
+  
   
   $chat_id         = "chat_" . $id;
   $chat_client_num = "n" . time() . mt_rand(0, 10000);
@@ -50,7 +52,11 @@ function draw_chat($id)
   
   
   require(dirname(__FILE__) . "/../themes/" . $chat_settings['theme'] . "/layout.php");
-  
+  if (empty($chat_layout_user_entry))
+  {
+    return 'Missing $chat_layout_user_entry in layout.php. Please write at least "$chat_layout_user_entry = \'!!USER!!\';"';
+    return false;
+  }
   $chat_id_css   = "#$chat_id";
   $chat_css_file = str_replace("\n", " ", file_get_contents(dirname(__FILE__) . "/../themes/" . $chat_settings['theme'] . "/chat.css"));
   
@@ -105,7 +111,19 @@ function draw_chat($id)
   }
   
   
-  $chat_html = $chat_html . "));</script></div>";
+  $chat_html = $chat_html . "));";
+  
+  if (!empty($chat_layout_functions))
+  {
+    foreach ($chat_layout_functions as $name => $function)
+    {
+      $chat_html = $chat_html."chat_objects[chat_objects.length-1].$name = ".chat_translate($function).";";
+      if ($name == "layout_init")
+	$chat_html = $chat_html."chat_objects[chat_objects.length-1].$name();";
+    }
+  }
+  
+  $chat_html = $chat_html."</script></div>";
   
   
   
@@ -130,9 +148,13 @@ function draw_chat($id)
   
   $chat_html = str_replace("!!SMILEYS!!", $chat_smileys, $chat_html);
   $chat_html = str_replace("!!ID!!", $chat_id, $chat_html);
+  $chat_html = str_replace("!!NUM!!", "$chat_num", $chat_html);
   $chat_html = str_replace("!!USER_NUM!!", "<span id='chat_user_num'>?</span>", $chat_html);
   
   unset($GLOBALS['chat_settings']);
+  
+  $chat_num++;
+  
   return $chat_html;
   
 }
@@ -537,8 +559,8 @@ function get_save_user()
       else
       {
         $chat_user_info_id = addslashes($get_user->name) . "_" . addslashes($get_user->chat_id) . "_" . addslashes($get_user->channel);
-        $tmp_entry         = "<div onmouseover=\"chat_objects[$chat_num].ui_dropdown_sign('" . $chat_user_info_id . "_dropdown_info', 'show');\" onmouseout=\"chat_objects[$chat_num].ui_dropdown_sign('" . $chat_user_info_id . "_dropdown_info', 'hide');\" onclick=\"chat_objects[$chat_num].user_info('" . $chat_user_info_id . "_user_info');\" class='";
-        
+        /*$tmp_entry         = "<div onmouseover=\"chat_objects[$chat_num].ui_dropdown_sign('" . $chat_user_info_id . "_dropdown_info', 'show');\" onmouseout=\"chat_objects[$chat_num].ui_dropdown_sign('" . $chat_user_info_id . "_dropdown_info', 'hide');\" onclick=\"chat_objects[$chat_num].user_info('" . $chat_user_info_id . "_user_info');\" class='";
+        */
         $chat_user_style_array = explode("|", $get_user->style);
         
         $chat_user_online_class  = $chat_user_style_array[0];
@@ -550,7 +572,7 @@ function get_save_user()
         if ($chat_user_online_class == "!!AUTO!!")
           $chat_user_online_class = "online_user";
         
-        
+        /*
         if ($get_user->afk == 1)
           $tmp_entry = $tmp_entry . $chat_user_afk_class; //afk_user
         else
@@ -569,7 +591,7 @@ function get_save_user()
           $tmp_entry = $tmp_entry . $get_user->name . "&nbsp;<span class='user_afk_status'>[<||t28||>]"; //afk
         
         $tmp_entry = $tmp_entry . "</span><span id=\"" . $chat_user_info_id . "_dropdown_info\"></span></div><div id=\"" . $chat_user_info_id . "_user_info\" class='user_info_box'>";
-        
+        */
         $user_info_tmp = $get_user->info;
         if ($chat_settings['can_see_ip'])
           $user_info_tmp = "IP:" . $get_user->ip . "|||" . $user_info_tmp;
@@ -584,7 +606,33 @@ function get_save_user()
           $user_info = $user_info . "<p>" . $info . "</p>";
         }
         
-        $tmp_entry = $tmp_entry . "$user_info</div>";
+        require(dirname(__FILE__) . "/../themes/" . $chat_settings['theme'] . "/layout.php");
+        $tmp_entry = "<span class='chat_speech_bubble'><img src='" . $chat_html_path . "themes/" . $chat_settings['theme'] . "/speech_bubble.gif' alt='writing' title='writing'></span>".$chat_layout_user_entry;
+        
+
+        
+	if ($chat_user_custom_status != "!!AUTO!!")
+	{
+          $chat_user_afk = "online";
+          $chat_user_status = $chat_user_custom_status;
+        }
+        else if ($get_user->afk == 0)
+        {
+          $chat_user_afk = "online";
+          $chat_user_status = "<||t27||>"; //online
+        }
+        else
+        {
+          $chat_user_afk = "afk";
+          $chat_user_status = "<||t28||>"; //afk
+        }
+        $tmp_entry = str_replace("!!USER!!", $get_user->name, $tmp_entry);
+        $tmp_entry = str_replace("!!USER_ID!!", $chat_user_info_id, $tmp_entry);
+        $tmp_entry = str_replace("!!NUM!!", $chat_num, $tmp_entry);
+        $tmp_entry = str_replace("!!USER_AFK!!", $chat_user_afk, $tmp_entry);
+        $tmp_entry = str_replace("!!USER_STATUS!!", $chat_user_status, $tmp_entry);
+        $tmp_entry = str_replace("!!USER_INFO!!", $user_info, $tmp_entry);
+        /*$tmp_entry = $tmp_entry . "$user_info</div>";*/
         
         if ($get_user->name == $_SESSION[$chat_id]['chat_username'])
         {

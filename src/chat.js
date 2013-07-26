@@ -50,16 +50,6 @@ function add_chat(html_path, theme, id, client_num, channels, texts)
   chat_html_path = html_path;
   chat_objects_id[id] = chat_objects.length;
   chat_objects[chat_objects.length] = new Chat(theme, id, client_num, channels, texts);
-  
-  try
-  {
-    chat_objects[chat_objects.length-1].layout_init = chat_layout_init;
-    chat_objects[chat_objects.length-1].layout_init();
-  }catch(e){}
-  try
-  {
-    chat_objects[chat_objects.length-1].layout_tasks = chat_layout_tasks;
-  }catch(e){}
 }
 
 function chat_ajax()
