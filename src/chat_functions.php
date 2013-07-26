@@ -404,6 +404,10 @@ function get_messages($last_id)
         if ($into->extra == 0)
         {
           $message_entry   = $message_entry . "chat_entry";
+          if ($into->user == $_SESSION[$chat_id]['chat_username'])
+	    $message_entry = $message_entry . "_own";
+	  else
+	    $message_entry = $message_entry . "_others";
           $chat_entry_user = "[" . $chat_entry_user . "]:";
         }
         else if ($into->extra == 1 || $into->extra == 4)
