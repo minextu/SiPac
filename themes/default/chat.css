@@ -31,6 +31,36 @@
   overflow: auto;
 }
 
+/* Chat-Entries */
+
+.chat_entry
+{
+	padding: 3px;
+	background: #f3f3f3;
+	border-bottom: 1px solid #747474;
+	min-height: 30px;
+	line-height: 30px;
+}
+
+.chat_entry_user
+{
+	font-weight: bold;
+	color: #747474;
+	font-size: 12pt;
+}
+
+.chat_entry_message
+{
+	font-size: 11pt;
+}
+
+.chat_entry_date
+{
+	float: right;
+	font-size: 10pt;
+	color: #b0afaf;
+}
+
 .chat_user_area
 {
   width: 100%;
