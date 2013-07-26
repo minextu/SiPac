@@ -195,7 +195,7 @@ function Chat(theme, id, client_num, channels, texts)
   this.enable_sound = true;
   this.add_channel(undefined, true);
   this.change_channel(this.channels[0]);
-  this.user_info_status = new Array();
+
 
   this.username_key = 0;
 
@@ -205,10 +205,6 @@ function Chat(theme, id, client_num, channels, texts)
   
   this.old_message = "";
   this.messages_to_send = new Array();
-
-  var element = this.chat.getElementsByClassName('chat_speech_bubble')[0];
-  var style = window.getComputedStyle(element);
-  this.speech_bubble_width = style.getPropertyValue('width');
 
   /* audio */
   this.new_post_audio = new Audio();
@@ -388,7 +384,6 @@ Chat.prototype.handle_userlist = function (userlist_arr, channel)
       document.getElementById(this.id + "_" + channel + "_user_" + userlist_arr['change_user_id'][i])
         .innerHTML = userlist_arr['change_user'][i];
     }
-    this.restore_user_info();
   }
 
   if (userlist_arr['delete_user'] != undefined)
@@ -403,19 +398,27 @@ Chat.prototype.handle_userlist = function (userlist_arr, channel)
       catch (e)
       {}
     }
-    this.restore_user_info();
   }
 
   if (userlist_arr['user_writing'] != undefined)
   {
     for (var i = 0; i < userlist_arr['user_writing'].length; i++)
     {
+      /*
       if (userlist_arr['user_writing'][i] == "0")
         document.getElementById(this.id + "_" + channel + "_user_" + i)
           .getElementsByClassName("chat_speech_bubble")[0].style.width = "0px";
       else
         document.getElementById(this.id + "_" + channel + "_user_" + i)
           .getElementsByClassName("chat_speech_bubble")[0].style.width = this.speech_bubble_width;
+      */
+      
+      try
+      {
+	this.layout_user_writing_status(userlist_arr['user_writing'][i], userlist_arr['users'][i], this.id + "_" + channel + "_user_" + i);
+      }
+      catch(e){}
+      
     }
   }
 };
@@ -622,59 +625,6 @@ Chat.prototype.add_debug_entry = function (type, text)
        break;
   }
 };
-Chat.prototype.ui_dropdown_sign = function (id, action)
-{
-  id = addslashes(id);
-
-  if (action == "show")
-    document.getElementById(id).innerHTML = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/arrow_down.png'>";
-  else if (action == "hide")
-    document.getElementById(id).innerHTML = "";
-};
-Chat.prototype.user_info = function (box_id)
-{
-  box_id = addslashes(box_id);
-  if (this.user_info_status[box_id] == undefined || this.user_info_status[box_id] == "closed")
-  {
-    document.getElementById(box_id).style.display = "block";
-    this.user_info_status[box_id] = "opened";
-  }
-  else
-  {
-    document.getElementById(box_id).style.display = "none";
-    this.user_info_status[box_id] = "closed";
-  }
-
-};
-Chat.prototype.restore_user_info = function ()
-{
-  for (var key in this.user_info_status)
-  {
-    if (this.user_info_status[key] == "closed")
-    {
-      try
-      {
-        document.getElementById(key).style.display = "none";
-      }
-      catch (e)
-      {
-        this.user_info_status[key] = "closed";
-      }
-    }
-    else
-    {
-      try
-      {
-        document.getElementById(key).style.display = "block";
-      }
-      catch (e)
-      {
-        this.user_info_status[key] = "closed";
-      }
-    }
-  }
-};
-
 Chat.prototype.insert_command = function(command, auto_send)
 {
   if (auto_send)

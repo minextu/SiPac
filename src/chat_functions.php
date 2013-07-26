@@ -85,7 +85,6 @@ function draw_chat($id)
 		var text_obj = document.createTextNode('$chat_new_css');
 		style_obj.appendChild(text_obj);
 		document.getElementById('$chat_id').appendChild(style_obj);
-		document.getElementById('$chat_id').innerHTML += \"<span class='chat_speech_bubble' style='display: none;'></span>\";
 		add_chat('$chat_html_path','" . $chat_settings['theme'] . "','$chat_id', '$chat_client_num',";
   
   
@@ -607,7 +606,7 @@ function get_save_user()
         }
         
         require(dirname(__FILE__) . "/../themes/" . $chat_settings['theme'] . "/layout.php");
-        $tmp_entry = "<span class='chat_speech_bubble'><img src='" . $chat_html_path . "themes/" . $chat_settings['theme'] . "/speech_bubble.gif' alt='writing' title='writing'></span>".$chat_layout_user_entry;
+        $tmp_entry = $chat_layout_user_entry;
         
 
         
