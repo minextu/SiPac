@@ -103,9 +103,8 @@ $chat_default_settings["default_special_commands"] = array(
   '/name new name,user' => "command_name('#1#', '#2#');",
   "/join channel" => "command_join('#1#');",
   '/systemmessage message' => "command_systemmessage('#1#');",
-  "/answer user,message" => "command_answer('#1#', '#2#');",
   "/kick name,reason" => "command_kick('#1#', '#2#');",
-  "/ban name,time(in days),reason" => "command_ban('#1#', '#2#', '#3#');",
+  //"/ban name,time(in days),reason" => "command_ban('#1#', '#2#', '#3#');",
   "/about" => "command_about();",
   "/debug type" => "command_debug('#1#');"
 );
@@ -155,11 +154,11 @@ function command_me($text, $user = 0)
   if (empty($message))
   {
     $random_sentences = array(
-      " hat gerade etwas anderes zu tun",
-      " hat den Nutzer in der Liste unter sich total lieb",
-      " wünschte sich er hätte den Text jetzt nicht vergessen",
-      " hält sich für wunderschön",
-      " hat es auf <b>" . $_SESSION[$chat_id]['chat_users'][mt_rand(0, count($_SESSION[$chat_id]['chat_users']) - 1)] . "</b> abgegesehen"
+      "<||t41||>", //has something better to do
+      "<||t42|<b>". $_SESSION[$chat_id]['chat_users'][mt_rand(0, count($_SESSION[$chat_id]['chat_users']) - 1)]."</b>||>", //has fallen in love with %1
+      " <||t43||>", //wishes he had not forgotten the text
+      "<||t44||>", //thinks he/she is beautiful
+      "<||t45|<b>" . $_SESSION[$chat_id]['chat_users'][mt_rand(0, count($_SESSION[$chat_id]['chat_users']) - 1)] . "</b>||>" //is watching for %1
     );
     
     $message = $random_sentences[mt_rand(0, count($random_sentences) - 1)];
@@ -192,13 +191,13 @@ function command_afk($reason=0)
     {
       $_SESSION[$chat_id]['chat_new_afk'] = false;
       if (!empty($reason))
-	return array('info_type' => "warn",'info_text' => "You can't give a reason for not being afk!");
+	return array('info_type' => "warn",'info_text' => "<||t46||>"); //You can't give a reason for not being afk!
     }
   }
   else
     return array(
       'info_type' => "error",
-      'info_text' => "AFK is not enabled!"
+      'info_text' => "<||t47||>" //afk is not enable
     );
 }
 function command_name($new_name, $user = 0)
@@ -259,7 +258,7 @@ function command_join($channel = 0)
     else
       return array(
         'info_type' => "error",
-        'info_text' => "You must enter a channel!"
+        'info_text' => "<||t48||>" //You must enter a channel!
       );
   }
   else
@@ -275,14 +274,14 @@ function command_systemmessage($message)
   {
     return array(
       'info_type' => "info",
-      'info_text' => "Keine Systemnachricht angegeben!"
+      'info_text' => "<||t49||>" //You didn't enter a message!
     ); //show a message
   }
   else
     save_message($message, $chat_active_channel, 2);
 }
 
-function command_answer($user, $message)
+/*function command_answer($user, $message)
 {
   global $chat_id;
   global $chat_active_channel;
@@ -305,7 +304,7 @@ function command_answer($user, $message)
     save_message($message, $chat_active_channel, 3, 0, 0, $user);
   }
 }
-
+*/
 function command_kick($user, $reason = 0)
 {
   global $chat_settings;
@@ -347,10 +346,10 @@ function command_kick($user, $reason = 0)
   else
     return array(
       "info_type" => "error",
-      "info_text" => "Kein Benutzer angegeben!"
+      "info_text" => "<||t50||>" //no user specified
     );
 }
-function command_ban($user, $time = 0, $reason = 0)
+/*function command_ban($user, $time = 0, $reason = 0)
 {
   global $chat_settings;
   global $chat_id;
@@ -401,7 +400,7 @@ function command_ban($user, $time = 0, $reason = 0)
       "info_type" => "error",
       "info_text" => "Kein Benutzer angegeben!"
     );
-}
+}*/
 
 function command_about()
 {
@@ -428,7 +427,7 @@ function command_debug($type)
       $_SESSION[$chat_id]['debug'] = $type;
       return array(
         "info_type" => "success",
-        "info_text" => "Debug aktiviert!"
+        "info_text" => "<||t51||>" // debug enabled
       );
     }
     else
@@ -442,13 +441,13 @@ function command_debug($type)
     $_SESSION[$chat_id]['debug'] = false;
     return array(
       "info_type" => "success",
-      "info_text" => "Debug deaktiviert!"
+      "info_text" => "<||t51||>" // debug enabled
     );
   }
   else
     return array(
       "info_type" => "warn",
-      "info_text" => "type muss warn, all oder off sein (siehe /help debug)"
+      "info_text" => "<||t52||>" //type has to be warn, all or off (see /help debug)
     );
 }
 
@@ -561,6 +560,8 @@ function afterproxy_bbcode($message, $extra, $chat_user, $chat_time, $highlight)
   $message = preg_replace('#\[b\](.*)\[/b\]#isU', "<b>$1</b>", $message);
   $message = preg_replace('#\[i\](.*)\[/i\]#isU', "<i>$1</i>", $message);
   $message = preg_replace('#\[u\](.*)\[/u\]#isU', "<u>$1</u>", $message);
+  $message = preg_replace('#\[color=(.*)\](.*)\[/color\]#isU', "<span style=\"color: $1\">$2</span>", $message);
+  
   return	$message;
 }
 function afterproxy_smileys($message, $extra, $chat_user, $chat_time, $highlight)
