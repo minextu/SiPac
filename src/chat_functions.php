@@ -602,7 +602,7 @@ function get_save_user()
         foreach (explode("|||", $user_info_tmp) as $info)
         {
           //user dropdown infos
-          $user_info = $user_info . "<p>" . $info . "</p>";
+          $user_info = $user_info . "<li>" . $info . "</li>";
         }
         
         require(dirname(__FILE__) . "/../themes/" . $chat_settings['theme'] . "/layout.php");
