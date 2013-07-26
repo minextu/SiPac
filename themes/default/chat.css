@@ -31,6 +31,90 @@
   overflow: auto;
 }
 
+/* Chat-Entries */
+
+.chat_entry_own
+{
+	padding: 3px;
+	background: #6f98b2;
+	border-bottom: 1px solid #000;
+	min-height: 30px;
+	line-height: 30px;
+}
+
+.chat_entry_own .chat_entry_user
+{
+	font-weight: bold;
+	color: #fff;
+	font-size: 12pt;
+}
+
+.chat_entry_own .chat_entry_message
+{
+	font-size: 11pt;
+}
+
+.chat_entry_own .chat_entry_date
+{
+	float: right;
+	font-size: 10pt;
+	color: #fff;
+}
+
+.chat_entry_others
+{
+	padding: 3px;
+	background: #d2d2d2;
+	border-bottom: 1px solid #747474;
+	min-height: 30px;
+	line-height: 30px;
+}
+
+.chat_entry_others .chat_entry_user
+{
+	font-weight: bold;
+	color: #3a3a3a;
+	font-size: 12pt;
+}
+
+.chat_entry_others .chat_entry_message
+{
+	font-size: 11pt;
+}
+
+.chat_entry_others .chat_entry_date
+{
+	float: right;
+	font-size: 10pt;
+	color: #3a3a3a;
+}
+
+.chat_notify
+{
+	height: 20px;
+	line-height: 20px;
+	padding: 3px;
+	background: #b0b0b0;
+}
+
+.chat_notify .chat_entry_user
+{
+	font-weight: bold;
+	font-size: 12pt;
+}
+
+.chat_notify .chat_entry_message
+{
+	font-size: 11pt;
+	font-style: italic;
+}
+
+.chat_notify .chat_entry_date
+{
+	float: right;
+	font-size: 10pt;
+}
+
 .chat_user_area
 {
   width: 100%;
@@ -74,6 +158,7 @@
   font-size: 12pt;
   color: #fff;
   text-shadow: 1px 1px 1px #000;
+  background: #ddd;
 }
 
 
