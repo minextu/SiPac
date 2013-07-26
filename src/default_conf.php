@@ -521,10 +521,10 @@ function proxy_log($message, $extra, $chat_user, $chat_time, $highlight)
       fclose($chat_log_file);
     }
     else
-      $chat_debug['warn_once'][] = "Error: Wrong Permissions in Folder \"$log_folder\". Please change it to 777!";
+      $chat_debug['warn_once'][] = "Wrong Permissions in Folder \"$log_folder\". Please change it to 777!";
   }
   else
-    $chat_debug['warn_once'][] = "Error: Wrong Permissions in Folder \"log\". Please change it to 777!";
+    $chat_debug['warn_once'][] = "Wrong Permissions in Folder \"log\". Please change it to 777!";
   
   return $message;
 }
