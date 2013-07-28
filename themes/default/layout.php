@@ -10,8 +10,19 @@ $default_smiley_height = 30;
 !!NUM!! -> gives the chat num (chat_objects[!!NUM!!])
 */
 
-$chat_layout_user_entry = "!!USER!! <button onclick='chat_objects[!!NUM!!].test()'>click me!</button>";
-//$chat_layout_user_entry = '<div onmouseover="chat_objects[!!NUM!!].ui_dropdown_sign(\'!!USER_ID!!_dropdown_info\', \'show\');" onmouseout="chat_objects[!!NUM!!].ui_dropdown_sign(\'!!USER_ID!!_dropdown_info\', \'hide\');" onclick="chat_objects[!!NUM!!].user_info(\'!!USER_ID!!_user_info\');" class="!!USER_AFK!!_user"><span class="chat_speech_bubble" style="width: 0px;"><img src="/SiPac/themes/default/speech_bubble.gif" alt="writing" title="writing"></span>!!USER!!&nbsp;<span class="user_online_status">[!!USER_STATUS!!]</span><span id="!!USER_ID!!_dropdown_info"></span></div><div id="!!USER_ID!!_user_info" class="user_info_box">!!USER_INFO!!</div>';
+$chat_layout_user_entry = "
+<div class='chat_user' id='!!USER_ID!!' onmouseover='chat_objects[!!NUM!!].user_options(\"!!USER_ID!!\", \"show\");' onmouseout='chat_objects[!!NUM!!].user_options(\"!!USER_ID!!\", \"hide\");'>
+	<div class='chat_user_top'>
+		<div class='chat_user_name'>!!USER!!<span class='chat_user_status'>[!!USER_STATUS!!]</span></div>
+	</div><!-- end: chat_user_top-class -->
+	<div class='chat_user_bottom' style='display: none;'>
+		<ul>
+		!!USER_INFO!!
+		</ul>
+	</div><!-- end: chat_user_bottom-class -->
+</div><!-- end: chat_user-class -->
+";
+
 $chat_layout = "
 <div class='chat_main'>
   <div class='chat_left'>
@@ -30,15 +41,18 @@ $chat_layout = "
 </div><!-- end: chat_main-class -->
 ";
 
-$chat_layout_functions['test'] = "
-function test()
-{
-  alert('test');
-}";
-$chat_layout_functions['test2'] ="
-function test2(test)
-{
-  alert('testus');
-}
-"
+$chat_layout_functions['user_options'] = "
+function user_options(user_id, action)
+	{
+		console.debug(user_id);
+		if(action == 'show')
+			{
+				document.getElementById(user_id).getElementsByClassName('chat_user_bottom')[0].style.display = 'block';
+			}
+		else if(action == 'hide')
+			{
+				document.getElementById(user_id).getElementsByClassName('chat_user_bottom')[0].style.display = 'none';
+			}
+	}
+";
 ?>
