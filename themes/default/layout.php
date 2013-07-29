@@ -31,7 +31,10 @@ $chat_layout = "
   <div class='chat_right'>
     <div class='chat_conversation'></div><!-- end: chat_conversation-class -->
     <div class='chat_user_area'>
-      <div class='chat_extra_bar'></div><!-- end: chat_extra_bar-class -->
+      <div class='chat_extra_bar'>
+      
+      <div class='chat_notice_msg'></div>
+      </div><!-- end: chat_extra_bar-class -->
       <div class='chat_user_input'>
 	<input type='text' class='chat_message' placeholder='<||t34||>'>
 	<button class='chat_send_button'><||t12||></button><!-- end: chat_send_button-class -->

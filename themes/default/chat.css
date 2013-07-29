@@ -2,8 +2,6 @@
 
 .chat_main
 {
-  width: 100%;
-  height: 100%;
   border: 1px solid #747474;
 }
 
@@ -199,12 +197,69 @@
 }
 
 
-
-
-
-
-
-
-
-
-
+.chat_notice_msg div
+{
+  position:absolute;
+  padding:10px;
+  bottom: 10.8%;
+  color:#000;
+  min-width: 180px;
+  
+  -moz-border-radius:10px;
+  -webkit-border-radius:10px;
+  border-radius:10px;
+}
+.chat_notice_msg div:after
+{
+   content: "";
+   display: block;
+   position: absolute;
+   bottom: -10px;
+   left: 50px;
+   width: 0;
+   border-width: 10px 10px 0;
+   border-style: solid;
+}
+.chat_notice_msg .close_chat_information
+{
+  right: 0px;
+  margin: 10px;
+  top: 0px;
+  position: absolute;
+}
+.chat_notice_msg .chat_notice_info
+{
+  background: #6994ec;
+  background: rgba(105, 148, 236, 0.9);
+}
+.chat_notice_msg .chat_notice_info:after
+{
+  border-color: #6994ec transparent;
+}
+.chat_notice_msg .chat_notice_error
+{
+  background: #d9a270;
+  background: rgba(217, 162, 112, 0.9);
+}
+.chat_notice_msg .chat_notice_error:after
+{
+  border-color: #d9a270 transparent;
+}
+.chat_notice_msg .chat_notice_warn
+{
+  background: #eced90;
+  background: rgba(236, 237, 144, 0.9);
+}
+.chat_notice_msg .chat_notice_warn:after
+{
+  border-color: #eced90 transparent;
+}
+.chat_notice_msg .chat_notice_success
+{
+  background: #89c97a;
+  background: rgba(137, 201, 122, 0.9);
+}
+.chat_notice_msg .chat_notice_success:after
+{
+  border-color: #89c97a transparent;
+}
