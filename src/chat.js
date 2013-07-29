@@ -341,15 +341,8 @@ Chat.prototype.handle_chat_tasks = function (answer)
   }
   catch (e)
   {}
-
-  try
-  {
-    if (this.is_writing)
-      document.getElementById(this.id + "_" + this.active_channel + "_user_" + this.username_key).getElementsByClassName("chat_speech_bubble")[0].style.width = this.speech_bubble_width;
-    else
-      document.getElementById(this.id + "_" + this.active_channel + "_user_" + this.username_key).getElementsByClassName("chat_speech_bubble")[0].style.width = "0px";
-   }
-  catch(e){}
+  
+  this.layout_user_writing_status(this.is_writing, this.username, this.id + "_" + this.active_channel + "_user_" + this.username_key);
   
   try{this.layout_tasks();}catch(e){}
 };
@@ -404,15 +397,6 @@ Chat.prototype.handle_userlist = function (userlist_arr, channel)
   {
     for (var i = 0; i < userlist_arr['user_writing'].length; i++)
     {
-      /*
-      if (userlist_arr['user_writing'][i] == "0")
-        document.getElementById(this.id + "_" + channel + "_user_" + i)
-          .getElementsByClassName("chat_speech_bubble")[0].style.width = "0px";
-      else
-        document.getElementById(this.id + "_" + channel + "_user_" + i)
-          .getElementsByClassName("chat_speech_bubble")[0].style.width = this.speech_bubble_width;
-      */
-      
       try
       {
 	this.layout_user_writing_status(userlist_arr['user_writing'][i], userlist_arr['users'][i], this.id + "_" + channel + "_user_" + i);
