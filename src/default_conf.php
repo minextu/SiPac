@@ -443,13 +443,13 @@ function command_debug($type)
     $_SESSION[$chat_id]['debug'] = false;
     return array(
       "info_type" => "success",
-      "info_text" => "<||t51||>" // debug enabled
+      "info_text" => "<||t52||>" // debug disabled
     );
   }
   else
     return array(
       "info_type" => "warn",
-      "info_text" => "<||t52||>" //type has to be warn, all or off (see /help debug)
+      "info_text" => "<||t53||>" //type has to be warn, all or off (see /help debug)
     );
 }
 

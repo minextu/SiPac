@@ -28,7 +28,7 @@ $chat_text = array(
 "No Commands found!",
 "No permissions!",
 "User %1 not found",
-"You didn't enter a new name!",										//10
+"You didn't enter a new name!",												//10
 "Nothing is entered",
 "send",
 "Message",
@@ -38,12 +38,12 @@ $chat_text = array(
 "%1 to %2:",
 "is now away",
 "is back again",
-"Loading the Room. Please wait...",										//20
+"Loading the Room. Please wait...",											//20
 "User %1 will be kicked",
 "no reason",
 "You were kicked! Reason: %1",
 "%1 was kicked by %3. Reason: %2",
-"%1 was kicked. Reason: %2",											//25
+"%1 was kicked. Reason: %2",												//25
 "Kick %1",
 "online",
 "afk",
@@ -53,12 +53,12 @@ $chat_text = array(
 "Activate sound",
 "Privat Message",
 "Please enter a message...",
-"Reason for the Kick:",												//35
+"Reason for the Kick:",													//35
 "kick user",
 "Info:",
 "Error:",
 "Warning:",
-"Success:",															//40
+"Success:",														//40
 "has something better to do",
 "has fallen in love with %1",
 "wishes he had not forgotten the text",
@@ -69,7 +69,10 @@ $chat_text = array(
 "You must enter a channel!",
 "You didn't enter a message!",
 "no user specified",													//50
-"debug enabled",
-"type has to be warn, all or off (see /help debug)"
+"debug enabled!",
+"debug diabled!",
+"type has to be warn, all or off (see /help debug)",
+"Functions",
+"Writing..."														//55
 );
 ?>
