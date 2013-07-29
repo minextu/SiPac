@@ -28,7 +28,9 @@ If you want to change theese settings, use "$chat_settings[setting_name_here] = 
 date_default_timezone_set('Europe/Berlin');
 $chat_default_settings = array(
   "default_user_infos" => array(
-    "<a href='#' onclick=\"alert('Will be added soon'); chat_answer('" . addslashes($_SESSION[$chat_id]['chat_username']) . "');\"><||t3|" . $_SESSION[$chat_id]['chat_username'] . "||></a>" //Write to %1
+  "<a href='javascript:void();'>Kicken</a>",
+  "<a href='javascript:void();'>Bannen</a>",
+  "<a href='javascript:void();'>Direkt schreiben</a>"
   ),
   "language" => "en",
   "log_language" => "en",
