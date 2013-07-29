@@ -342,7 +342,9 @@ Chat.prototype.handle_chat_tasks = function (answer)
   catch (e)
   {}
   
-  this.layout_user_writing_status(this.is_writing, this.username, this.id + "_" + this.active_channel + "_user_" + this.username_key);
+  try{
+    this.layout_user_writing_status(this.is_writing, this.username, this.id + "_" + this.active_channel + "_user_" + this.username_key);
+  }catch(e){}
   
   try{this.layout_tasks();}catch(e){}
 };
