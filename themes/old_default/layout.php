@@ -12,7 +12,7 @@ $chat_layout = "
 	<div class='chat_user_area'>
 		<div class='chat_left'>
 		<div class='chat_top'>
-			<button class='functions_button' onclick='chat_objects[!!NUM!!].layout_functions_menu()'>Functions</button><!-- end: functions_button -->
+			<button class='functions_button' onclick='chat_objects[!!NUM!!].layout_functions_menu()'><||t54||></button><!-- end: functions_button -->
 			<div class='functions_box' style='display: none;' onclick='chat_objects[!!NUM!!].layout_functions_menu()'>
 				<ul>
 					<li><a href='javascript:void(null)' class='chat_afk_button' onclick='chat_objects[!!NUM!!].insert_command(\"afk\", true);'>Loading...</a></li>
