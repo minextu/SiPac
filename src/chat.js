@@ -646,7 +646,7 @@ Chat.prototype.alert = function(text, action)
 Chat.prototype.prompt = function(text, id, action, button_text)
 {
   var alert_text = text;
-  alert_text += "<p><input type='text' onkeydown='if (event.keyCode == 13) { " + action + " chat_objects[" + this.num + "].alert(undefined, \"close\");}' id='" + id + "'></p><button onclick='" + action + " chat_objects[" + this.num + "].chat_alert(undefined, \"close\");'>" + button_text + "</button></p>";
+  alert_text += "<p><input type='text' onkeydown='if (event.keyCode == 13) { " + action + " chat_objects[" + this.num + "].alert(undefined, \"close\");}' id='" + id + "'></p><button onclick='" + action + " chat_objects[" + this.num + "].alert(undefined, \"close\");'>" + button_text + "</button></p>";
   this.alert(alert_text)
 };
 
