@@ -69,11 +69,8 @@ $chat_default_settings = array(
   "show_ban_user" => true,
   "can_write_as_fake_user" => true,
   "can_rename_others" => true,
-  "can_see_ip" => true,
+  "can_see_ip" => false,
   "user_infos" => array(
-    "Info",
-    "More Infp",
-    "Or something"
   ),
   "replace_commands" => array(
     '/link:#1#,#2#' => "<a href='#1#' target='_blank'>#2#</a>",
