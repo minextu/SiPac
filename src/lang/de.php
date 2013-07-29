@@ -72,6 +72,7 @@ $chat_text = array(
 "Debug wurde aktiviert!",
 "Debug wurde deaktiviert!",
 "Type muss warn oder all sein (siehe /help debug)",
-"Funktionen"
+"Funktionen",
+"Schreibt..."														//55
 );
 ?>
