@@ -16,6 +16,42 @@
   border-right: 1px solid #747474;
 }
 
+.chat_user
+{
+	background: #eff2f7;
+	border-bottom: 1px solid #747474;
+	height: 50px;
+	padding: 5px;
+}
+
+.chat_user .chat_user_name
+{
+	font-size: 14pt;
+	color: #fff;
+	text-shadow: 0px 0px 2px #000;
+}
+
+.chat_user .chat_user_status
+{
+	float: right;
+	text-shadow: none;
+	font-size: 10pt;
+	color: #5372a1;
+	font-weight: bold;
+}
+
+.chat_user .chat_user_bottom ul
+{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.chat_user .chat_user_bottom ul li
+{
+	float: left;
+}
+
 .chat_right
 {
   float: left;
