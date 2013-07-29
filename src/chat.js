@@ -567,7 +567,7 @@ Chat.prototype.information = function (info, type, nohide, onlyhide, noclose)
       info_msg_element_sub.className = "chat_notice_info";
 
     if (noclose != true)
-      info = "<span class='close_chat_information'>(<a href='#' onclick='chat_objects[" + this.num + "].information(undefined, undefined, undefined, true)'>schlie&szlig;en</a>)</span>" + info;
+      info = "<span class='close_chat_information'><a href='#' onclick='chat_objects[" + this.num + "].information(undefined, undefined, undefined, true)'><img src='" + chat_html_path + "themes/" + this.theme + "/icons/delete.png' alt='(close)' title='close'></a></span>" + info;
 
     info = "<br>" + info;
 
