@@ -341,15 +341,10 @@ Chat.prototype.handle_chat_tasks = function (answer)
   }
   catch (e)
   {}
-
-  try
-  {
-    if (this.is_writing)
-      document.getElementById(this.id + "_" + this.active_channel + "_user_" + this.username_key).getElementsByClassName("chat_speech_bubble")[0].style.width = this.speech_bubble_width;
-    else
-      document.getElementById(this.id + "_" + this.active_channel + "_user_" + this.username_key).getElementsByClassName("chat_speech_bubble")[0].style.width = "0px";
-   }
-  catch(e){}
+  
+  try{
+    this.layout_user_writing_status(this.is_writing, this.username, this.id + "_" + this.active_channel + "_user_" + this.username_key);
+  }catch(e){}
   
   try{this.layout_tasks();}catch(e){}
 };
@@ -404,15 +399,6 @@ Chat.prototype.handle_userlist = function (userlist_arr, channel)
   {
     for (var i = 0; i < userlist_arr['user_writing'].length; i++)
     {
-      /*
-      if (userlist_arr['user_writing'][i] == "0")
-        document.getElementById(this.id + "_" + channel + "_user_" + i)
-          .getElementsByClassName("chat_speech_bubble")[0].style.width = "0px";
-      else
-        document.getElementById(this.id + "_" + channel + "_user_" + i)
-          .getElementsByClassName("chat_speech_bubble")[0].style.width = this.speech_bubble_width;
-      */
-      
       try
       {
 	this.layout_user_writing_status(userlist_arr['user_writing'][i], userlist_arr['users'][i], this.id + "_" + channel + "_user_" + i);
@@ -567,7 +553,7 @@ Chat.prototype.information = function (info, type, nohide, onlyhide, noclose)
       info_msg_element_sub.className = "chat_notice_info";
 
     if (noclose != true)
-      info = "<span class='close_chat_information'>(<a href='#' onclick='chat_objects[" + this.num + "].information(undefined, undefined, undefined, true)'>schlie&szlig;en</a>)</span>" + info;
+      info = "<span class='close_chat_information'><a href='#' onclick='chat_objects[" + this.num + "].information(undefined, undefined, undefined, true)'><img src='" + chat_html_path + "themes/" + this.theme + "/icons/delete.png' alt='(close)' title='close'></a></span>" + info;
 
     info = "<br>" + info;
 
@@ -662,7 +648,7 @@ Chat.prototype.alert = function(text, action)
 Chat.prototype.prompt = function(text, id, action, button_text)
 {
   var alert_text = text;
-  alert_text += "<p><input type='text' onkeydown='if (event.keyCode == 13) { " + action + " chat_objects[" + this.num + "].alert(undefined, \"close\");}' id='" + id + "'></p><button onclick='" + action + " chat_objects[" + this.num + "].chat_alert(undefined, \"close\");'>" + button_text + "</button></p>";
+  alert_text += "<p><input type='text' onkeydown='if (event.keyCode == 13) { " + action + " chat_objects[" + this.num + "].alert(undefined, \"close\");}' id='" + id + "'></p><button onclick='" + action + " chat_objects[" + this.num + "].alert(undefined, \"close\");'>" + button_text + "</button></p>";
   this.alert(alert_text)
 };
 
