@@ -162,7 +162,7 @@ function chat_error(error, clear)
   else
     chat_error_text += " (Timeout)";
 
-  chat_error_information_text = chat_error_text + ". " + chat_error_num + ". Versuch...";
+  chat_error_information_text = chat_error_text + ". " + chat_error_num + ". Try...";
   console.error(chat_error_text);
   for (var i = 0; i < chat_objects.length; i++)
   {
@@ -598,13 +598,12 @@ Chat.prototype.add_smiley = function (code)
 Chat.prototype.add_debug_entries = function (debug_entries)
 {
   if (debug_entries != undefined)
+  {
+    for (var i in debug_entries)
     {
-      console.debug(debug_entries.length);
-      for (var i in debug_entries)
-      {
-	this.add_debug_entry(debug_entries[i]['type'], debug_entries[i]['text']);
-      }
-    } 
+      this.add_debug_entry(debug_entries[i]['type'], debug_entries[i]['text']);
+    }
+  } 
 }
 Chat.prototype.add_debug_entry = function (type, text)
 {
