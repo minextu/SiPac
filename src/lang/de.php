@@ -18,26 +18,60 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 $chat_text = array(
-"%1 heißt nun %2",														//0
-"%1 hat den Chat verlassen",
-"%1 trat dem Chat bei",
-"Nachricht schreiben an %1",
-"Sie können die folgenden Kommandos verwenden",
-"Kommandoschreibweise",													//5
-"Kommando %1 konnte nicht gefunden werden!",
-"Keine Kommandos gefunden!",
-"Sie verfügen nicht über die ausreichende Berechtigung!",
-"Nutzer %1 konnte nicht gefunden und festgenommen werden!",
-"Sie müssen einen neuen Nutzernamen eingeben!",						//10
-"Kein Text unsooo diggah",
-"absenden",
+"%1 ist nun %2",														//0
+"%1 ist gegangen",
+"%1 ist beigetreten",
+"%1 Schreiben",
+"Folgende Kommandos können benutzt werden",
+"Kommando Syntax",													//5
+"Das Kommando %1 wurde nicht gefunden!",
+"Keine Kommandos gefunden",
+"Keine Berechtigung!",
+"Benutzer %1 wurde nicht gefunden",
+"Kein neuer Name eingegeben!",										//10
+"Es wurde nichts eingegeben",
+"Senden",
 "Nachricht",
-"Information",
+"Info",
 "Systemnachricht",													//15
-"Hochlicht",
+"Highlight",
 "%1 an %2:",
-"ist nun abwesend",
-"ist nun wieder anwesend",
-"Chat wird geladen. Lehnen sie sich zurück und holen sie sich einen Kaffee..."				//20
+"ist jetzt abwesend",
+"ist wieder zurück",
+"Der Raum wird geladen. Bite warten...",										//20
+"Der Benutzer %1 wird gekickt",
+"Kein Grund",
+"Du wurdest gekickt! Grund: %1",
+"%1 wurde von %3 gekickt. Grund: %2",
+"%1 wurde gekickt. Grund: %2",											//25
+"%1 Kicken",
+"online",
+"afk",
+"Status auf Online setzen",
+"Status auf afk setzen",													//30
+"Sound deaktivieren",
+"Sound aktivieren",
+"Private Nachricht",
+"Bitte eine Nachricht eingeben...",
+"Grund für den Kick:",												//35
+"Benutzer Kicken",
+"Info:",
+"Fehler:",
+"Warnung:",
+"Erfolg:",															//40
+"hat etwas besseres zu tun",
+"hat sich in %1 verliebt",
+"wünscht sich, er hätte den Text nicht vergessen",
+"denkt er/sie ist wäre hübsch",
+"beobachtet %1",													//45
+"Es kann kein Grund für das nicht abwesend sein angegeben werden!",
+"afk ist nicht aktiviert",
+"Es muss ein Channel eingegeben werden!",
+"Es wurde keine Nachricht eingegeben!",
+"Kein Benutzer angegeben",													//50
+"Debug wurde aktiviert!",
+"Debug wurde deaktiviert!",
+"Type muss warn oder all sein (siehe /help debug)",
+"Funktionen"
 );
 ?>

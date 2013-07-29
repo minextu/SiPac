@@ -69,7 +69,9 @@ $chat_text = array(
 "You must enter a channel!",
 "You didn't enter a message!",
 "no user specified",													//50
-"debug enabled",
-"type has to be warn, all or off (see /help debug)"
+"debug enabled!",
+"debug diabled!",
+"type has to be warn, all or off (see /help debug)",
+"Functions"
 );
 ?>
