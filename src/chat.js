@@ -610,7 +610,7 @@ Chat.prototype.add_debug_entry = function (type, text)
 {
   var time = new Date();
   try{
-    this.chat.getElementsByClassName('chat_conversation_channel_' + this.active_channel)[0].innerHTML += "<div class='chat_system_message'><span class='chat_entry_user'>" + type + ": </span><span class='chat_entry_message'>" + text + "</span><span class='chat_entry_date'>" + time.getHours() + ":" + time.getMinutes() + "</span></div>";
+    this.chat.getElementsByClassName('chat_conversation_channel_' + this.active_channel)[0].innerHTML += "<div class='chat_entry_debug'><span class='chat_entry_user'>" + type + ": </span><span class='chat_entry_message'>" + text + "</span><span class='chat_entry_date'>" + time.getHours() + ":" + time.getMinutes() + "</span></div>";
   }catch(e){}
     scroll(this.chat, "chat_conversation", 20, true);
   switch(type)
