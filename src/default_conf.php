@@ -27,11 +27,7 @@ If you want to change theese settings, use "$chat_settings[setting_name_here] = 
 
 date_default_timezone_set('Europe/Berlin');
 $chat_default_settings = array(
-  "default_user_infos" => array(
-  "<a href='javascript:void();'>Kicken</a>",
-  "<a href='javascript:void();'>Bannen</a>",
-  "<a href='javascript:void();'>Direkt schreiben</a>"
-  ),
+  "default_user_infos" => array(),
   "language" => "en",
   "log_language" => "en",
   "html_path" => "!!AUTO!!",
