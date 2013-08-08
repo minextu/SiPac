@@ -8,12 +8,22 @@ SiPac minimal config
 
 */
 
-require_once dirname(__FILE__)."/src/chat.php";
-//db config
-$chat_settings['host'] = "localhost";
-$chat_settings['user'] = "example_user";
-$chat_settings['pw'] = "example_password";
-$chat_settings['db'] = "example_database";
+
+
+$chat_settings['chat_id'] = "example_id"; //replace exmaple_id with a custom id for the chat
+
+//mysql config (fill out everything right here)
+$chat_settings['mysql_hostname'] = "localhost";
+$chat_settings['mysql_username'] = "exmaple_user";
+$chat_settings['mysql_password'] = "exmaple_password";
+$chat_settings['mysql_database'] = "exmaple_database";
+
+
+require_once dirname(__FILE__)."/src/server/SiPac.php";
+$chat = new Chat($chat_settings);
+
+
+
 ?>
 
 <html>
@@ -23,7 +33,11 @@ $chat_settings['db'] = "example_database";
 <body>
 
 <?php 
-echo draw_chat("example_id"); // Replace example_id with a custom id for the chat
+
+//put the next line somewhere, where the chat should be shown
+echo $chat->draw();
+
+
 ?>
 
 </body>
