@@ -31,9 +31,10 @@ $chat_layout = "
   <div class='chat_right'>
     <div class='chat_conversation'></div><!-- end: chat_conversation-class -->
     <div class='chat_user_area'>
+		<div class='chat_notice_msg'></div>
       <div class='chat_extra_bar'>
-      
-      <div class='chat_notice_msg'></div>
+			<button onclick='chat_objects[!!NUM!!].smiley_bar(this);' class='chat_smiley_bar_button_closed'>s</button>
+			<div class='chat_smiley_bar'>!!SMILEYS!!</div>
       </div><!-- end: chat_extra_bar-class -->
       <div class='chat_user_input'>
 	<input type='text' class='chat_message' placeholder='<||t34||>'>
@@ -52,7 +53,6 @@ function layout_init()
 $chat_layout_functions['user_options'] = "
 function user_options(user_id, action)
 	{
-		console.debug(user_id);
 		if(action == 'show')
 			{
 				document.getElementById(user_id).getElementsByClassName('chat_user_bottom')[0].style.display = 'block';
@@ -76,5 +76,23 @@ function layout_user_writing_status (status, username, user_id)
     document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML =  this.old_user_status[username];
   }
 }
+';
+
+$chat_layout_functions['smiley_bar'] = '
+function smiley_bar(smiley_button)
+	{
+		if(smiley_button.className == "chat_smiley_bar_button_closed")
+			{
+				smiley_button.className = "chat_smiley_bar_button_opened";
+				document.getElementsByClassName("chat_smiley_bar")[0].style.width = "50%";
+				document.getElementsByClassName("chat_smiley_bar")[0].style.display = "block";
+			}
+		else if(smiley_button.className == "chat_smiley_bar_button_opened")
+			{
+				smiley_button.className = "chat_smiley_bar_button_closed";
+				document.getElementsByClassName("chat_smiley_bar")[0].style.width = "0%";
+				document.getElementsByClassName("chat_smiley_bar")[0].style.display = "none";
+			}
+	}
 ';
 ?>
