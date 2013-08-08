@@ -24,6 +24,7 @@ class Chat
   private $client_num;
   private $id;
   private $settings = array();
+  private $html_path;
   
  
   public function __construct($settings)
@@ -52,7 +53,7 @@ class Chat
   }
   public function draw()
   {
-    return $this->client_num;
+
   }
   
   private function load_settings($settings=false, $id=false)
@@ -68,8 +69,8 @@ class Chat
     //if the settings are already given, load them
     if ($settings !== false)
       $this->settings = $settings;
-    else if (isset($_SESSION[$chat_id]['settings'])) //else load them from the php session (if set)
-      $this->settings = $_SESSION[$chat_id]['settings'];
+    else if (isset($_SESSION[$this->id]['settings'])) //else load them from the php session (if set)
+      $this->settings = $_SESSION[$this->id]['settings'];
     else
       die("No settings found!");
     
@@ -86,9 +87,18 @@ class Chat
 	//$chat_debug['all_once'][] = "Setting $setting is unused!";
       }
     }
+    //save the settings in the session
+    $_SESSION[$this->id]['settings'] = $chat_settings;
+    
+    //check mysql settings
     if (empty($this->settings['mysql_hostname']) OR empty($this->settings['mysql_username']) OR !isset($this->settings['mysql_password']) OR empty($this->settings['mysql_database']))
       die("Missing MySQL Settings!");
       
+    //get the correct html path or load a custom
+    if ($this->settings['html_path'] == "!!AUTO!!")
+      $this->html_path = str_replace("//", "/", "/" . str_replace($_SERVER['DOCUMENT_ROOT'], "", dirname(dirname(__FILE__)) . "/"));
+    else
+      $this->html_path = $this->settings['html_path'];
     
   }
 }
