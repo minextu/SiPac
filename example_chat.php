@@ -19,7 +19,7 @@ $chat_settings['mysql_password'] = "exmaple_password";
 $chat_settings['mysql_database'] = "exmaple_database";
 
 
-require_once dirname(__FILE__)."/src/server/SiPac.php";
+require_once dirname(__FILE__)."/src/php/SiPac.php";
 $chat = new Chat($chat_settings);
 
 

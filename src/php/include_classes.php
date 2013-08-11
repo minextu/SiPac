@@ -19,6 +19,6 @@
  */
  
 require_once("class/Chat.php");
-
+require_once("class/Chat_MySQL.php");
 ?>
 

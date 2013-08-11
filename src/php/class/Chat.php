@@ -25,6 +25,11 @@ class Chat
   private $id;
   private $settings = array();
   private $html_path;
+  private $html_code;
+  
+  private $db_error;
+  
+  private $js_chat;
   
  
   public function __construct($settings)
@@ -48,14 +53,75 @@ class Chat
     //load all settings for this chat
     $this->load_settings($settings);
     
+    //check, if all mysql settings are given
+    if (empty($this->settings['mysql_hostname']) OR empty($this->settings['mysql_username']) OR !isset($this->settings['mysql_password']) OR empty($this->settings['mysql_database']))
+      die("Missing MySQL Settings!");
+    else
+    {
+      //start mysql connection
+      $this->db = new Chat_MySQL($this->settings['mysql_hostname'], $this->settings['mysql_username'], $this->settings['mysql_password'], $this->settings['mysql_database']);
+      
+      //check the connection
+      $this->db_error = $this->db->check();
+      if ($this->db_error !==  true)
+	die($this->db_error);
+    }
+    
     
     
   }
+  //generate and return the html code for the chat
   public function draw()
   {
+    $layout_path = dirname(__FILE__) . "/../../../themes/".$this->settings['theme'];
+    require_once($layout_path."/layout.php");
+    
+    $css_file = str_replace("\n", " ", file_get_contents($layout_path."/chat.css"));
+    $id_css   = "#".$this->id;
+    
+    /* generate js function arguments, to start the chat*/
+    $this->js_chat = "add_chat('".$this->html_path."','" . $this->settings['theme'] . "','".$this->id."', '".$this->client_num."',";
+    $this->js_chat = $this->js_chat."new Array(";
+    foreach ($this->settings['channels'] as $key => $channel)
+    {
+      if ($key != 0)
+	$this->js_chat = $this->js_chat.",";
+      $this->js_chat = $this->js_chat."\"$channel\"";  
+    }
+    $this->js_chat = $this->js_chat."), new Array(";
+    /*foreach ($chat_text as $key => $text)
+    {
+      if ($key != 0)
+	$this->js_chat = $this->js_chat.",";
+      $this->js_chat = $this->js_chat."\"$text\"";
+    }*/
+    $this->js_chat = $this->js_chat."));";
+    
+    //save the html code of the layout
+    $this->html_code = $chat_layout;
+    
+    //add the chat id to the div with the class 'chat_main'
+    $this->html_code =str_replace('"chat_main"', '"chat_main" id="' . $this->id . '"', str_replace("'chat_main'", "'chat_main' id='".$this->id."'", $this->html_code));
+    
+    //load the chat.js
+    $this->html_code = $this->html_code."<script class='sipac_script' type='text/javascript' src='".$this->html_path."src/javascript/chat.js'></script>";
+    
+    //load the layout css file via javascript
+    $this->html_code = $this->html_code."
+		<script class='sipac_script' type='text/javascript'>
+		var style_obj = document.createElement('style');
+		var text_obj = document.createTextNode('$css_file');
+		style_obj.appendChild(text_obj);
+		document.getElementById('".$this->id."').appendChild(style_obj);
+		".
+		//start the chat, by calling the add_chat function
+		$this->js_chat
+		."
+		</script>";
 
+    return $this->html_code;
   }
-  
+ 
   private function load_settings($settings=false, $id=false)
   {
     //get the chat id, either from the settings or the function variable $id
@@ -88,15 +154,11 @@ class Chat
       }
     }
     //save the settings in the session
-    $_SESSION[$this->id]['settings'] = $chat_settings;
-    
-    //check mysql settings
-    if (empty($this->settings['mysql_hostname']) OR empty($this->settings['mysql_username']) OR !isset($this->settings['mysql_password']) OR empty($this->settings['mysql_database']))
-      die("Missing MySQL Settings!");
-      
+    $_SESSION[$this->id]['settings'] = $settings;
+
     //get the correct html path or load a custom
     if ($this->settings['html_path'] == "!!AUTO!!")
-      $this->html_path = str_replace("//", "/", "/" . str_replace($_SERVER['DOCUMENT_ROOT'], "", dirname(dirname(__FILE__)) . "/"));
+      $this->html_path = str_replace("//", "/", "/" . str_replace($_SERVER['DOCUMENT_ROOT'], "", realpath(dirname(__FILE__)."/../../..") . "/"));
     else
       $this->html_path = $this->settings['html_path'];
     
