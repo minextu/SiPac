@@ -81,13 +81,13 @@ function chat_ajax()
     }
 
 
-    httpobject.open("POST", chat_html_path + "src/chat.php?task=get_chat", true);
+    httpobject.open("POST", chat_html_path + "src/php/SiPac.php?task=get_chat", true);
     httpobject.onreadystatechange = function ()
     {
       if (httpobject.readyState == 4 && httpobject.status == 200)
       {
-        try
-        {
+     //   try
+       // {
           try
           {
             var answer = JSON.parse(httpobject.responseText);
@@ -115,11 +115,11 @@ function chat_ajax()
           window.clearTimeout(chat_error_timeout);
           chat_timeout = window.setTimeout(chat_ajax, 500);
           chat_is_ajax = false;
-        }
-        catch (e)
-        {
-          chat_error(e);
-        }
+       // }
+        //catch (e)
+        //{
+          //chat_error(e);
+        //}
       }
     }
     httpobject.setRequestHeader("Content-type", "application/x-www-form-urlencoded");

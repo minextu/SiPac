@@ -35,5 +35,35 @@ Header("Content-Type: text/html");
 require_once(dirname(__FILE__)."/include_classes.php");
 
 
-
+if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
+{
+  $json_anwer = array();
+  if (isset($_POST['chat_string']))
+  {
+    $chat_string  = $_POST['chat_string'];
+    $chat_objects = explode("&&", $chat_string);
+    foreach ($chat_objects as $chat_object)
+    {
+      if (!empty($chat_object))
+      {
+        $chat_variable_parts = explode("&", $chat_object);
+        
+        foreach ($chat_variable_parts as $chat_variable_part)
+        {
+          $chat_variable                     = explode("=", $chat_variable_part);
+          $chat_variables[$chat_variable[0]] = urldecode($chat_variable[1]);
+        }
+        
+        $chat = new Chat(false, false, $chat_variables['client_num'], $chat_variables['chat_id']);
+        
+        $chat->check_name();
+        
+        $json_anwer[]['get'] = $chat->get_posts($chat_variables['last_id']);
+       
+      }
+    }
+    
+  }
+  echo json_encode($json_anwer);
+}
 ?>

@@ -25,6 +25,7 @@ class Chat
   private $id;
   private $settings = array();
   private $html_path;
+  private $nickname;
   private $html_code;
   
   private $db_error;
@@ -32,13 +33,13 @@ class Chat
   private $js_chat;
   
  
-  public function __construct($settings)
+  public function __construct($settings=false, $is_new=true, $client_num=false, $id=false)
   {
-    $this->init($settings, true);
+    $this->init($settings, $is_new, $client_num, $id);
   }
   
   //initiate the chat: load settings, check all variables
-  public function init($settings, $is_new, $client_num=false)
+  public function init($settings=false, $is_new=true, $client_num=false, $id=false)
   {
     /*
     if not already set,
@@ -51,7 +52,7 @@ class Chat
       $this->client_num = $client_num;
     
     //load all settings for this chat
-    $this->load_settings($settings);
+    $this->load_settings($settings, $id);
     
     //check, if all mysql settings are given
     if (empty($this->settings['mysql_hostname']) OR empty($this->settings['mysql_username']) OR !isset($this->settings['mysql_password']) OR empty($this->settings['mysql_database']))
@@ -121,7 +122,21 @@ class Chat
 
     return $this->html_code;
   }
- 
+  public function get_posts($last_id)
+  {
+    $posts = $this->db->get_posts($this->id);
+
+
+    return array('messages' => array("Main" => array($posts['message'][0])));
+  }
+  public function check_name()
+  {
+    if ($this->settings['username_var'] == "!!AUTO!!")
+      $this->nickname = "Guest " . mt_rand(1, 1000);
+    else
+      $this->nickname = $this->settings['username_var'];
+  
+  }
   private function load_settings($settings=false, $id=false)
   {
     //get the chat id, either from the settings or the function variable $id
@@ -154,7 +169,7 @@ class Chat
       }
     }
     //save the settings in the session
-    $_SESSION[$this->id]['settings'] = $settings;
+    $_SESSION[$this->id]['settings'] = $this->settings;
 
     //get the correct html path or load a custom
     if ($this->settings['html_path'] == "!!AUTO!!")

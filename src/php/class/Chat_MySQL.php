@@ -39,6 +39,15 @@ class Chat_MySQL
     $this->mysql_error = $this->connect();
     return $this->mysql_error;
   }
+  
+  public function get_posts($chat_id)
+  {
+    $this->connect();
+    $chat_mysql = mysql_query("SELECT * FROM chat_entries ORDER BY id ASC");
+    $posts = mysql_fetch_array($chat_mysql);
+    return $posts;
+  }
+  
   private function connect()
   {
     /*Connect to mysql */
