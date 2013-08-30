@@ -26,6 +26,7 @@ class Chat_MySQL
   private $pw;
   
   private $mysql_error;
+  private $connected = false;
   
   public function __construct($host, $user, $pw, $db)
   {
@@ -44,19 +45,44 @@ class Chat_MySQL
   {
     $this->connect();
     $chat_mysql = mysql_query("SELECT * FROM chat_entries ORDER BY id ASC");
-    $posts = mysql_fetch_array($chat_mysql);
+    while ($posts_mysql = mysql_fetch_assoc($chat_mysql))
+    {
+      $posts[] = $posts_mysql;
+    }
+
     return $posts;
+  }
+  
+  public function save_post($message, $chat_id = 0, $channel = 0, $extra = 0, $user = 0, $time = 0, $highlight = "none")
+  {
+    $this->connect();
+    
+    if (empty($user))
+      $user = "test";
+  
+    if (empty($time))
+      $time = time();
+      
+    $save_message_mysql = mysql_query("INSERT INTO chat_entries (user, message, extra, highlight, time, channel, chat_id) VALUES('" . mysql_real_escape_string($user) . "', '" . mysql_real_escape_string($message) . "','$extra', '$highlight', '$time', '" . mysql_real_escape_string($channel) . "', '$chat_id')");
+    
+    return $save_message_mysql;
   }
   
   private function connect()
   {
-    /*Connect to mysql */
-    if (!mysql_connect($this->host, $this->user, $this->pw))
-      return mysql_error();
-    else if (!mysql_select_db($this->db))
-      return mysql_error();
-    else
-      return true;
+    if ($this->connected == false)
+    {
+      /*Connect to mysql */
+      if (!mysql_connect($this->host, $this->user, $this->pw))
+	return mysql_error();
+      else if (!mysql_select_db($this->db))
+	return mysql_error();
+      else
+      {
+	$this->connected = true;
+	return true;
+      }
+    }
   }
 }
 

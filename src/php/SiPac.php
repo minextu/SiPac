@@ -34,36 +34,63 @@ Header("Content-Type: text/html");
 //include all classes
 require_once(dirname(__FILE__)."/include_classes.php");
 
-
+//if this is an AJAX Connection
 if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 {
-  $json_anwer = array();
+  $json_answer = array();
   if (isset($_POST['chat_string']))
   {
+    //get the chat string, which contains all started chats
     $chat_string  = $_POST['chat_string'];
+    //split all chats
     $chat_objects = explode("&&", $chat_string);
+    
+    //proceed every chat
     foreach ($chat_objects as $chat_object)
     {
       if (!empty($chat_object))
       {
+	//split all transmitted variables
         $chat_variable_parts = explode("&", $chat_object);
-        
+        //save them
         foreach ($chat_variable_parts as $chat_variable_part)
         {
           $chat_variable                     = explode("=", $chat_variable_part);
           $chat_variables[$chat_variable[0]] = urldecode($chat_variable[1]);
         }
         
+        //create the Chat class
         $chat = new Chat(false, false, $chat_variables['client_num'], $chat_variables['chat_id']);
-        
+	//obtain a nickname or load the old
         $chat->check_name();
         
-        $json_anwer[]['get'] = $chat->get_posts($chat_variables['last_id']);
-       
+        //create a temp json answer var to collect all tmp answer to a big json array
+        $tmp_json_answer = array();
+        
+        //if one or more message were send
+	if (isset($chat_variables['send_message']))
+        {
+	  $send_answer = array();
+	  //split them
+	  $messages_to_save = explode("|||", $chat_variables['send_message']);
+          foreach ($messages_to_save as $message)
+          {
+	    // save the message and keep the answer of the save_message function (it could contain notifications)
+            $send_answer = array_merge($send_answer, $chat->send_message($message));
+          }
+          //merge the json array with the send_answer array
+	  $tmp_json_answer = array_merge($send_answer, $tmp_json_answer);
+	}
+	
+        //get all new posts since the last request and save them in the var tmp json_answer
+        $tmp_json_answer['get'] = $chat->get_posts($chat_variables['last_id']);
+        
+	//save the tmp json array in the real one
+	$json_answer[] = $tmp_json_answer;
       }
     }
     
   }
-  echo json_encode($json_anwer);
+  echo json_encode($json_answer);
 }
 ?>

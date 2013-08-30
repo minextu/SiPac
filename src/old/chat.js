@@ -113,7 +113,7 @@ function chat_ajax()
           }
 
           window.clearTimeout(chat_error_timeout);
-          chat_timeout = window.setTimeout(chat_ajax, 1000);
+          chat_timeout = window.setTimeout(chat_ajax, 500);
           chat_is_ajax = false;
        // }
         //catch (e)
@@ -188,11 +188,11 @@ function Chat(theme, id, client_num, channels, texts)
   this.client_num = client_num;
   this.channels = channels;
   this.texts = texts;
-  this.last_id = 0;
+  this.last_id = "none";
   this.first_start = true;
   this.new_channels = new Array();
   this.active_channel = "";
-  this.enable_sound = false; //change to true
+  this.enable_sound = true;
   this.add_channel(undefined, true);
   this.change_channel(this.channels[0]);
 
@@ -300,7 +300,7 @@ Chat.prototype.handle_chat_tasks = function (answer)
     {}
   }
   this.username = answer['get']['username'];
-  if (answer['get']['posts'] != undefined)
+  if (answer['get']['messages'] != undefined)
   {
     for (var i = 0; i < this.channels.length; i++)
     {
@@ -310,10 +310,8 @@ Chat.prototype.handle_chat_tasks = function (answer)
         this.new_channels[this.channels[i]] = false;
       }
 
-      if (answer['get']['posts'][this.channels[i]] != undefined)
-      {
-        this.add_entries(this.channels[i], answer['get']['posts'][this.channels[i]], answer['get']['post_users'][this.channels[i]], answer['get']['highlight']);
-      }
+      if (answer['get']['messages'][this.channels[i]] != undefined)
+        this.add_entries(this.channels[i], answer['get']['messages'][this.channels[i]], answer['get']['messages_user'][this.channels[i]], answer['get']['highlight']);
     }
   }
   if (answer['get']['userlist'] != undefined)

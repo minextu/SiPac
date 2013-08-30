@@ -124,10 +124,42 @@ class Chat
   }
   public function get_posts($last_id)
   {
-    $posts = $this->db->get_posts($this->id);
-
-
-    return array('messages' => array("Main" => array($posts['message'][0])));
+    //load all posts
+    $db_response = $this->db->get_posts($this->id);
+ 
+    $new_posts = array();
+    $new_post_users = array();
+    
+    foreach ($db_response as $post)
+    {
+      //check if the post is new
+      if ($post['id'] > $last_id)
+      {
+	$new_posts[] = "<div>".$post['user'].": ".$post['message']."</div>";
+	$new_post_users[] = $post['user'];
+      }
+      //save the highest id
+      $updated_last_id = $post['id'];
+    }
+    $last_id = $updated_last_id;
+    //return all new posts and the highest id
+    return array('posts' => array("Main" => $new_posts), 'post_users' => $new_post_users, 'last_id' => $last_id);
+  }
+  public function send_message($message)
+  {
+    //remove uneeded space
+    $message = trim($message);
+    
+    if (!empty($message))
+    {
+      $db_response = $this->db->save_post($message);
+      if ($db_response !== true)
+	return array('info_type' => "error", 'info_text' => $db_response);
+      else
+	return array();
+    }
+    else
+      return array('info_type' => "error", 'info_text' => "Nothing entered");
   }
   public function check_name()
   {
