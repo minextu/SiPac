@@ -130,6 +130,8 @@ class Chat
     $new_posts = array();
     $new_post_users = array();
     
+    $updated_last_id = $last_id;
+    
     foreach ($db_response as $post)
     {
       //check if the post is new
@@ -145,14 +147,20 @@ class Chat
     //return all new posts and the highest id
     return array('posts' => array("Main" => $new_posts), 'post_users' => $new_post_users, 'last_id' => $last_id);
   }
-  public function send_message($message)
+  public function send_message($message, $channel = 0, $extra = 0, $user = 0, $time = 0)
   {
     //remove uneeded space
     $message = trim($message);
     
+    if (empty($user))
+      $user = $this->nickname;
+  
+    if (empty($time))
+      $time = time();
+      
     if (!empty($message))
     {
-      $db_response = $this->db->save_post($message);
+      $db_response = $this->db->save_post($message, $this->id, $channel, $extra, $user, $time);
       if ($db_response !== true)
 	return array('info_type' => "error", 'info_text' => $db_response);
       else
@@ -161,12 +169,46 @@ class Chat
     else
       return array('info_type' => "error", 'info_text' => "Nothing entered");
   }
+  public function handle_userlist()
+  {
+    //save the user in the db
+    $this->save_user();
+    
+    //get other users
+    
+    /* will be added later
+    $userlist_answer = $this->get_users();
+    
+    return $userlist_answer;*/
+  }
+  private function save_user()
+  {
+    //try to get user information
+    $user_info = $this->db->get_user($this->nickname, $this->id);
+    
+    //if no infomation by this user are available
+    if (empty($user_info))
+    {
+      //save the user
+      $this->db->save_user($this->nickname, $this->id);
+      //send a message, that this user jas joined the chat
+      $this->send_message($this->nickname. " has joined");
+    }
+    else //if the user is already in the db, just update the information
+      $this->db->update_user($this->nickname, $this->id, time());
+      
+    
+  }
   public function check_name()
   {
-    if ($this->settings['username_var'] == "!!AUTO!!")
+    if (!empty($_SESSION[$this->id]['nickname']))
+      $this->nickname = $_SESSION[$this->id]['nickname'];
+    else if ($this->settings['username_var'] == "!!AUTO!!")
       $this->nickname = "Guest " . mt_rand(1, 1000);
     else
       $this->nickname = $this->settings['username_var'];
+      
+    $_SESSION[$this->id]['nickname'] = $this->nickname;
   
   }
   private function load_settings($settings=false, $id=false)

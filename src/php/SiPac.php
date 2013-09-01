@@ -85,6 +85,9 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
         //get all new posts since the last request and save them in the var tmp json_answer
         $tmp_json_answer['get'] = $chat->get_posts($chat_variables['last_id']);
         
+        //save user in the db and add other users to the userlist
+        $tmp_json_answer['get']['userlist'] = $chat->handle_userlist();
+        
 	//save the tmp json array in the real one
 	$json_answer[] = $tmp_json_answer;
       }
