@@ -47,9 +47,9 @@ class Chat_MySQL
     $chat_mysql = mysql_query("SELECT * FROM chat_entries ORDER BY id ASC");
     
     $posts = array();
-    while ($posts_mysql = mysql_fetch_assoc($chat_mysql))
+    while ($post = mysql_fetch_assoc($chat_mysql))
     {
-      $posts[] = $posts_mysql;
+      $posts[] = $post;
     }
 
     return $posts;
@@ -64,6 +64,19 @@ class Chat_MySQL
     return $save_message_mysql;
   }
   
+  public function get_all_users($chat_id)
+  {
+    //get all users in the chat
+    $users_mysql = mysql_query("SELECT * FROM chat_users WHERE chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
+    
+    $users = array();
+    while ($user = mysql_fetch_assoc($users_mysql))
+    {
+      $users[] = $user;
+    }
+    return $users;
+  }
+  
   public function get_user($nickname, $chat_id)
   {
     //get all values of the user with the given nickname
@@ -72,17 +85,23 @@ class Chat_MySQL
     return mysql_fetch_assoc($user_info);
   }
   
-  public function update_user($nickname, $chat_id, $time)
+  public function update_user($nickname, $chat_id, $time, $is_writing)
   {
     //variables to add later
     $is_afk = false;
     $user_info = "";
-    $is_writing = false;
     $user_style = "";
     $channel = "";
     
+    if ($is_writing == "true")
+      $is_writing = 1;
+    else
+      $is_writing = 0;
+      
     //update the user entry with all new values
-    $update_user_mysql = mysql_query("UPDATE chat_users SET last_time = '" . $time . "', afk = '" . $is_afk . "', info = '" . mysql_real_escape_string($user_info) . "', writing = '" . $is_writing . "', style = '" . $user_style . "' WHERE name = '" . mysql_real_escape_string($nickname) . "' AND chat_id = '" . mysql_real_escape_string($chat_id) . "'");
+    $update_user_mysql = mysql_query("UPDATE chat_users SET last_time = '" . $time . "', afk = '" . $is_afk . "', info = '" . mysql_real_escape_string($user_info) . "', writing = '" . mysql_real_escape_string($is_writing) . "', style = '" . $user_style . "' WHERE name = '" . mysql_real_escape_string($nickname) . "' AND chat_id = '" . mysql_real_escape_string($chat_id) . "'");
+    
+    
     
     return $update_user_mysql;
   }
@@ -98,6 +117,13 @@ class Chat_MySQL
     
     //save the user with all given values
     $add_user_mysql = mysql_query("INSERT INTO chat_users (name, info, style, afk, writing, ip, last_time, channel, chat_id) VALUES ('" . mysql_real_escape_string($nickname) . "', '" . mysql_real_escape_string($user_info) . "', '" . $user_style . "', '" . $is_afk . "', 'false', '" . $user_ip . "', '" . time() . "', '" . mysql_real_escape_string($channel) . "', '$chat_id')");
+  }
+  
+  public function delete_user($nickname, $chat_id)
+  {
+  
+  
+    $delete_user = mysql_query("DELETE FROM chat_users WHERE name LIKE '" . mysql_real_escape_string($nickname) . "' AND chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
   }
   private function connect()
   {

@@ -366,12 +366,9 @@ Chat.prototype.handle_userlist = function (userlist_arr, channel)
     for (var i = 0; i < userlist_arr['add_user'].length; i++)
     {
       chat_userlist.innerHTML += "<span id='" + this.id + "_" + channel + "_user_" + userlist_arr['add_user_id'][i] + "'>" + userlist_arr['add_user'][i] + "</span>";
-    }
-    
-    for (var i = 0; i < userlist_arr['users'].length; i++)
-    {
-      if (userlist_arr['users'][i] == this.username)
-	this.username_key = i;
+      
+      if (userlist_arr['users'][userlist_arr['add_user_id'][i]] == this.username)
+	this.username_key = userlist_arr['add_user_id'][i];
     }
   }
   if (userlist_arr['change_user'] != undefined)
@@ -399,11 +396,11 @@ Chat.prototype.handle_userlist = function (userlist_arr, channel)
 
   if (userlist_arr['user_writing'] != undefined)
   {
-    for (var i = 0; i < userlist_arr['user_writing'].length; i++)
+    for (var i = 0; i < userlist_arr['user_writing']['id'].length; i++)
     {
       try
       {
-	this.layout_user_writing_status(userlist_arr['user_writing'][i], userlist_arr['users'][i], this.id + "_" + channel + "_user_" + i);
+	this.layout_user_writing_status(userlist_arr['user_writing']['status'][i], userlist_arr['users'][userlist_arr['user_writing']['id'][i]], this.id + "_" + channel + "_user_" + userlist_arr['user_writing']['id'][i]);
       }
       catch(e){}
       

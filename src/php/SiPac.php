@@ -58,11 +58,13 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
           $chat_variable                     = explode("=", $chat_variable_part);
           $chat_variables[$chat_variable[0]] = urldecode($chat_variable[1]);
         }
-        
         //create the Chat class
         $chat = new Chat(false, false, $chat_variables['client_num'], $chat_variables['chat_id']);
 	//obtain a nickname or load the old
         $chat->check_name();
+        
+        //save the writing status
+        $chat->is_writing = $chat_variables['writing'];
         
         //create a temp json answer var to collect all tmp answer to a big json array
         $tmp_json_answer = array();

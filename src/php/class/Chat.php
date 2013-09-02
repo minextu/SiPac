@@ -26,12 +26,13 @@ class Chat
   private $settings = array();
   private $html_path;
   private $nickname;
+  private $users;
   private $html_code;
   
   private $db_error;
   
   private $js_chat;
-  
+  public $is_writing = false;
  
   public function __construct($settings=false, $is_new=true, $client_num=false, $id=false)
   {
@@ -116,9 +117,20 @@ class Chat
 		document.getElementById('".$this->id."').appendChild(style_obj);
 		".
 		//start the chat, by calling the add_chat function
-		$this->js_chat
-		."
-		</script>";
+		$this->js_chat;
+		
+    //load all javascript functions by the layout
+		
+    if (!empty($chat_layout_functions))
+    {
+      foreach ($chat_layout_functions as $name => $function)
+      {
+	$this->html_code = $this->html_code."chat_objects[chat_objects.length-1].$name = $function;";
+	if ($name == "layout_init")
+	  $this->html_code = $this->html_code."chat_objects[chat_objects.length-1].$name();";
+      }
+    }
+    $this->html_code = $this->html_code."</script>";
 
     return $this->html_code;
   }
@@ -145,7 +157,7 @@ class Chat
     }
     $last_id = $updated_last_id;
     //return all new posts and the highest id
-    return array('posts' => array("Main" => $new_posts), 'post_users' => $new_post_users, 'last_id' => $last_id);
+    return array('posts' => array("Main" => $new_posts), 'post_users' => $new_post_users, 'last_id' => $last_id, 'username' => $this->nickname);
   }
   public function send_message($message, $channel = 0, $extra = 0, $user = 0, $time = 0)
   {
@@ -176,10 +188,10 @@ class Chat
     
     //get other users
     
-    /* will be added later
+
     $userlist_answer = $this->get_users();
     
-    return $userlist_answer;*/
+    return $userlist_answer;
   }
   private function save_user()
   {
@@ -192,12 +204,62 @@ class Chat
       //save the user
       $this->db->save_user($this->nickname, $this->id);
       //send a message, that this user jas joined the chat
-      $this->send_message($this->nickname. " has joined");
+      $this->send_message($this->nickname. " has joined", "channel", 1, 0);
     }
     else //if the user is already in the db, just update the information
-      $this->db->update_user($this->nickname, $this->id, time());
+      $this->db->update_user($this->nickname, $this->id, time(), $this->is_writing);
       
     
+  }
+  private function get_users()
+  {
+    $user_array = array();
+    
+    if (!isset($_SESSION[$this->id]['userlist'][$this->client_num]))
+      $_SESSION[$this->id]['userlist'][$this->client_num] = array();
+    
+    $users = $this->db->get_all_users($this->id);
+    foreach($users as $user)
+    {
+     if (time() - $user['last_time'] > $this->settings['max_ping_remove'])
+      {
+	$this->db->delete_user($user['name'], $this->id);
+        
+        $this->send_message($user['name']. " has left", $user['channel'], 1, 0, $user['last_time']);
+      }
+      $this->users[$user['id']] = new Chat_User($user);
+      
+      $user_array['Main']['user_writing']['id'][] = $user['id'];
+      $user_array['Main']['user_writing']['status'][] = $this->users[$user['id']]->is_writing;
+      
+      $user_array['Main']['users'][$user['id']] = $user['name'];
+      
+      $user_html = $this->users[$user['id']]->generate_html();
+      
+      if (!isset($_SESSION[$this->id]['userlist'][$this->client_num][$user['id']]))
+      {
+	$user_array['Main']['add_user'][] = $user_html;
+	$user_array['Main']['add_user_id'][] = $user['id']; 
+	$_SESSION[$this->id]['userlist'][$this->client_num][$user['id']] = $user_html;
+      }
+      else if ($_SESSION[$this->id]['userlist'][$this->client_num][$user['id']] != $user_html)
+      {
+	$user_array['Main']['change_user'][] = $user_html;
+	$user_array['Main']['change_user_id'][] = $user['id'];
+	$_SESSION[$this->id]['userlist'][$this->client_num][$user['id']] = $user_html;
+      }
+      
+    }
+    
+    foreach ($_SESSION[$this->id]['userlist'][$this->client_num] as $id => $user)
+    {
+      if (!isset($this->users[$id]))
+      {
+        $user_array['Main']['delete_user'][] = $id;
+        unset($_SESSION[$this->id]['userlist'][$this->client_num][$id]);
+      }
+    }
+    return $user_array;
   }
   public function check_name()
   {
