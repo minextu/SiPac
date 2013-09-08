@@ -22,7 +22,13 @@ $chat_layout_user_entry = "
 	</div><!-- end: chat_user_bottom-class -->
 </div><!-- end: chat_user-class -->
 ";
-
+$chat_layout_post_entry = "
+<div class='chat_entry_!!TYPE!!'>
+  <span class='chat_entry_user'>!!USER!!</span>
+  <span class='chat_entry_message'>!!MESSAGE!!</span>
+  <span class='chat_entry_date'>!!TIME!!</span>
+</div>
+";
 $chat_layout = "
 <div class='chat_main'>
   <div class='chat_left'>

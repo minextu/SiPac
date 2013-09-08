@@ -21,5 +21,6 @@
 require_once("class/Chat.php");
 require_once("class/Chat_MySQL.php");
 require_once("class/Chat_User.php");
+require_once("class/Chat_Userlist.php");
 ?>
 

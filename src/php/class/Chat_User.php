@@ -21,26 +21,19 @@
 class Chat_User
 {
   
-  public function __construct($array)
+  public function __construct($array, $layout)
   {
     $this->id = $array['id'];
     $this->nickname = $array['name'];
     $this->is_writing = $array['writing'];
+    $this->layout = $layout;
   }
   
   public function generate_html()
   {
-    $user_html = "
-    <div>
-	<div class='chat_user_top'>
-		<div class='chat_user_name'>".$this->nickname."<span class='chat_user_status'>[!!USER_STATUS!!]</span></div>
-	</div><!-- end: chat_user_top-class -->
-	<div class='chat_user_bottom' style='display: none;'>
-		<ul>
-		!!USER_INFO!!
-		</ul>
-	</div><!-- end: chat_user_bottom-class -->
-    </div><!-- end: chat_user-class -->";
+    $user_html = $this->layout['user_html'];
+    $user_html = str_replace("!!USER!!", $this->nickname, $user_html);
+
 	
     return $user_html;
   }

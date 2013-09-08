@@ -124,7 +124,7 @@
 	color: #3a3a3a;
 }
 
-.chat_notify
+.chat_entry_notify
 {
 	height: 20px;
 	line-height: 20px;
@@ -133,19 +133,19 @@
 	border-bottom: 1px solid #747474;
 }
 
-.chat_notify .chat_entry_user
+.chat_entry_notify .chat_entry_user
 {
 	font-weight: bold;
 	font-size: 12pt;
 }
 
-.chat_notify .chat_entry_message
+.chat_entry_notify .chat_entry_message
 {
 	font-size: 11pt;
 	font-style: italic;
 }
 
-.chat_notify .chat_entry_date
+.chat_entry_notify .chat_entry_date
 {
 	float: right;
 	font-size: 10pt;

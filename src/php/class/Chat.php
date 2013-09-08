@@ -21,13 +21,13 @@
 class Chat
 {
   //define all private variables
-  private $client_num;
-  private $id;
-  private $settings = array();
+  public $client_num;
+  public $id;
+  public $settings = array();
   private $html_path;
-  private $nickname;
-  private $users;
+  public $nickname;
   private $html_code;
+  public $layout;
   
   private $db_error;
   
@@ -69,16 +69,13 @@ class Chat
 	die($this->db_error);
     }
     
-    
+    $this->include_layout();
     
   }
   //generate and return the html code for the chat
   public function draw()
-  {
-    $layout_path = dirname(__FILE__) . "/../../../themes/".$this->settings['theme'];
-    require_once($layout_path."/layout.php");
-    
-    $css_file = str_replace("\n", " ", file_get_contents($layout_path."/chat.css"));
+  {    
+    $css_file = str_replace("\n", " ", file_get_contents($this->layout['path']."/chat.css"));
     $id_css   = "#".$this->id;
     
     /* generate js function arguments, to start the chat*/
@@ -100,7 +97,7 @@ class Chat
     $this->js_chat = $this->js_chat."));";
     
     //save the html code of the layout
-    $this->html_code = $chat_layout;
+    $this->html_code = $this->layout['html'];
     
     //add the chat id to the div with the class 'chat_main'
     $this->html_code =str_replace('"chat_main"', '"chat_main" id="' . $this->id . '"', str_replace("'chat_main'", "'chat_main' id='".$this->id."'", $this->html_code));
@@ -121,9 +118,9 @@ class Chat
 		
     //load all javascript functions by the layout
 		
-    if (!empty($chat_layout_functions))
+    if (!empty($this->layout['javascript_functions']))
     {
-      foreach ($chat_layout_functions as $name => $function)
+      foreach ($this->layout['javascript_functions'] as $name => $function)
       {
 	$this->html_code = $this->html_code."chat_objects[chat_objects.length-1].$name = $function;";
 	if ($name == "layout_init")
@@ -133,6 +130,20 @@ class Chat
     $this->html_code = $this->html_code."</script>";
 
     return $this->html_code;
+  }
+  
+  private function include_layout()
+  {
+   $layout_path = dirname(__FILE__) . "/../../../themes/".$this->settings['theme'];
+    require_once($layout_path."/layout.php");
+    
+    $layout_array['path'] = $layout_path;
+    $layout_array['html'] = $chat_layout;
+    $layout_array['user_html'] = $chat_layout_user_entry;
+    $layout_array['post_html'] = $chat_layout_post_entry;
+    $layout_array['javascript_functions'] = $chat_layout_functions;
+    
+    $this->layout = $layout_array;
   }
   public function get_posts($last_id)
   {
@@ -149,8 +160,28 @@ class Chat
       //check if the post is new
       if ($post['id'] > $last_id)
       {
-	$new_posts[] = "<div>".$post['user'].": ".$post['message']."</div>";
-	$new_post_users[] = $post['user'];
+	if ($post['extra'] == 0)
+	{
+	  $post_user = $post['user'].": ";
+	  
+	  if ($post['user'] == $this->nickname)
+	    $post_type = "own";
+	  else
+	    $post_type = "others";
+	}
+	else 
+	{
+	  $post_user = "";
+	  $post_type = "notify";
+	}
+	$post_html = $this->layout['post_html'];
+	$post_html = str_replace("!!USER!!", $post_user, $post_html);
+	$post_html = str_replace("!!MESSAGE!!", $post['message'], $post_html);
+	$post_html = str_replace("!!TYPE!!", $post_type, $post_html);
+	  
+	 
+	$new_posts[] = $post_html;
+	$new_post_users[] = $post_user;
       }
       //save the highest id
       $updated_last_id = $post['id'];
@@ -183,95 +214,39 @@ class Chat
   }
   public function handle_userlist()
   {
+    $this->userlist = new Chat_Userlist($this);
     //save the user in the db
-    $this->save_user();
+    $this->userlist->save_user();
     
     //get other users
     
 
-    $userlist_answer = $this->get_users();
+    $userlist_answer = $this->userlist->get_users();
     
     return $userlist_answer;
   }
-  private function save_user()
-  {
-    //try to get user information
-    $user_info = $this->db->get_user($this->nickname, $this->id);
-    
-    //if no infomation by this user are available
-    if (empty($user_info))
-    {
-      //save the user
-      $this->db->save_user($this->nickname, $this->id);
-      //send a message, that this user jas joined the chat
-      $this->send_message($this->nickname. " has joined", "channel", 1, 0);
-    }
-    else //if the user is already in the db, just update the information
-      $this->db->update_user($this->nickname, $this->id, time(), $this->is_writing);
-      
-    
-  }
-  private function get_users()
-  {
-    $user_array = array();
-    
-    if (!isset($_SESSION[$this->id]['userlist'][$this->client_num]))
-      $_SESSION[$this->id]['userlist'][$this->client_num] = array();
-    
-    $users = $this->db->get_all_users($this->id);
-    foreach($users as $user)
-    {
-     if (time() - $user['last_time'] > $this->settings['max_ping_remove'])
-      {
-	$this->db->delete_user($user['name'], $this->id);
-        
-        $this->send_message($user['name']. " has left", $user['channel'], 1, 0, $user['last_time']);
-      }
-      $this->users[$user['id']] = new Chat_User($user);
-      
-      $user_array['Main']['user_writing']['id'][] = $user['id'];
-      $user_array['Main']['user_writing']['status'][] = $this->users[$user['id']]->is_writing;
-      
-      $user_array['Main']['users'][$user['id']] = $user['name'];
-      
-      $user_html = $this->users[$user['id']]->generate_html();
-      
-      if (!isset($_SESSION[$this->id]['userlist'][$this->client_num][$user['id']]))
-      {
-	$user_array['Main']['add_user'][] = $user_html;
-	$user_array['Main']['add_user_id'][] = $user['id']; 
-	$_SESSION[$this->id]['userlist'][$this->client_num][$user['id']] = $user_html;
-      }
-      else if ($_SESSION[$this->id]['userlist'][$this->client_num][$user['id']] != $user_html)
-      {
-	$user_array['Main']['change_user'][] = $user_html;
-	$user_array['Main']['change_user_id'][] = $user['id'];
-	$_SESSION[$this->id]['userlist'][$this->client_num][$user['id']] = $user_html;
-      }
-      
-    }
-    
-    foreach ($_SESSION[$this->id]['userlist'][$this->client_num] as $id => $user)
-    {
-      if (!isset($this->users[$id]))
-      {
-        $user_array['Main']['delete_user'][] = $id;
-        unset($_SESSION[$this->id]['userlist'][$this->client_num][$id]);
-      }
-    }
-    return $user_array;
-  }
   public function check_name()
   {
-    if (!empty($_SESSION[$this->id]['nickname']))
-      $this->nickname = $_SESSION[$this->id]['nickname'];
+    if (!empty($_SESSION['SiPac'][$this->id]['nickname']))
+      $this->nickname = $_SESSION['SiPac'][$this->id]['nickname'];
     else if ($this->settings['username_var'] == "!!AUTO!!")
       $this->nickname = "Guest " . mt_rand(1, 1000);
     else
       $this->nickname = $this->settings['username_var'];
       
-    $_SESSION[$this->id]['nickname'] = $this->nickname;
+    $_SESSION['SiPac'][$this->id]['nickname'] = $this->nickname;
   
+  }
+  private function check_command($text)
+  {
+  /*
+     if (strpos($text, "/") === 0)
+     {
+      
+     }
+     else
+      return false;
+      */
   }
   private function load_settings($settings=false, $id=false)
   {
@@ -286,8 +261,8 @@ class Chat
     //if the settings are already given, load them
     if ($settings !== false)
       $this->settings = $settings;
-    else if (isset($_SESSION[$this->id]['settings'])) //else load them from the php session (if set)
-      $this->settings = $_SESSION[$this->id]['settings'];
+    else if (isset($_SESSION['SiPac'][$this->id]['settings'])) //else load them from the php session (if set)
+      $this->settings = $_SESSION['SiPac'][$this->id]['settings'];
     else
       die("No settings found!");
     
@@ -305,7 +280,7 @@ class Chat
       }
     }
     //save the settings in the session
-    $_SESSION[$this->id]['settings'] = $this->settings;
+    $_SESSION['SiPac'][$this->id]['settings'] = $this->settings;
 
     //get the correct html path or load a custom
     if ($this->settings['html_path'] == "!!AUTO!!")

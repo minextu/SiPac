@@ -44,7 +44,7 @@ class Chat_MySQL
   public function get_posts($chat_id)
   {
     $this->connect();
-    $chat_mysql = mysql_query("SELECT * FROM chat_entries ORDER BY id ASC");
+    $chat_mysql = mysql_query("SELECT * FROM chat_entries WHERE chat_id LIKE '".mysql_real_escape_string($chat_id)."' ORDER BY id ASC");
     
     $posts = array();
     while ($post = mysql_fetch_assoc($chat_mysql))
