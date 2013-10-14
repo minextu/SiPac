@@ -41,7 +41,7 @@ class Chat_MySQL
     return $this->mysql_error;
   }
   
-  public function get_posts($chat_id)
+  public function get_posts($chat_id, $channels)
   {
     $this->connect();
     $chat_mysql = mysql_query("SELECT * FROM chat_entries WHERE chat_id LIKE '".mysql_real_escape_string($chat_id)."' ORDER BY id ASC");
@@ -49,7 +49,8 @@ class Chat_MySQL
     $posts = array();
     while ($post = mysql_fetch_assoc($chat_mysql))
     {
-      $posts[] = $post;
+      if (array_search($post['channel'], $channels) !== false)
+	$posts[] = $post;
     }
 
     return $posts;

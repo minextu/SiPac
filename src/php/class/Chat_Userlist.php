@@ -67,7 +67,7 @@
         
         continue;
       }
-      $this->users[$user['id']] = new Chat_User($user, $this->chat->layout);
+      $this->users[$user['id']] = new Chat_User($user, $this->chat->layout, $this->chat->chat_num);
       
       //add the status, if a user is writing
       $user_array['Main']['user_writing']['id'][] = $user['id'];

@@ -17,13 +17,14 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 class Chat
 {
   //define all private variables
   public $client_num;
   public $id;
+  public $chat_num;
   public $settings = array();
+  private $channels;
   private $html_path;
   public $nickname;
   private $html_code;
@@ -34,13 +35,13 @@ class Chat
   private $js_chat;
   public $is_writing = false;
  
-  public function __construct($settings=false, $is_new=true, $client_num=false, $id=false)
+  public function __construct($settings=false, $is_new=true, $client_num=false, $id=false, $channels=false, $chat_num=false)
   {
-    $this->init($settings, $is_new, $client_num, $id);
+    $this->init($settings, $is_new, $client_num, $id, $channels, $chat_num);
   }
   
   //initiate the chat: load settings, check all variables
-  public function init($settings=false, $is_new=true, $client_num=false, $id=false)
+  public function init($settings, $is_new, $client_num, $id, $channels, $chat_num)
   {
     /*
     if not already set,
@@ -68,6 +69,12 @@ class Chat
       if ($this->db_error !==  true)
 	die($this->db_error);
     }
+    if ($this->channels == false)
+      $this->channels = $this->settings['channels'];
+    else
+      $this->channels = $channels;
+      
+    $this->chat_num = $chat_num;
     
     $this->include_layout();
     
@@ -75,6 +82,7 @@ class Chat
   //generate and return the html code for the chat
   public function draw()
   {    
+    
     $css_file = str_replace("\n", " ", file_get_contents($this->layout['path']."/chat.css"));
     $id_css   = "#".$this->id;
     
@@ -135,7 +143,7 @@ class Chat
   private function include_layout()
   {
    $layout_path = dirname(__FILE__) . "/../../../themes/".$this->settings['theme'];
-    require_once($layout_path."/layout.php");
+    require($layout_path."/layout.php");
     
     $layout_array['path'] = $layout_path;
     $layout_array['html'] = $chat_layout;
@@ -148,7 +156,7 @@ class Chat
   public function get_posts($last_id)
   {
     //load all posts
-    $db_response = $this->db->get_posts($this->id);
+    $db_response = $this->db->get_posts($this->id, $this->channels);
  
     $new_posts = array();
     $new_post_users = array();
@@ -178,19 +186,29 @@ class Chat
 	$post_html = str_replace("!!USER!!", $post_user, $post_html);
 	$post_html = str_replace("!!MESSAGE!!", $post['message'], $post_html);
 	$post_html = str_replace("!!TYPE!!", $post_type, $post_html);
+	
+	if ($this->settings['time_24_hours'])
+          $date = date("H:i", $post['time']);
+        else
+          $date = date("h:i A", $post['time']);
+        
+        if (date("d.m.Y", $post['time']) != date("d.m.Y", time()))
+          $date = date($this->settings['date_format'], $post['time']). " " . $date;
+          
+	$post_html = str_replace("!!TIME!!", $date, $post_html);
 	  
-	 
-	$new_posts[] = $post_html;
-	$new_post_users[] = $post_user;
+	
+	$new_posts[$post['channel']][] = $post_html;
+	$new_post_users[$post['channel']][] = $post_user;
       }
       //save the highest id
       $updated_last_id = $post['id'];
     }
     $last_id = $updated_last_id;
     //return all new posts and the highest id
-    return array('posts' => array("Main" => $new_posts), 'post_users' => $new_post_users, 'last_id' => $last_id, 'username' => $this->nickname);
+    return array('posts' => $new_posts, 'post_users' => $new_post_users, 'last_id' => $last_id, 'username' => $this->nickname);
   }
-  public function send_message($message, $channel = 0, $extra = 0, $user = 0, $time = 0)
+  public function send_message($message, $channel, $extra = 0, $user = 0, $time = 0)
   {
     //remove uneeded space
     $message = trim($message);
@@ -266,12 +284,11 @@ class Chat
     else
       die("No settings found!");
     
+ 
     
-    //include the default config
-    require_once(dirname(__FILE__)."/../default_conf.php");
-    
+    $default_settings = return_default_settings();
     //if some settings are not set, load them from the default config
-    foreach ($chat_default_settings as $setting => $default)
+    foreach ($default_settings as $setting => $default)
     {
       if (!isset($this->settings[$setting]))
       {

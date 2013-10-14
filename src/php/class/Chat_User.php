@@ -21,11 +21,13 @@
 class Chat_User
 {
   
-  public function __construct($array, $layout)
+  public function __construct($array, $layout, $chat_num)
   {
     $this->id = $array['id'];
+    $this->chat_num = $chat_num;
     $this->nickname = $array['name'];
     $this->is_writing = $array['writing'];
+    $this->afk = $array['afk'];
     $this->layout = $layout;
   }
   
@@ -33,8 +35,15 @@ class Chat_User
   {
     $user_html = $this->layout['user_html'];
     $user_html = str_replace("!!USER!!", $this->nickname, $user_html);
-
-	
+    
+    if ($this->afk == 0)
+      $user_status = "online";
+    else
+      $user_status = "afk";
+    
+    $user_html = str_replace("!!USER_STATUS!!", $user_status, $user_html);
+    $user_html = str_replace("!!NUM!!", $this->chat_num, $user_html);
+    $user_html = str_replace("!!USER_ID!!", "user_".$this->id, $user_html);
     return $user_html;
   }
   

@@ -24,8 +24,14 @@ Please don't change anything here.
 If you want to change theese settings, use "$chat_settings[setting_name_here] = setting;" like in the sample index.php
 
 */
-
 date_default_timezone_set('Europe/Berlin');
+
+function return_default_settings()
+{
+  global $chat_default_settings;
+  return  $chat_default_settings;
+}
+
 $chat_default_settings = array(
   "default_user_infos" => array(),
   "language" => "en",
