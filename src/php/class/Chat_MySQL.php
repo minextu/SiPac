@@ -28,6 +28,8 @@ class Chat_MySQL
   private $mysql_error;
   private $connected = false;
   
+  private $nickname;
+  
   public function __construct($host, $user, $pw, $db)
   {
     $this->host = $host;
@@ -125,6 +127,19 @@ class Chat_MySQL
   
   
     $delete_user = mysql_query("DELETE FROM chat_users WHERE name LIKE '" . mysql_real_escape_string($nickname) . "' AND chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
+  }
+  
+  public function add_task($task, $user=false)
+  {
+    if ($user === false)
+      $user = $this->nickname;
+      
+    $add_task = mysql_query("UPDATE chat_users SET action = '".mysql_real_escape_string($task)."' WHERE name LIKE '".mysql_real_escape_string($user)."'");
+  }
+  
+  public function update_nickname($nickname)
+  {
+    $this->nickname = $nickname;
   }
   private function connect()
   {

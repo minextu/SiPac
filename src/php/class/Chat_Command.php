@@ -17,12 +17,13 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-require_once("class/Chat.php");
-require_once("class/Chat_MySQL.php");
-require_once("class/Chat_User.php");
-require_once("class/Chat_Userlist.php");
-require_once("class/Chat_Command.php");
-
+interface SiPacCommand
+{
+ // public $name;
+  //public $usage;
+  
+  public function set_variables($chat, $parameters);
+  public function check_permission();
+  public function execute();
+}
 ?>
-

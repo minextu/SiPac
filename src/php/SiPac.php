@@ -25,7 +25,7 @@ if (strlen(session_id()) < 1)
   session_start();
 
 
-//Tell the Browser, not to use cache
+//Tell the Browser, to not use cache
 Header("Pragma: no-cache");
 Header("Cache-Control: no-store, no-cache, max-age=0, must-revalidate");
 Header("Content-Type: text/html");

@@ -17,6 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+ $GLOBALS['global_chat_num'] = 0;
 class Chat
 {
   //define all private variables
@@ -74,7 +75,10 @@ class Chat
     else
       $this->channels = $channels;
       
-    $this->chat_num = $chat_num;
+    if ($chat_num ===false)
+      $this->chat_num =  $GLOBALS['global_chat_num'] ;
+    else
+      $this->chat_num = $chat_num;
     
     $this->include_layout();
     
@@ -137,6 +141,10 @@ class Chat
     }
     $this->html_code = $this->html_code."</script>";
 
+    $this->html_code = str_replace("!!NUM!!", $this->chat_num, $this->html_code);
+    
+    $GLOBALS['global_chat_num']  = $GLOBALS['global_chat_num'] + 1;
+    
     return $this->html_code;
   }
   
@@ -221,11 +229,19 @@ class Chat
       
     if (!empty($message))
     {
-      $db_response = $this->db->save_post($message, $this->id, $channel, $extra, $user, $time);
-      if ($db_response !== true)
-	return array('info_type' => "error", 'info_text' => $db_response);
+      $command_return = $this->check_command($message) ;
+      if ($command_return !== false)
+      {
+	return $command_return;
+      }
       else
-	return array();
+      {
+	$db_response = $this->db->save_post($message, $this->id, $channel, $extra, $user, $time);
+	if ($db_response !== true)
+	  return array('info_type' => "error", 'info_text' => $db_response);
+	else
+	  return array();
+      }
     }
     else
       return array('info_type' => "error", 'info_text' => "Nothing entered");
@@ -253,18 +269,50 @@ class Chat
       $this->nickname = $this->settings['username_var'];
       
     $_SESSION['SiPac'][$this->id]['nickname'] = $this->nickname;
-  
+    $this->db->update_nickname($this->nickname);
   }
-  private function check_command($text)
+  private function check_command($message)
   {
-  /*
-     if (strpos($text, "/") === 0)
-     {
-      
+    
+     if (strpos($message, "/") === 0)
+     { //message is a command
+	$command_parts = explode(" ", $message, 2);
+	$command_name = str_replace("/", "", $command_parts[0]);
+	
+	if (isset($command_parts[1]))
+	  $command_parameters =  $command_parts[1];
+	else
+	  $command_parameters = "";
+	  
+	$command_class = "SiPacCommand_".$command_name;
+	$command_path = dirname(__FILE__) ."/../command/".$command_class.".php";
+	if (file_exists($command_path))
+	{
+	  include_once($command_path);
+	  if (class_exists($command_class))
+	  {
+	    $command = new $command_class;
+	    $command->set_variables($this, $command_parameters);
+	    if ($command->check_permission() == true)
+	    {
+	      $command_return = $command->execute();
+	      
+	      if (is_array($command_return))
+		return $command_return;
+	      else
+		return array();
+	    }
+	    else
+	      return array("info_type"=>"warn", "info_text" => 'No Permissions!');
+	  }
+	  else
+	    return array("info_type"=>"error", "info_text" => 'Classname is not "'.$command_class.'"');
+	}
+	else
+	  return array("info_type"=>"warn", "info_text" => "Command not found!");
      }
      else
       return false;
-      */
   }
   private function load_settings($settings=false, $id=false)
   {
