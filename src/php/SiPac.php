@@ -30,6 +30,28 @@ Header("Pragma: no-cache");
 Header("Cache-Control: no-store, no-cache, max-age=0, must-revalidate");
 Header("Content-Type: text/html");
 
+
+
+//Thanks to selfhtml.org for this function
+function check_mobile() {
+  $agents = array(
+    'Windows CE', 'Pocket', 'Mobile',
+    'Portable', 'Smartphone', 'SDA',
+    'PDA', 'Handheld', 'Symbian',
+    'WAP', 'Palm', 'Avantgo',
+    'cHTML', 'BlackBerry', 'Opera Mini',
+    'Nokia', 'webOS', 'android', 'Android'
+  );
+
+  //Check Browseragent, for a mobile browser
+  for ($i=0; $i<count($agents); $i++) {
+    if(isset($_SERVER["HTTP_USER_AGENT"]) && strpos($_SERVER["HTTP_USER_AGENT"], $agents[$i]) !== false)
+      return true;
+  }
+
+  return false;
+}
+
 //include the default config
 require_once(dirname(__FILE__)."/default_conf.php");
 

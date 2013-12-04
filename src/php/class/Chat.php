@@ -38,6 +38,7 @@ class Chat
   
   private $js_chat;
   public $is_writing = false;
+  public $is_mobile = false;
  
   public function __construct($settings=false, $is_new=true, $chat_variables=false, $channels=false, $chat_num=false)
   {
@@ -97,8 +98,7 @@ class Chat
   }
   //generate and return the html code for the chat
   public function draw()
-  {    
-    
+  {   
     $css_file = str_replace("\n", " ", file_get_contents($this->layout['path']."/chat.css"));
     $id_css   = "#".$this->id;
     
@@ -162,7 +162,15 @@ class Chat
   
   private function include_layout()
   {
-   $layout_path = dirname(__FILE__) . "/../../../themes/".$this->settings['theme'];
+    $is_mobile = check_mobile();
+    
+     $layout_path = dirname(__FILE__) . "/../../../themes/".$this->settings['theme']."_mobile";
+     
+    if ($is_mobile && is_dir($layout_path))
+      $this->is_mobile = true;
+    else
+      $layout_path = dirname(__FILE__) . "/../../../themes/".$this->settings['theme'];
+      
     require($layout_path."/layout.php");
     
     $layout_array['path'] = $layout_path;
