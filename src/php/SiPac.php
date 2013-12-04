@@ -69,7 +69,7 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 	  //split all channels
 	  $chat_channels = explode("|||", $chat_variables['channels']);
 	  //create the Chat class
-	  $chat = new Chat(false, false, $chat_variables['client_num'], $chat_variables['chat_id'], $chat_channels, $chat_num);
+	  $chat = new Chat(false, false, $chat_variables, $chat_channels, $chat_num);
 	  //obtain a nickname or load the old
 	  $chat->check_name();
 	  
@@ -101,6 +101,11 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 	  
 	  //save user in the db and add other users to the userlist
 	  $tmp_json_answer['get']['userlist'] = $chat->handle_userlist();
+	  
+	  $check_changes['get'] = $chat->check_changes();
+	  
+	  //check_changes can contain messages, so merge with the orginal json_answer
+	  $tmp_json_answer['get'] = array_merge($tmp_json_answer['get'], $check_changes['get']);
 	  
 	  //save the tmp json array in the real one
 	  $json_answer[] = $tmp_json_answer;

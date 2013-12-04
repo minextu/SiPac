@@ -25,34 +25,46 @@ class Chat
   public $id;
   public $chat_num;
   public $settings = array();
-  private $channels;
+  public $channels;
   private $html_path;
   public $nickname;
+  public $new_nickname;
   private $html_code;
   public $layout;
   
   private $db_error;
   
+  public $active_channel;
+  
   private $js_chat;
   public $is_writing = false;
  
-  public function __construct($settings=false, $is_new=true, $client_num=false, $id=false, $channels=false, $chat_num=false)
+  public function __construct($settings=false, $is_new=true, $chat_variables=false, $channels=false, $chat_num=false)
   {
-    $this->init($settings, $is_new, $client_num, $id, $channels, $chat_num);
+    $this->init($settings, $is_new, $chat_variables, $channels, $chat_num);
   }
   
   //initiate the chat: load settings, check all variables
-  public function init($settings, $is_new, $client_num, $id, $channels, $chat_num)
+  public function init($settings, $is_new, $chat_variables, $channels, $chat_num)
   {
     /*
     if not already set,
     generate random id for this tab/window of the client
     (so the chat can be opened more than once in different tabs, but same with the same session)
     */
-    if ($client_num == false)
+      
+  if ($chat_variables == false)
+  {
       $this->client_num = "n" . time() . mt_rand(0, 10000);
-    else
-      $this->client_num = $client_num;
+      $id = false;
+      $this->active_channel = false;
+   }
+   else
+   {
+      $this->client_num = $chat_variables['client_num'];
+      $id = $chat_variables['chat_id'];
+      $this->active_channel = $chat_variables['active_channel'];
+    }
     
     //load all settings for this chat
     $this->load_settings($settings, $id);
@@ -252,22 +264,43 @@ class Chat
     //save the user in the db
     $this->userlist->save_user();
     
-    //get other users
+    //get tasks (kick, ban, etc.)
+    $this->userlist->get_tasks();
     
-
+    //get other users
     $userlist_answer = $this->userlist->get_users();
     
     return $userlist_answer;
   }
+  public function check_changes()
+  {
+    $this->check_name();
+    return array();
+  }
   public function check_name()
   {
-    if (!empty($_SESSION['SiPac'][$this->id]['nickname']))
+    if (!empty($this->new_nickname))
+    {
+      $this->nickname =$this->new_nickname;
+      unset($this->new_nickname);
+    }
+    else if (!empty($_SESSION['SiPac'][$this->id]['nickname']))
       $this->nickname = $_SESSION['SiPac'][$this->id]['nickname'];
     else if ($this->settings['username_var'] == "!!AUTO!!")
       $this->nickname = "Guest " . mt_rand(1, 1000);
     else
       $this->nickname = $this->settings['username_var'];
       
+    if (!empty($_SESSION['SiPac'][$this->id]['nickname'] ) AND $_SESSION['SiPac'][$this->id]['nickname']  != $this->nickname)
+    {
+      foreach($this->channels as $channel)
+      {
+	$this->send_message($_SESSION['SiPac'][$this->id]['nickname'] . " is now ".$this->nickname, $channel, 1, 0);
+	$this->db->delete_user($_SESSION['SiPac'][$this->id]['nickname'], $channel, $this->id);
+	$this->db->save_user($this->nickname, $channel, $this->id);
+       }
+    }
+       
     $_SESSION['SiPac'][$this->id]['nickname'] = $this->nickname;
     $this->db->update_nickname($this->nickname);
   }

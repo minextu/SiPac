@@ -1,6 +1,13 @@
 <?php // !!SMILEYS!! -> Smileys, <||t20||> -> Loading the Chat. Please wait..., <||t12||> -> send !!ID!! -> chat id
 $default_smiley_height = 30;
-$chat_layout_user_entry = '<div onmouseover="chat_objects[!!NUM!!].ui_dropdown_sign(\'!!USER_ID!!_dropdown_info\', \'show\');" onmouseout="chat_objects[!!NUM!!].ui_dropdown_sign(\'!!USER_ID!!_dropdown_info\', \'hide\');" onclick="chat_objects[!!NUM!!].user_info(\'!!USER_ID!!_user_info\');" class="!!USER_AFK!!_user"><span class="chat_speech_bubble" style="width: 0px;"><img src="'.$chat_html_path.'themes/'.$chat_settings['theme'].'/speech_bubble.gif" alt="writing" title="writing"></span>!!USER!!&nbsp;<span class="user_online_status">[!!USER_STATUS!!]</span><span id="!!USER_ID!!_dropdown_info"></span></div><div id="!!USER_ID!!_user_info" class="user_info_box">!!USER_INFO!!</div>';
+$chat_layout_user_entry = '<div onmouseover="chat_objects[!!NUM!!].ui_dropdown_sign(\'!!USER_ID!!_dropdown_info\', \'show\');" onmouseout="chat_objects[!!NUM!!].ui_dropdown_sign(\'!!USER_ID!!_dropdown_info\', \'hide\');" onclick="chat_objects[!!NUM!!].user_info(\'!!USER_ID!!_user_info\');" class="!!USER_STATUS!!_user"><span class="chat_speech_bubble" style="width: 0px;"><img src="chat_html_path/themes/chat_settings[theme]/speech_bubble.gif" alt="writing" title="writing"></span>!!USER!!&nbsp;<span class="user_online_status">[!!USER_STATUS!!]</span><span id="!!USER_ID!!_dropdown_info"></span></div><div id="!!USER_ID!!_user_info" class="user_info_box">!!USER_INFO!!</div>';
+$chat_layout_post_entry = "
+<div class='chat_entry_!!TYPE!!'>
+  <span class='chat_entry_user'>!!USER!!</span>
+  <span class='chat_entry_message'>!!MESSAGE!!</span>
+  <span class='chat_entry_date'>!!TIME!!</span>
+</div>
+";
 $chat_layout = "
 <div class='chat_main'>
 		<span class='chat_speech_bubble' style='display: none;'></span>

@@ -18,8 +18,7 @@ class SiPacCommand_name implements SiPacCommand
   
   public function execute()
   {
-    $this->chat->db->add_task("new_name|".$this->parameters);
-    return array("info_type"=>"warn", "info_text"=>"Not working, yet");
+    $this->chat->db->add_task("new_name|".$this->parameters, $this->chat->nickname, $this->chat->active_channel, $this->chat->id);
   }
 }
 

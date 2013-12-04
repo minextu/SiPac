@@ -329,7 +329,7 @@
 
 
 /* notification-messages */
-.chat_notify
+.chat_entry_notify
 {
 	border-left: 2px solid #fff;
 	padding-left: 5px;
@@ -340,15 +340,15 @@
 	line-height: 30px;
 	color: #000;
 }
-.chat_notify .chat_entry_user
+.chat_entry_notify .chat_entry_user
 {
 	font-weight: bold;
 }
-.chat_notify .chat_entry_message
+.chat_entry_notify .chat_entry_message
 {
 	font-family: Arial;
 }
-.chat_notify .chat_entry_date
+.chat_entry_notify .chat_entry_date
 {
 	color: #000; 
 	font-size: 8pt;

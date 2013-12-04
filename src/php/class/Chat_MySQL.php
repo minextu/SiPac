@@ -67,10 +67,10 @@ class Chat_MySQL
     return $save_message_mysql;
   }
   
-  public function get_all_users($chat_id)
+  public function get_all_users($channel,$chat_id)
   {
     //get all users in the chat
-    $users_mysql = mysql_query("SELECT * FROM chat_users WHERE chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
+    $users_mysql = mysql_query("SELECT * FROM chat_users WHERE chat_id LIKE '".mysql_real_escape_string($chat_id)."' AND channel LIKE '".mysql_real_escape_string($channel)."'");
     
     $users = array();
     while ($user = mysql_fetch_assoc($users_mysql))
@@ -80,21 +80,21 @@ class Chat_MySQL
     return $users;
   }
   
-  public function get_user($nickname, $chat_id)
+  public function get_user($nickname, $channel, $chat_id)
   {
     //get all values of the user with the given nickname
-    $user_info = mysql_query("SELECT * FROM chat_users WHERE name LIKE '".mysql_real_escape_string($nickname)."'");
+    $user_info = mysql_query("SELECT * FROM chat_users WHERE name LIKE '".mysql_real_escape_string($nickname)."' AND channel LIKE '".mysql_real_escape_string($channel)."'");
     
     return mysql_fetch_assoc($user_info);
   }
   
-  public function update_user($nickname, $chat_id, $time, $is_writing)
+  public function update_user($nickname, $channel, $chat_id, $time, $is_writing)
   {
     //variables to add later
     $is_afk = false;
     $user_info = "";
     $user_style = "";
-    $channel = "";
+    $channel = $channel;
     
     if ($is_writing == "true")
       $is_writing = 1;
@@ -102,39 +102,39 @@ class Chat_MySQL
       $is_writing = 0;
       
     //update the user entry with all new values
-    $update_user_mysql = mysql_query("UPDATE chat_users SET last_time = '" . $time . "', afk = '" . $is_afk . "', info = '" . mysql_real_escape_string($user_info) . "', writing = '" . mysql_real_escape_string($is_writing) . "', style = '" . $user_style . "' WHERE name = '" . mysql_real_escape_string($nickname) . "' AND chat_id = '" . mysql_real_escape_string($chat_id) . "'");
+    $update_user_mysql = mysql_query("UPDATE chat_users SET last_time = '" . $time . "', afk = '" . $is_afk . "', info = '" . mysql_real_escape_string($user_info) . "', writing = '" . mysql_real_escape_string($is_writing) . "', style = '" . $user_style . "' WHERE name = '" . mysql_real_escape_string($nickname) . "' AND channel = '" . mysql_real_escape_string($channel) . "' AND chat_id = '" . mysql_real_escape_string($chat_id) . "'");
     
     
     
     return $update_user_mysql;
   }
 
-  public function save_user($nickname, $chat_id)
+  public function save_user($nickname, $channel, $chat_id)
   {
     //variables to add later
     $user_info = "";
     $user_style = "";
     $is_afk = "";
     $user_ip = "";
-    $channel = "";
+    $channel = $channel;
     
     //save the user with all given values
     $add_user_mysql = mysql_query("INSERT INTO chat_users (name, info, style, afk, writing, ip, last_time, channel, chat_id) VALUES ('" . mysql_real_escape_string($nickname) . "', '" . mysql_real_escape_string($user_info) . "', '" . $user_style . "', '" . $is_afk . "', 'false', '" . $user_ip . "', '" . time() . "', '" . mysql_real_escape_string($channel) . "', '$chat_id')");
   }
   
-  public function delete_user($nickname, $chat_id)
+  public function delete_user($nickname, $channel, $chat_id)
   {
   
   
-    $delete_user = mysql_query("DELETE FROM chat_users WHERE name LIKE '" . mysql_real_escape_string($nickname) . "' AND chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
+    $delete_user = mysql_query("DELETE FROM chat_users WHERE name LIKE '" . mysql_real_escape_string($nickname) . "' AND channel LIKE '".mysql_real_escape_string($channel)."' AND chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
   }
   
-  public function add_task($task, $user=false)
+  public function add_task($task, $user, $channel, $chat_id)
   {
     if ($user === false)
       $user = $this->nickname;
       
-    $add_task = mysql_query("UPDATE chat_users SET action = '".mysql_real_escape_string($task)."' WHERE name LIKE '".mysql_real_escape_string($user)."'");
+    $add_task = mysql_query("UPDATE chat_users SET action = '".mysql_real_escape_string($task)."' WHERE name LIKE '".mysql_real_escape_string($user)."' AND channel LIKE '".mysql_real_escape_string($channel)."' AND chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
   }
   
   public function update_nickname($nickname)
