@@ -101,9 +101,14 @@
 
 .chat_conversation
 {
-  height: 90%;
+  height: 85%;
   width: 100%;
   overflow: auto;
+}
+.chat_user_writing
+{
+  height: 5%;
+  color: white;
 }
 /* Chat-Entries */
 .chat_entry_own

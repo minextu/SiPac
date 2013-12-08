@@ -38,6 +38,7 @@ $chat_layout = "
 <div class='chat_main'>
     <div class='chat_top'><ul><li class='chat_userlist_closed' onclick='chat_objects[!!NUM!!].layout_show_userlist(this)'>Userlist (!!USER_NUM!! Online)</li><li class='chat_top_n'>Channel</li></ul></div>
     <div class='chat_conversation'></div>
+    <div class='chat_user_writing'></div>
         <div class='chat_userlist'></div>
     <div class='chat_user_area'>
 		<div class='chat_notice_msg'></div>
@@ -51,7 +52,7 @@ $chat_layout = "
 $chat_layout_functions['layout_init'] = '
 function layout_init()
 {
-  this.old_user_status = new Array();
+  this.user_writing = new Array();
 }
 ';
 $chat_layout_functions['user_options'] = "
@@ -70,14 +71,54 @@ function user_options(user_id, action)
 $chat_layout_functions['layout_user_writing_status'] = '
 function layout_user_writing_status (status, username, user_id)
 {
-  if (document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML != "[" + this.texts[55] + "]")
-    this.old_user_status[username] = document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML;
-  
-  if (status == 1)
-    document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML = "[" + this.texts[55] + "]";
-  else if (this.old_user_status[username] != undefined)
+  if (user_id != this.id + "_" + this.active_channel + "_user_" + this.username_key)
   {
-    document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML =  this.old_user_status[username];
+    
+    if (status == 1)
+    {
+      var is_writing = false;
+      for (var i = 0; i < this.user_writing.length; i++)
+      {
+	if (this.user_writing[i] == username)
+	{
+	  is_writing = true;
+	}
+      }
+      if (is_writing == false)
+	this.user_writing[this.user_writing.length] = username;
+      var writing_text = "";
+      for (var i = 0; i < this.user_writing.length; i++)
+      {
+	if (i != 0)
+	{
+	  if (i = this.user_writing.length - 1)
+	    writing_text += " and ";
+	  else
+	    writing_text += ", ";
+	}
+	writing_text += this.user_writing[i];
+      }
+      if (this.user_writing.length > 1)
+	writing_text += " are writing...";
+      else
+	writing_text+= " is writing...";
+	
+      this.chat.getElementsByClassName("chat_user_writing")[0].innerHTML = writing_text;
+    }
+    else
+    {
+      for (var i = 0; i < this.user_writing.length; i++)
+      {
+	if (this.user_writing[i] == username)
+	{
+	  this.user_writing = new Array();
+	  break;
+	}
+      }
+	
+      if (this.user_writing.length == 0)
+	this.chat.getElementsByClassName("chat_user_writing")[0].innerHTML = "";
+    }
   }
 }
 ';

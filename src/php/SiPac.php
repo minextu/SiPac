@@ -40,7 +40,7 @@ function check_mobile() {
     'PDA', 'Handheld', 'Symbian',
     'WAP', 'Palm', 'Avantgo',
     'cHTML', 'BlackBerry', 'Opera Mini',
-    'Nokia', 'webOS', 'android', 'Android', ' '
+    'Nokia', 'webOS', 'android', 'Android'
   );
 
   //Check Browseragent, for a mobile browser
