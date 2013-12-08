@@ -48,7 +48,9 @@ function check_mobile() {
     if(isset($_SERVER["HTTP_USER_AGENT"]) && strpos($_SERVER["HTTP_USER_AGENT"], $agents[$i]) !== false)
       return true;
   }
-
+  if (isset($_GET['mobile']) == true)
+    return true;
+    
   return false;
 }
 
