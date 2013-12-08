@@ -2,11 +2,21 @@
 
 .chat_main
 {
-	height: 100%;
+  height: 100%;
+  width: 100%;
+  background: rgb(53,106,160); /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(53,106,160,1) 0%, rgba(53,106,160,1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(53,106,160,1)), color-stop(100%,rgba(53,106,160,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(53,106,160,1) 0%,rgba(53,106,160,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, rgba(53,106,160,1) 0%,rgba(53,106,160,1) 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, rgba(53,106,160,1) 0%,rgba(53,106,160,1) 100%); /* IE10+ */
+  background: linear-gradient(to bottom, rgba(53,106,160,1) 0%,rgba(53,106,160,1) 100%); /* W3C */
 }
 .chat_top
 {
   height: 5%;
+  background: rgb(209,209,209); /* Old browsers */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(209,209,209,1)), color-stop(100%,rgba(188,188,188,1))); /* Chrome,Safari4+ */
   background: linear-gradient(to bottom, rgba(209,209,209,1) 0%,rgba(188,188,188,1) 100%);
   text-align: center;
 }
@@ -25,23 +35,41 @@
 }
 .chat_top .chat_top_n, .chat_userlist_closed
 {
-  background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(225,225,225,1) 51%,rgba(246,246,246,1) 100%);
+  background: rgb(226,226,226); /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(226,226,226,1) 0%, rgba(219,219,219,1) 50%, rgba(209,209,209,1) 51%, rgba(254,254,254,1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(226,226,226,1)), color-stop(50%,rgba(219,219,219,1)), color-stop(51%,rgba(209,209,209,1)), color-stop(100%,rgba(254,254,254,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%); /* IE10+ */
+  background: linear-gradient(to bottom, rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%); /* W3C */
 }
 .chat_userlist_opened
 {
-  background: linear-gradient(to bottom, rgba(155,155,155,1) 0%,rgba(141,141,141,1) 50%,rgba(125,125,125,1) 51%,rgba(146,146,146,1) 100%);
+  background: rgb(165,165,165); /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(165,165,165,1) 0%, rgba(147,147,147,1) 50%, rgba(137,137,137,1) 51%, rgba(254,254,254,1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(165,165,165,1)), color-stop(50%,rgba(147,147,147,1)), color-stop(51%,rgba(137,137,137,1)), color-stop(100%,rgba(254,254,254,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(165,165,165,1) 0%,rgba(147,147,147,1) 50%,rgba(137,137,137,1) 51%,rgba(254,254,254,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, rgba(165,165,165,1) 0%,rgba(147,147,147,1) 50%,rgba(137,137,137,1) 51%,rgba(254,254,254,1) 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, rgba(165,165,165,1) 0%,rgba(147,147,147,1) 50%,rgba(137,137,137,1) 51%,rgba(254,254,254,1) 100%); /* IE10+ */
+  background: linear-gradient(to bottom, rgba(165,165,165,1) 0%,rgba(147,147,147,1) 50%,rgba(137,137,137,1) 51%,rgba(254,254,254,1) 100%); /* W3C */
 }
 .chat_user
 {
-	background: #eff2f7;
 	border-bottom: 1px solid #747474;
+	background: rgba(0,0,0,0.5);
 	min-height: 50px;
 	overflow: auto;
 	padding: 5px;
+	color: white;
 }
 .chat_userlist
 {
   display: none;
+  position: absolute;
+  background: rgba(0,0,0,0.5);
+  top: 5%;
+  padding: 5px;
+  border-radius: 5px;
 }
 .chat_user .chat_user_name
 {
@@ -75,7 +103,6 @@
 {
   height: 90%;
   width: 100%;
-  background: #fff;
   overflow: auto;
 }
 /* Chat-Entries */
@@ -88,11 +115,15 @@
   -moz-border-radius:10px;
   -webkit-border-radius:10px;
   border-radius:10px;
-  box-shadow: 0px -1px 1px #000;
   position: relative;
-  border: 2px solid #3e588c;
-  background: #4b6aa9;
-background: linear-gradient(to bottom, #226baa 0%,#2989d8 51%,#207cca 51%,#67aee5 100%);
+  border: 2px solid #55859F;
+  background: rgb(154,219,226); /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(154,219,226,1) 0%, rgba(106,169,181,1) 44%, rgba(51,99,124,1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(154,219,226,1)), color-stop(44%,rgba(106,169,181,1)), color-stop(100%,rgba(51,99,124,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(154,219,226,1) 0%,rgba(106,169,181,1) 44%,rgba(51,99,124,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, rgba(154,219,226,1) 0%,rgba(106,169,181,1) 44%,rgba(51,99,124,1) 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, rgba(154,219,226,1) 0%,rgba(106,169,181,1) 44%,rgba(51,99,124,1) 100%); /* IE10+ */
+  background: linear-gradient(to bottom, rgba(154,219,226,1) 0%,rgba(106,169,181,1) 44%,rgba(51,99,124,1) 100%); /* W3C */
   margin: 10px;
 }
 .chat_entry_own :after
@@ -105,7 +136,7 @@ background: linear-gradient(to bottom, #226baa 0%,#2989d8 51%,#207cca 51%,#67aee
    width: 0;
    border-width: 10px 10px 0px 10px;
    border-style: solid;
-   border-color: #4b6aa9 transparent;
+   border-color: #55859F transparent;
 }
 
 .chat_entry_others
@@ -117,11 +148,15 @@ background: linear-gradient(to bottom, #226baa 0%,#2989d8 51%,#207cca 51%,#67aee
   -moz-border-radius:10px;
   -webkit-border-radius:10px;
   border-radius:10px;
-  box-shadow: 0px -1px 1px #000;
   position: relative;
   border: 2px solid #91BC78;
-  background: #91BC78;
-  background: linear-gradient(to bottom, #91bc78 0%,#61c419 50%,#b4e391 100%);
+  background: rgb(201,222,150); /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(201,222,150,1) 0%, rgba(138,182,107,1) 44%, rgba(57,130,53,1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(201,222,150,1)), color-stop(44%,rgba(138,182,107,1)), color-stop(100%,rgba(57,130,53,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(201,222,150,1) 0%,rgba(138,182,107,1) 44%,rgba(57,130,53,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, rgba(201,222,150,1) 0%,rgba(138,182,107,1) 44%,rgba(57,130,53,1) 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, rgba(201,222,150,1) 0%,rgba(138,182,107,1) 44%,rgba(57,130,53,1) 100%); /* IE10+ */
+  background: linear-gradient(to bottom, rgba(201,222,150,1) 0%,rgba(138,182,107,1) 44%,rgba(57,130,53,1) 100%); /* W3C */
   margin: 10px;
 }
 .chat_entry_others :after
@@ -140,31 +175,30 @@ background: linear-gradient(to bottom, #226baa 0%,#2989d8 51%,#207cca 51%,#67aee
 .chat_entry_notify
 {
   width: 80%;
-  background: gray;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
-  
- -moz-border-radius:4px;
-  -webkit-border-radius:4px;
-  border-radius:4px;
+  background: rgba(0,0,0,0.2);
   padding:4px;
-  
 }
 .chat_entry_date
 {
   float: right;
   padding-left: 20px;
 }
-.chat_enty_info
+.chat_entry_info
 {
-  color: gray;
+  color: #555;
 }
-
+.chat_entry_notify .chat_entry_info
+{
+  color: #333;
+}
 
 .chat_user_area
 {
   width: 100%;
   height: 4.8%;
-  background: #cfcfcf;
+  min-height: 20px;
+  bottom: 0px;
+  position: absolute;
 }
 .chat_user_input
 {
@@ -178,7 +212,7 @@ background: linear-gradient(to bottom, #226baa 0%,#2989d8 51%,#207cca 51%,#67aee
   width: 80%;
   height: 100%;
   box-shadow: inset 0px 1px 2px #747474;
-  background: #e3e3e3;
+  background: rgba(0,0,0,0.5);
   padding-left: 5px;
   font-size: 14pt;
   border: none;
@@ -194,7 +228,7 @@ background: linear-gradient(to bottom, #226baa 0%,#2989d8 51%,#207cca 51%,#67aee
   font-size: 12pt;
   color: #fff;
   text-shadow: 1px 1px 1px #000;
-  background: #ddd;
+  background: rgba(0,0,0,0.5);
 }
 
 

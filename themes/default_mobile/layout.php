@@ -36,8 +36,8 @@ $chat_layout = "
 <meta name='viewport' content='width=device-width, height=device-height, user-scalable=no'>
 <div class='chat_main'>
     <div class='chat_top'><ul><li class='chat_userlist_closed' onclick='chat_objects[!!NUM!!].layout_show_userlist(this)'>Userliste (X Online)</li><li class='chat_top_n'>Channel</li></ul></div>
-    <div class='chat_userlist'></div>
     <div class='chat_conversation'></div>
+        <div class='chat_userlist'></div>
     <div class='chat_user_area'>
 		<div class='chat_notice_msg'></div>
       <div class='chat_user_input'>
