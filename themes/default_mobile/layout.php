@@ -1,4 +1,5 @@
 <?php // !!SMILEYS!! -> Smileys, <||t20||> -> Loading the Chat. Please wait..., <||t12||> -> send !!ID!! -> chat id
+global $chat_text;
 $default_smiley_height = 30;
 
 /*
@@ -35,14 +36,14 @@ $chat_layout_post_entry = "
 $chat_layout = "
 <meta name='viewport' content='width=device-width, height=device-height, user-scalable=no'>
 <div class='chat_main'>
-    <div class='chat_top'><ul><li class='chat_userlist_closed' onclick='chat_objects[!!NUM!!].layout_show_userlist(this)'>Userliste (X Online)</li><li class='chat_top_n'>Channel</li></ul></div>
+    <div class='chat_top'><ul><li class='chat_userlist_closed' onclick='chat_objects[!!NUM!!].layout_show_userlist(this)'>Userlist (!!USER_NUM!! Online)</li><li class='chat_top_n'>Channel</li></ul></div>
     <div class='chat_conversation'></div>
         <div class='chat_userlist'></div>
     <div class='chat_user_area'>
 		<div class='chat_notice_msg'></div>
       <div class='chat_user_input'>
-	<input type='text' class='chat_message' placeholder='<||t34||>'>
-	<button class='chat_send_button'><||t12||></button><!-- end: chat_send_button-class -->
+	<input type='text' class='chat_message' placeholder='".$chat_text['message-input-placeholder']."'>
+	<button class='chat_send_button'>".$chat_text['send-button-text']."</button><!-- end: chat_send_button-class -->
       </div><!-- end: chat_user_input-class -->
     </div><!-- end: chat_user_area-class -->
 </div><!-- end: chat_main-class -->

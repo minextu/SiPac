@@ -92,7 +92,8 @@ class Chat
       $this->chat_num =  $GLOBALS['global_chat_num'] ;
     else
       $this->chat_num = $chat_num;
-    
+      
+    $this->include_language();
     $this->include_layout();
     
   }
@@ -154,6 +155,7 @@ class Chat
     $this->html_code = $this->html_code."</script>";
 
     $this->html_code = str_replace("!!NUM!!", $this->chat_num, $this->html_code);
+    $this->html_code = str_replace("!!USER_NUM!!", "<span class='chat_user_num'>?</span>", $this->html_code);
     
     $GLOBALS['global_chat_num']  = $GLOBALS['global_chat_num'] + 1;
     
@@ -180,6 +182,12 @@ class Chat
     $layout_array['javascript_functions'] = $chat_layout_functions;
     
     $this->layout = $layout_array;
+  }
+  private function include_language()
+  {
+    global $chat_text;
+    $language_path = dirname(__FILE__)."/../../lang/";
+    require($language_path.$this->settings['language'].".php");
   }
   public function get_posts($last_id)
   {

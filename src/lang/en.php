@@ -18,61 +18,61 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 $chat_text = array(
-"%1 is now %2",														//0
+"rename-notification" => "%1 is now %2",
 "%1 has left",
 "%1 has joined",
 "Write to %1",
 "You can use the following Commands",
-"Command Syntax",													//5
+"Command Syntax",
 "Command %1 not found!",
 "No Commands found!",
 "No permissions!",
 "User %1 not found",
-"You didn't enter a new name!",												//10
+"You didn't enter a new name!",
 "Nothing is entered",
-"send",
+"send-button-text" => "send",
 "Message",
 "Info",
-"System Message",													//15
+"System Message",
 "Highlight",
 "%1 to %2:",
 "is now away",
 "is back again",
-"Loading the Room. Please wait...",											//20
+"Loading the Room. Please wait...",
 "User %1 will be kicked",
 "no reason",
 "You were kicked! Reason: %1",
 "%1 was kicked by %3. Reason: %2",
-"%1 was kicked. Reason: %2",												//25
+"%1 was kicked. Reason: %2",
 "Kick %1",
 "online",
 "afk",
 "Set status to online",
-"Set status to afk",													//30
+"Set status to afk",
 "Deactivate sound",
 "Activate sound",
 "Privat Message",
-"Please enter a message...",
-"Reason for the Kick:",													//35
+"message-input-placeholder" => "Please enter a message...",
+"Reason for the Kick:",
 "kick user",
 "Info:",
 "Error:",
 "Warning:",
-"Success:",														//40
+"Success:",	
 "has something better to do",
 "has fallen in love with %1",
 "wishes he had not forgotten the text",
 "thinks he/she is beautiful",
-"is watching for %1",													//45
+"is watching for %1",
 "You can't give a reason for not being afk!",
 "afk is not enable",
 "You must enter a channel!",
 "You didn't enter a message!",
-"no user specified",													//50
+"no user specified",
 "debug enabled!",
 "debug diabled!",
 "type has to be warn, all or off (see /help debug)",
 "Functions",
-"Writing..."														//55
+"Writing..."	
 );
 ?>

@@ -337,9 +337,11 @@ Chat.prototype.handle_chat_tasks = function (answer)
   if (answer['get']['afk'] != undefined)
     this.chat_afk = answer['get']['afk'];
 
-  try
+ try
   {
-    document.getElementById('chat_user_num').innerHTML = answer['get']['userlist']['users'].length;
+    var user_num = 0;
+    for (e in answer['get']['userlist'][this.active_channel]['users']) { user_num++; }
+    this.chat.getElementsByClassName('chat_user_num')[0].innerHTML = user_num;
   }
   catch (e)
   {}
