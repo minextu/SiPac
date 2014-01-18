@@ -1,5 +1,4 @@
 <?php // !!SMILEYS!! -> Smileys, <||t20||> -> Loading the Chat. Please wait..., <||t12||> -> send !!ID!! -> chat id
-global $chat_text;
 $default_smiley_height = 30;
 
 /*
@@ -43,8 +42,8 @@ $chat_layout = "
     <div class='chat_user_area'>
 		<div class='chat_notice_msg'></div>
       <div class='chat_user_input'>
-	<input type='text' class='chat_message' placeholder='".$chat_text['message-input-placeholder']."'>
-	<button class='chat_send_button'>".$chat_text['send-button-text']."</button><!-- end: chat_send_button-class -->
+	<input type='text' class='chat_message' placeholder='<||message-input-placeholder||>'>
+	<button class='chat_send_button'><||send-button-text||></button><!-- end: chat_send_button-class -->
       </div><!-- end: chat_user_input-class -->
     </div><!-- end: chat_user_area-class -->
 </div><!-- end: chat_main-class -->

@@ -33,6 +33,7 @@ class Chat
   public $layout;
   
   private $db_error;
+  private $text;
   
   public $active_channel;
   
@@ -94,6 +95,7 @@ class Chat
       $this->chat_num = $chat_num;
       
     $this->include_language();
+    
     $this->include_layout();
     
   }
@@ -103,8 +105,14 @@ class Chat
     $css_file = str_replace("\n", " ", file_get_contents($this->layout['path']."/chat.css"));
     $id_css   = "#".$this->id;
     
-    /* generate js function arguments, to start the chat*/
-    $this->js_chat = "add_chat('".$this->html_path."','" . $this->settings['theme'] . "','".$this->id."', '".$this->client_num."',";
+    $this->js_chat = "var chat_text = new Array();";
+    foreach ($this->text as $key => $text)
+    {
+      $this->js_chat = $this->js_chat."chat_text['$key'] = '".addslashes($text)."';";
+    }
+    
+     /* generate js function arguments, to start the chat*/
+    $this->js_chat =$this->js_chat. "add_chat('".$this->html_path."','" . $this->settings['theme'] . "','".$this->id."', '".$this->client_num."',";
     $this->js_chat = $this->js_chat."new Array(";
     foreach ($this->settings['channels'] as $key => $channel)
     {
@@ -112,14 +120,11 @@ class Chat
 	$this->js_chat = $this->js_chat.",";
       $this->js_chat = $this->js_chat."\"$channel\"";  
     }
-    $this->js_chat = $this->js_chat."), new Array(";
-    /*foreach ($chat_text as $key => $text)
-    {
-      if ($key != 0)
-	$this->js_chat = $this->js_chat.",";
-      $this->js_chat = $this->js_chat."\"$text\"";
-    }*/
-    $this->js_chat = $this->js_chat."));";
+    $this->js_chat = $this->js_chat."), chat_text";
+    
+
+    
+    $this->js_chat = $this->js_chat.");";
     
     //save the html code of the layout
     $this->html_code = $this->layout['html'];
@@ -159,6 +164,7 @@ class Chat
     
     $GLOBALS['global_chat_num']  = $GLOBALS['global_chat_num'] + 1;
     
+    $this->html_code = $this->translate($this->html_code);
     return $this->html_code;
   }
   
@@ -185,9 +191,14 @@ class Chat
   }
   private function include_language()
   {
-    global $chat_text;
     $language_path = dirname(__FILE__)."/../../lang/";
     require($language_path.$this->settings['language'].".php");
+    
+    foreach ($chat_text as $key => $text)
+    {
+      $this->text[$key] = $text;
+    }
+    
   }
   public function get_posts($last_id)
   {
@@ -403,6 +414,52 @@ class Chat
       $this->html_path = $this->settings['html_path'];
     
   }
+  private function translate($text)
+  {
+    preg_match_all('#<\|\|(.*)\|\|>#isU', $text, $matches, PREG_SET_ORDER);
+    
+    
+    foreach ($matches as $match)
+    {
+      if (strpos($match[1], "|"))
+      {
+	$parts = explode("|", $match[1]);
+	$translation_key = $parts[0];
+      }
+      else
+	$translation_key = $match[1];
+	
+      if (isset($this->text[$translation_key]))
+      {
+	$translation = $this->text[$translation_key];
+	
+	if (isset($parts))
+	{
+	  $translation_argument_num = substr_count($translation, "%");
+	  if (count($parts) - 1 == $translation_argument_num)
+	  {
+	    $translation = preg_replace("#%(.+)#isU", "||parts$1||", $translation);
+	    
+	    for ($i = 1; $i <= $translation_argument_num; $i++)
+	    {
+	      $translation = str_replace("||parts$i||", $parts[$i], $translation);
+	    }
+	  }
+	     //$text = preg_replace('#<\|\|(.*)\|\|>#isU', "${'this->text[$1]'}", $text);
+	  else
+	    $translation =$translation. " Translation: Too many Arguments";
+	}
+      }
+      else
+	$translation = "No translation for: '".$translation_key."'";
+      $text = str_replace($match[0], $translation, $text);
+      unset($parts);
+    }
+    
+    
+    return $text;
+  }
+  
 }
 
 

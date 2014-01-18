@@ -43,8 +43,8 @@ $chat_layout = "
 			<div class='chat_smiley_bar'>!!SMILEYS!!</div>
       </div><!-- end: chat_extra_bar-class -->
       <div class='chat_user_input'>
-	<input type='text' class='chat_message' placeholder='<||t34||>'>
-	<button class='chat_send_button'><||t12||></button><!-- end: chat_send_button-class -->
+	<input type='text' class='chat_message' placeholder='<||message-input-placeholder||>'>
+	<button class='chat_send_button'><||send-button-text||></button><!-- end: chat_send_button-class -->
       </div><!-- end: chat_user_input-class -->
     </div><!-- end: chat_user_area-class -->
   </div><!-- end: chat_right-class -->
