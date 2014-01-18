@@ -49,12 +49,17 @@ class Chat_MySQL
     $chat_mysql = mysql_query("SELECT * FROM chat_entries WHERE chat_id LIKE '".mysql_real_escape_string($chat_id)."' ORDER BY id ASC");
     
     $posts = array();
-    while ($post = mysql_fetch_assoc($chat_mysql))
+    
+    if ($chat_mysql == false)
+     echo mysql_error();
+    else
     {
-      if (array_search($post['channel'], $channels) !== false)
-	$posts[] = $post;
+      while ($post = mysql_fetch_assoc($chat_mysql))
+      {
+	if (array_search($post['channel'], $channels) !== false)
+	  $posts[] = $post;
+      }
     }
-
     return $posts;
   }
   
@@ -73,9 +78,15 @@ class Chat_MySQL
     $users_mysql = mysql_query("SELECT * FROM chat_users WHERE chat_id LIKE '".mysql_real_escape_string($chat_id)."' AND channel LIKE '".mysql_real_escape_string($channel)."'");
     
     $users = array();
-    while ($user = mysql_fetch_assoc($users_mysql))
+    
+    if ($users_mysql == false)
+      echo mysql_error();
+    else
     {
-      $users[] = $user;
+      while ($user = mysql_fetch_assoc($users_mysql))
+      {
+	$users[] = $user;
+      }
     }
     return $users;
   }
@@ -84,8 +95,10 @@ class Chat_MySQL
   {
     //get all values of the user with the given nickname
     $user_info = mysql_query("SELECT * FROM chat_users WHERE name LIKE '".mysql_real_escape_string($nickname)."' AND channel LIKE '".mysql_real_escape_string($channel)."'");
-    
-    return mysql_fetch_assoc($user_info);
+    if ($user_info == false)
+      echo mysql_error();
+    else
+      return mysql_fetch_assoc($user_info);
   }
   
   public function update_user($nickname, $channel, $chat_id, $time, $is_writing)
