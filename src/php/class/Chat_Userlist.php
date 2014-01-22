@@ -40,7 +40,7 @@
 	//save the user
 	$this->chat->db->save_user($this->chat->nickname, $channel, $this->chat->id);
 	//send a message, that this user jas joined the channel
-	$this->chat->send_message($this->chat->nickname. " has joined", $channel, 1, 0);
+	$this->chat->send_message("<||user-join-notification|".$this->chat->nickname. "||>", $channel, 1, 0);
       }
       else //if the user is already in the db, just update the information
 	$this->chat->db->update_user($this->chat->nickname, $channel, $this->chat->id, time(), $this->chat->is_writing);
@@ -107,7 +107,7 @@
 	  //delete the user
 	  $this->chat->db->delete_user($user['name'], $user['channel'], $this->chat->id);
 	  //save a message, that the user has left
-	  $this->chat->send_message($user['name']. " has left", $user['channel'], 1, 0, $user['last_time']);
+	  $this->chat->send_message("<||user-left-notification|".$user['name']. "||>", $user['channel'], 1, 0, $user['last_time']);
 	  
 	  continue;
 	}
@@ -120,7 +120,7 @@
 	$user_array[$channel]['users'][$user['id']] = $user['name'];
 	
 	//generate the html code of the user
-	$user_html = $this->users[$user['id']]->generate_html();
+	$user_html = $this->chat->translate($this->users[$user['id']]->generate_html());
 	
 	//if this user isn't in the user array session, he also isn't on the client's window
 	if (!isset($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$user['id']]))

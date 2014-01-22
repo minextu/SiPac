@@ -45,7 +45,7 @@ class SiPacCommand_help implements SiPacCommand
     if (empty($command_syntax))
       $command_syntax = "No commands found!";
     else
-      $command_syntax = "You can use the following commands:<br>".$command_syntax;
+      $command_syntax = "<||command-list-head||><br>".$command_syntax;
     return array("info_type"=>"info", "info_text"=>$command_syntax, "info_nohide"=>true);
   }
 }

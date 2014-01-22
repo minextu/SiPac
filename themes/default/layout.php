@@ -72,11 +72,11 @@ function user_options(user_id, action)
 $chat_layout_functions['layout_user_writing_status'] = '
 function layout_user_writing_status (status, username, user_id)
 {
-  if (document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML != "[" + this.texts[55] + "]")
+  if (document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML != "[" + this.texts["writing-status"] + "]")
     this.old_user_status[username] = document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML;
   
   if (status == 1)
-    document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML = "[" + this.texts[55] + "]";
+    document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML = "[" + this.texts["writing-status"] + "]";
   else if (this.old_user_status[username] != undefined)
   {
     document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML =  this.old_user_status[username];

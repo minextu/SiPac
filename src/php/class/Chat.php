@@ -178,8 +178,11 @@ class Chat
       $this->is_mobile = true;
     else
       $layout_path = dirname(__FILE__) . "/../../../themes/".$this->settings['theme'];
-      
-    require($layout_path."/layout.php");
+     
+	if (file_exists($layout_path."/layout.php"))
+		require($layout_path."/layout.php");
+	else
+		die($layout_path."/layout.php not found!");
     
     $layout_array['path'] = $layout_path;
     $layout_array['html'] = $chat_layout;
@@ -192,7 +195,9 @@ class Chat
   private function include_language()
   {
     $language_path = dirname(__FILE__)."/../../lang/";
-    require($language_path.$this->settings['language'].".php");
+    
+	global $chat_text;
+    (@include_once ($language_path.$this->settings['language'].".php")) OR die("Invalid Language");
     
     foreach ($chat_text as $key => $text)
     {
@@ -228,6 +233,7 @@ class Chat
 	{
 	  $post_user = "";
 	  $post_type = "notify";
+	  $post['message'] = $this->translate($post['message']);
 	}
 	$post_html = $this->layout['post_html'];
 	$post_html = str_replace("!!USER!!", $post_user, $post_html);
@@ -283,7 +289,7 @@ class Chat
       }
     }
     else
-      return array('info_type' => "error", 'info_text' => "Nothing entered");
+      return array('info_type' => "error", 'info_text' => $this->translate("<||message-empty-text||>"));
   }
   public function handle_userlist()
   {
@@ -311,24 +317,26 @@ class Chat
       $this->nickname =$this->new_nickname;
       unset($this->new_nickname);
     }
-    else if (!empty($_SESSION['SiPac'][$this->id]['nickname']))
+    else if (!empty($_SESSION['SiPac'][$this->id]['nickname']) AND $this->settings['username_var'] == $_SESSION['SiPac'][$this->id]['username_var'] )
       $this->nickname = $_SESSION['SiPac'][$this->id]['nickname'];
     else if ($this->settings['username_var'] == "!!AUTO!!")
       $this->nickname = "Guest " . mt_rand(1, 1000);
     else
       $this->nickname = $this->settings['username_var'];
-      
+    
     if (!empty($_SESSION['SiPac'][$this->id]['nickname'] ) AND $_SESSION['SiPac'][$this->id]['nickname']  != $this->nickname)
     {
       foreach($this->channels as $channel)
       {
-	$this->send_message($_SESSION['SiPac'][$this->id]['nickname'] . " is now ".$this->nickname, $channel, 1, 0);
-	$this->db->delete_user($_SESSION['SiPac'][$this->id]['nickname'], $channel, $this->id);
-	$this->db->save_user($this->nickname, $channel, $this->id);
+		$this->send_message("<||rename-notification|".$_SESSION['SiPac'][$this->id]['nickname']." |".$this->nickname."||>", $channel, 1, 0);
+		$this->db->delete_user($_SESSION['SiPac'][$this->id]['nickname'], $channel, $this->id);
+		$this->db->save_user($this->nickname, $channel, $this->id);
        }
     }
        
     $_SESSION['SiPac'][$this->id]['nickname'] = $this->nickname;
+     $_SESSION['SiPac'][$this->id]['username_var'] = $this->settings['username_var'];;
+     
     $this->db->update_nickname($this->nickname);
   }
   private function check_command($message)
@@ -353,23 +361,27 @@ class Chat
 	  {
 	    $command = new $command_class;
 	    $command->set_variables($this, $command_parameters);
-	    if ($command->check_permission() == true)
+		if ($command->check_permission() == true)
 	    {
-	      $command_return = $command->execute();
+			$command_return = $command->execute();
 	      
-	      if (is_array($command_return))
-		return $command_return;
+			if (is_array($command_return))
+			{
+				if (isset($command_return['info_text']))
+					$command_return['info_text'] = $this->translate($command_return['info_text']);
+				return $command_return;
+			}
 	      else
-		return array();
+			return array();
 	    }
 	    else
-	      return array("info_type"=>"warn", "info_text" => 'No Permissions!');
+	      return array("info_type"=>"warn", "info_text" =>$this->translate( '<||no-permissions-text||>'));
 	  }
 	  else
 	    return array("info_type"=>"error", "info_text" => 'Classname is not "'.$command_class.'"');
 	}
 	else
-	  return array("info_type"=>"warn", "info_text" => "Command not found!");
+	  return array("info_type"=>"warn", "info_text" => $this->translate("<||command-not-found-text|".$command_name."||>"));
      }
      else
       return false;
@@ -414,7 +426,7 @@ class Chat
       $this->html_path = $this->settings['html_path'];
     
   }
-  private function translate($text)
+  public function translate($text)
   {
     preg_match_all('#<\|\|(.*)\|\|>#isU', $text, $matches, PREG_SET_ORDER);
     

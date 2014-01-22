@@ -37,9 +37,9 @@ class Chat_User
     $user_html = str_replace("!!USER!!", $this->nickname, $user_html);
     
     if ($this->afk == 0)
-      $user_status = "online";
+      $user_status = "<||online-status-text||>";
     else
-      $user_status = "afk";
+      $user_status = "<||afk-status-text||>";
     
     $user_html = str_replace("!!USER_STATUS!!", $user_status, $user_html);
     $user_html = str_replace("!!NUM!!", $this->chat_num, $user_html);

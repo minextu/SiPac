@@ -467,7 +467,7 @@ Chat.prototype.add_channel = function (channel, noadd)
     this.chat.getElementsByClassName("chat_conversation")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative;' class='chat_conversation_channel_" + channel + "'></div>";
     this.chat.getElementsByClassName("chat_userlist")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative;' class='chat_userlist_channel_" + channel + "'></div>";
 
-    this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].innerHTML = "Loading the Chat...";
+    this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].innerHTML = this.texts['room-loading-text'];
 
     this.new_channels[channel] = true;
 
@@ -559,13 +559,13 @@ Chat.prototype.information = function (info, type, nohide, onlyhide, noclose)
     info = "<br>" + info;
 
     if (type == "info")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/information.png' alt='I'> " + this.texts[37] + info; //Info:
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/information.png' alt='I'> " + this.texts['info-head'] + info; //Info:
     else if (type == "error")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/exclamation.png' alt='I'> " + this.texts[38] + info; //Error:
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/exclamation.png' alt='I'> " + this.texts['error-head'] + info; //Error:
     else if (type == "warn")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/error.png' alt='I'> " + this.texts[39] + info; //Warning: 
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/error.png' alt='I'> " + this.texts['warning-head'] + info; //Warning: 
     else if (type == "success")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/check.png' alt='I'> " + this.texts[40] + info; //Success:
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/check.png' alt='I'> " + this.texts['success-head'] + info; //Success:
 
     info_msg_element_sub.innerHTML = info;
     var chat_num = this.num;

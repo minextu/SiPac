@@ -18,10 +18,10 @@ class SiPacCommand_name implements SiPacCommand
   
   public function execute()
   {
-    if (!empty($parameters))
+    if (!empty($this->parameters))
       $this->chat->db->add_task("new_name|".$this->parameters, $this->chat->nickname, $this->chat->active_channel, $this->chat->id);
     else
-       return array("info_type"=>"error", "info_text"=>"You didn't enter a new name!");
+       return array("info_type"=>"error", "info_text"=>"<||newname-not-entered-text||>");
   }
 }
 
