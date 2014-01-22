@@ -192,7 +192,7 @@ function Chat(theme, id, client_num, channels, texts)
   this.first_start = true;
   this.new_channels = new Array();
   this.active_channel = "";
-  this.enable_sound = false; //change to true
+  this.enable_sound = true;
   this.add_channel(undefined, true);
   this.change_channel(this.channels[0]);
 

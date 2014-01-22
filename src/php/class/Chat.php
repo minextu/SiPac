@@ -220,6 +220,7 @@ class Chat
       //check if the post is new
       if ($post['id'] > $last_id)
       {
+      	  $post_user_name = $post['user'];
 	if ($post['extra'] == 0)
 	{
 	  $post_user = $post['user'].": ";
@@ -252,7 +253,7 @@ class Chat
 	  
 	
 	$new_posts[$post['channel']][] = $post_html;
-	$new_post_users[$post['channel']][] = $post_user;
+	$new_post_users[$post['channel']][] = $post_user_name;
       }
       //save the highest id
       $updated_last_id = $post['id'];
