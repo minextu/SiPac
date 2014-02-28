@@ -1,4 +1,4 @@
-<?php // !!SMILEYS!! -> Smileys, <||t20||> -> Loading the Chat. Please wait..., <||t12||> -> send !!ID!! -> chat id
+<?php // !!SMILEYS!! -> Smileys
 $default_smiley_height = 30;
 
 /*
@@ -24,6 +24,13 @@ $chat_layout_user_entry = "
 ";
 $chat_layout_post_entry = "
 <div class='chat_entry_!!TYPE!!'>
+  <span class='chat_entry_user'>!!USER!!</span>
+  <span class='chat_entry_message'>!!MESSAGE!!</span>
+  <span class='chat_entry_date'>!!TIME!!</span>
+</div>
+";
+$chat_layout_notify_entry = "
+<div class='chat_entry_notify'>
   <span class='chat_entry_user'>!!USER!!</span>
   <span class='chat_entry_message'>!!MESSAGE!!</span>
   <span class='chat_entry_date'>!!TIME!!</span>

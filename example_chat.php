@@ -20,7 +20,7 @@ $chat_settings['mysql_database'] = "exmaple_database";
 
 
 require_once dirname(__FILE__)."/src/php/SiPac.php";
-$chat = new Chat($chat_settings);
+$chat = new SiPac_Chat($chat_settings);
 
 
 

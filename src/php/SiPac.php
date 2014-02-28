@@ -93,7 +93,7 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 	  //split all channels
 	  $chat_channels = explode("|||", $chat_variables['channels']);
 	  //create the Chat class
-	  $chat = new Chat(false, false, $chat_variables, $chat_channels, $chat_num);
+	  $chat = new SiPac_Chat(false, false, $chat_variables, $chat_channels, $chat_num);
 	  //obtain a nickname or load the old
 	  $chat->check_name();
 	  

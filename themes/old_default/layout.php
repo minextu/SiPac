@@ -8,6 +8,13 @@ $chat_layout_post_entry = "
   <span class='chat_entry_date'>!!TIME!!</span>
 </div>
 ";
+$chat_layout_notify_entry = "
+<div class='chat_entry_!!TYPE!!'>
+  <span class='chat_entry_user'>!!USER!!</span>
+  <span class='chat_entry_message'>!!MESSAGE!!</span>
+  <span class='chat_entry_date'>!!TIME!!</span>
+</div>
+";
 $chat_layout = "
 <div class='chat_main'>
 		<span class='chat_speech_bubble' style='display: none;'></span>

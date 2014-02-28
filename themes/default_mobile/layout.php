@@ -32,6 +32,16 @@ $chat_layout_post_entry = "
   </div>
 </div>
 ";
+$chat_layout_notify_entry = "
+<div class='chat_entry_!!TYPE!!'>
+  <div class='chat_entry_content'>
+  <div class='chat_entry_info'>
+  <span class='chat_entry_user'>!!USER!!</span><span class='chat_entry_date'>!!TIME!!</span>
+  </div>
+  <span class='chat_entry_message'>!!MESSAGE!!</span>
+  </div>
+</div>
+";
 $chat_layout = "
 <meta name='viewport' content='width=device-width, height=device-height, user-scalable=no'>
 <div class='chat_main'>

@@ -36,7 +36,7 @@ $chat_text = array(
 //"You were kicked! Reason: %1",
 //"%1 was kicked by %3. Reason: %2",
 //"%1 was kicked. Reason: %2",
-//"Kick %1",
+"kick-user"=>"Kick %1",
 "online-status-text" => "online",
 "afk-status-text" => "afk",
 "message-input-placeholder" => "Please enter a message...",
@@ -53,6 +53,9 @@ $chat_text = array(
 //"afk is not enable",
 //"You must enter a channel!",
 //"no user specified",
-"writing-status" => "Writing..."	
+"writing-status" => "Writing...",
+
+"log-message" => "Message",
+"log-info"=>"Info"
 );
 ?>

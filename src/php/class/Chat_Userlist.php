@@ -37,10 +37,12 @@
       //if no infomation by this user are available
       if (empty($user_info))
       {
-	//save the user
-	$this->chat->db->save_user($this->chat->nickname, $channel, $this->chat->id);
-	//send a message, that this user jas joined the channel
-	$this->chat->send_message("<||user-join-notification|".$this->chat->nickname. "||>", $channel, 1, 0);
+      	//save the user
+      	$ip = $_SERVER['REMOTE_ADDR'];
+		$user_array = array("id" => "user", "name" => $this->chat->nickname, "writing" => false, "afk" => false, "info" => "", "ip" => $ip);
+		$user = new Chat_User($user_array, $this->chat);
+		
+		$user->save_user($channel, true);
       }
       else //if the user is already in the db, just update the information
 	$this->chat->db->update_user($this->chat->nickname, $channel, $this->chat->id, time(), $this->chat->is_writing);
@@ -111,7 +113,7 @@
 	  
 	  continue;
 	}
-	$this->users[$user['id']] = new Chat_User($user, $this->chat->layout, $this->chat->chat_num);
+	$this->users[$user['id']] = new Chat_User($user, $this->chat);
 	
 	//add the status, if a user is writing
 	$user_array[$channel]['user_writing']['id'][] = $user['id'];

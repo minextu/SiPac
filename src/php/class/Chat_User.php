@@ -21,14 +21,20 @@
 class Chat_User
 {
   
-  public function __construct($array, $layout, $chat_num)
+  public function __construct($array, $chat)
   {
     $this->id = $array['id'];
-    $this->chat_num = $chat_num;
     $this->nickname = $array['name'];
     $this->is_writing = $array['writing'];
     $this->afk = $array['afk'];
-    $this->layout = $layout;
+    $this->info = $array['info'];
+    $this->ip = $array['ip'];
+    
+    $this->chat = $chat;
+	$this->chat_num = $chat->chat_num;
+	$this->layout = $this->chat->layout;
+    $this->settings = $this->chat->settings;
+    $this->db = $this->chat->db;
   }
   
   public function generate_html()
@@ -44,7 +50,26 @@ class Chat_User
     $user_html = str_replace("!!USER_STATUS!!", $user_status, $user_html);
     $user_html = str_replace("!!NUM!!", $this->chat_num, $user_html);
     $user_html = str_replace("!!USER_ID!!", "user_".$this->id, $user_html);
+    $user_html = str_replace("!!USER_INFO!!", $this->generate_user_info(), $user_html);
     return $user_html;
+  }
+  
+  public function generate_user_info()
+  {
+		$user_info_tmp = $this->info;
+        if ($this->settings['can_see_ip'])
+          $user_info_tmp = "IP:" . $this->ip . "|||" . $user_info_tmp;
+        
+        if ($this->settings['can_kick'])
+          $user_info_tmp = "<a href='javascript:void(null);' onclick='chat_objects[".$this->chat_num."].kick_user(\"".addslashes($this->nickname) . "\");'><||kick-user|" . $this->nickname . "||></a>|||" . $user_info_tmp;
+        
+        $user_info = "";
+        foreach (explode("|||", $user_info_tmp) as $info)
+        {
+          //user dropdown infos
+          $user_info = $user_info . "<li>" . $info . "</li>";
+        }
+		return $user_info;
   }
   
   public function generate_additional_info()
@@ -54,6 +79,17 @@ class Chat_User
     else
       return array();
   }
+  
+	public function save_user($channel, $add_notify)
+	{
+		$this->chat->db->save_user($this->nickname, $channel, $this->ip, $this->chat->id);
+		
+		if ($add_notify)
+		{
+			//send a message, that this user jas joined the channel
+			$this->chat->send_message("<||user-join-notification|".$this->nickname. "||>", $channel, 1, 0);
+		}
+	}
   
 }
 

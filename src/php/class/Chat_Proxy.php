@@ -17,16 +17,12 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-require_once("class/Chat/layout.php");
-require_once("class/Chat/language.php");
-require_once("class/Chat.php");
-
-require_once("class/Chat_MySQL.php");
-require_once("class/Chat_User.php");
-require_once("class/Chat_Userlist.php");
-require_once("class/Chat_Command.php");
-require_once("class/Chat_Proxy.php");
-
+interface SiPacProxy
+{
+ // public $name;
+  //public $usage;
+  
+  public function set_variables($chat, $post);
+  public function execute();
+}
 ?>
-

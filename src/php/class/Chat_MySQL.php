@@ -83,7 +83,7 @@ class Chat_MySQL
   public function get_user($nickname, $channel, $chat_id)
   {
     //get all values of the user with the given nickname
-    $user_info = mysql_query("SELECT * FROM chat_users WHERE name LIKE '".mysql_real_escape_string($nickname)."' AND channel LIKE '".mysql_real_escape_string($channel)."'");
+    $user_info = mysql_query("SELECT * FROM chat_users WHERE name LIKE '".mysql_real_escape_string($nickname)."' AND channel LIKE '".mysql_real_escape_string($channel)."' AND chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
     
     return mysql_fetch_assoc($user_info);
   }
@@ -109,14 +109,12 @@ class Chat_MySQL
     return $update_user_mysql;
   }
 
-  public function save_user($nickname, $channel, $chat_id)
+  public function save_user($nickname, $channel, $user_ip, $chat_id)
   {
     //variables to add later
     $user_info = "";
     $user_style = "";
     $is_afk = "";
-    $user_ip = "";
-    $channel = $channel;
     
     //save the user with all given values
     $add_user_mysql = mysql_query("INSERT INTO chat_users (name, info, style, afk, writing, ip, last_time, channel, chat_id) VALUES ('" . mysql_real_escape_string($nickname) . "', '" . mysql_real_escape_string($user_info) . "', '" . $user_style . "', '" . $is_afk . "', 'false', '" . $user_ip . "', '" . time() . "', '" . mysql_real_escape_string($channel) . "', '$chat_id')");
