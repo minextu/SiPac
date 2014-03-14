@@ -25,6 +25,34 @@ trait SiPac_layout
     $css_file = str_replace("\n", " ", file_get_contents($this->layout['path']."/chat.css"));
     $id_css   = "#".$this->id;
     
+    $css_files_parts = explode("{", $css_file);
+    
+    $new_css_file = "";
+    foreach ($css_files_parts as $part_num => $css_part)
+    {
+		if (!empty($css_part))
+		{
+			$css_parts = explode("}", $css_part);
+			if (count($css_parts) == 1)
+				$css_elements = explode(",",$css_parts[0]);
+			else
+			{
+				$new_css_file = $new_css_file.$css_parts[0]."} ";
+				$css_elements = explode( ",", $css_parts[1]);
+			}
+			foreach ($css_elements as  $element_key => $element)
+			{
+				if ($element_key > 0 )
+					$new_css_file = $new_css_file.","; 
+				if (strpos($element, ".chat_main") === false)
+					$new_css_file = $new_css_file.$id_css.$element; 
+				else
+					$new_css_file = $new_css_file.str_replace(".chat_main", $id_css, $element);
+			}
+			$new_css_file = $new_css_file." { ";
+		}
+    }
+    
     $this->js_chat = "var chat_text = new Array();";
     foreach ($this->text as $key => $text)
     {
@@ -59,7 +87,7 @@ trait SiPac_layout
     $this->html_code = $this->html_code."
 		<script class='sipac_script' type='text/javascript'>
 		var style_obj = document.createElement('style');
-		var text_obj = document.createTextNode('$css_file');
+		var text_obj = document.createTextNode('".trim($new_css_file)."');
 		style_obj.appendChild(text_obj);
 		document.getElementById('".$this->id."').appendChild(style_obj);
 		".
