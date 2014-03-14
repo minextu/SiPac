@@ -38,23 +38,37 @@ $chat_layout_notify_entry = "
 ";
 $chat_layout = "
 <div class='chat_main'>
-  <div class='chat_left'>
-    <div class='chat_userlist'></div><!-- end: chat_userlist-class -->
-  </div><!-- end: chat_left-class -->
-  <div class='chat_right'>
-    <div class='chat_conversation'></div><!-- end: chat_conversation-class -->
-    <div class='chat_user_area'>
-		<div class='chat_notice_msg'></div>
-      <div class='chat_extra_bar'>
-			<button onclick='chat_objects[!!NUM!!].smiley_bar(this);' class='chat_smiley_bar_button_closed'>s</button>
-			<div class='chat_smiley_bar'>!!SMILEYS!!</div>
-      </div><!-- end: chat_extra_bar-class -->
-      <div class='chat_user_input'>
-	<input type='text' class='chat_message' placeholder='<||message-input-placeholder||>'>
-	<button class='chat_send_button'><||send-button-text||></button><!-- end: chat_send_button-class -->
-      </div><!-- end: chat_user_input-class -->
-    </div><!-- end: chat_user_area-class -->
-  </div><!-- end: chat_right-class -->
+	<nav class='chat_channels_nav'>
+		<span class='chat_header'>SiPac</span>
+		<ul class='chat_channels_ul'>
+		</ul>
+		<span class='chat_add_channel'><a href='javascript:void(0);' onclick='chat_objects[!!NUM!!].insert_command(\"join \" + prompt(\"Please enter a channel name\"), true);'>+</a></span>
+	</nav>
+	<div class='chat_container'>
+		<div class='chat_left'>
+			<div class='chat_conversation'></div>
+			<div class='chat_user_input'>
+				<div class='chat_notice_msg'></div>
+				<input type='text' class='chat_message' placeholder='<||message-input-placeholder||>'>
+				<button class='chat_send_button'><||send-button-text||></button>
+			</div>
+		</div>
+		<div class='chat_vr'></div>
+		<div class='chat_right'>
+			<div class='chat_element'>
+				<div class='chat_element_head'>User</div>
+				<div class='chat_userlist'></div>
+			</div>
+			<div class='chat_element'>
+				<div class='chat_element_head'>Settings</div>
+				<input type ='checkbox' checked='checked' onclick='if (chat_objects[!!NUM!!].enable_sound == true) { chat_objects[!!NUM!!].enable_sound = false; } else { chat_objects[!!NUM!!].enable_sound = true; } ''>Enable Sound
+			</div>
+			<div class='chat_element' style='text-align: center;'>
+				<div class='chat_element_head'>Smileys</div>
+				<span>!!SMILEYS!!</span>
+			</div>
+		</div>
+	</div>
 </div><!-- end: chat_main-class -->
 ";
 $chat_layout_functions['layout_init'] = '

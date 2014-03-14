@@ -18,7 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-$chat_version = "0.0.3.0";
+$chat_version = "0.0.3.1";
 
 //initiate the session, if not already started
 if (strlen(session_id()) < 1)

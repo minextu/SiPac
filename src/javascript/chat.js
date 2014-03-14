@@ -460,7 +460,7 @@ Chat.prototype.add_channel = function (channel, noadd)
   else if (channel != undefined)
   {
     if (this.chat.getElementsByClassName("chat_channels_ul")[0] != undefined)
-      this.chat.getElementsByClassName("chat_channels_ul")[0].innerHTML += "<li id='" + this.id + "_channel_" + channel + "'><a href='javascript:void(0);' onclick='chat_objects[" + this.num + "].change_channel(this.innerHTML)'>" + channel + "</a></li>";
+      this.chat.getElementsByClassName("chat_channels_ul")[0].innerHTML += "<li id='" + this.id + "_channel_" + channel + "'><a class='chat_channel_selected' href='javascript:void(0);' onclick='chat_objects[" + this.num + "].change_channel(this.innerHTML)'>" + channel + "</a></li>";
     else
       this.add_debug_entry("warn", "Missing chat_channels_ul in theme!");
     

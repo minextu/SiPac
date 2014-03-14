@@ -17,19 +17,33 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-require_once("class/SiPac/layout.php");
-require_once("class/SiPac/language.php");
-require_once("class/SiPac/command.php");
-require_once("class/SiPac/proxy.php");
-require_once("class/SiPac.php");
-
-require_once("class/SiPac_MySQL.php");
-require_once("class/SiPac_User.php");
-require_once("class/SiPac_Userlist.php");
-
-require_once("class/Interface/SiPac_Command.php");
-require_once("class/Interface/SiPac_Proxy.php");
-
-?>
-
+trait SiPac_proxy
+{
+	public function check_proxy($post_array, $type)
+	{
+		$proxy_folder = dirname(__FILE__)."/../../proxy/".$type;
+		if ($handle = opendir($proxy_folder))
+		{
+			while (false !== ($file = readdir($handle)))
+			{
+				if ($file != "." && $file != "..") 
+				{
+					include_once($proxy_folder."/".$file);
+					$class_name = str_replace(".php", "", $file);
+				
+					if (class_exists($class_name))
+					{
+						$proxy = new $class_name;
+						$proxy->set_variables($this, $post_array);
+					
+						$post_array = $proxy->execute();
+					}
+					else
+						die('Classname is not "'.$class_name.'"');
+				}
+			}
+			closedir($handle);
+		}
+		return $post_array;
+	}
+}
