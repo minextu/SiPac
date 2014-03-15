@@ -193,6 +193,7 @@ function Chat(theme, id, client_num, channels, texts)
   this.new_channels = new Array();
   this.active_channel = "";
   this.enable_sound = true;
+  this.enable_notifications = false;
   this.add_channel(undefined, true);
   this.change_channel(this.channels[0]);
 
@@ -312,7 +313,7 @@ Chat.prototype.handle_chat_tasks = function (answer)
 
       if (answer['get']['posts'][this.channels[i]] != undefined)
       {
-        this.add_entries(this.channels[i], answer['get']['posts'][this.channels[i]], answer['get']['post_users'][this.channels[i]], answer['get']['highlight']);
+        this.add_entries(this.channels[i], answer['get']['posts'][this.channels[i]], answer['get']['post_users'][this.channels[i]], answer['get']['post_messages'][this.channels[i]]);
       }
     }
   }
@@ -410,7 +411,7 @@ Chat.prototype.handle_userlist = function (userlist_arr, channel)
   }
 };
 
-Chat.prototype.add_entries = function (channel, entries, users, highlight)
+Chat.prototype.add_entries = function (channel, entries, users, messages)
 {
   if (entries != undefined && entries.length > 0)
   {
@@ -418,6 +419,8 @@ Chat.prototype.add_entries = function (channel, entries, users, highlight)
     for (var i = 0; i < entries.length; i++)
     {
       chat_window.innerHTML += entries[i];
+	  if (users[i] != this.username && this.enable_notifications == true)
+		this.show_notification(users[i], messages[i]);
     }
     if (this.first_start)
       scroll(this.chat, "chat_conversation", 0, true);
@@ -576,6 +579,35 @@ Chat.prototype.information = function (info, type, nohide, onlyhide, noclose)
       }, 5000);
   }
 };
+Chat.prototype.show_notification = function(user, message)
+{
+	var Notification = window.Notifications || window.mozNotifications || window.webkitNotifications;
+
+	Notification.requestPermission(function (permission) {
+		 console.log(permission);
+	});
+
+
+	var instance = Notification.createNotification("", user, message);
+
+	setTimeout(function(){
+			instance.cancel();
+			}, '5000');
+
+		instance.onclick = function () {
+			// Something to do
+		};
+		instance.onerror = function () {
+			// Something to do
+		};
+		instance.onshow = function () {
+			// Something to do
+		};
+		instance.onclose = function () {
+			// Something to do
+		};
+	instance.show();
+}
 Chat.prototype.add_smiley = function (code)
 {
   this.chat.getElementsByClassName("chat_message")[0].value += code;

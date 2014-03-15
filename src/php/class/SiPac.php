@@ -111,6 +111,7 @@ class SiPac_Chat
  
     $new_posts = array();
     $new_post_users = array();
+    $new_post_messages = array();
     
     $updated_last_id = $last_id;
     
@@ -161,13 +162,14 @@ class SiPac_Chat
 	
 	$new_posts[$post_array['channel']][] = $post_html;
 	$new_post_users[$post_array['channel']][] = $post_user_name;
+	$new_post_messages[$post_array['channel']][] = $post_array['message'];
       }
       //save the highest id
       $updated_last_id = $post['id'];
     }
     $last_id = $updated_last_id;
     //return all new posts and the highest id
-    return array('posts' => $new_posts, 'post_users' => $new_post_users, 'last_id' => $last_id, 'username' => $this->nickname);
+    return array('posts' => $new_posts, 'post_users' => $new_post_users, 'post_messages' => $new_post_messages, 'last_id' => $last_id, 'username' => $this->nickname);
   }
   public function send_message($message, $channel, $extra = 0, $user = 0, $time = 0)
   {
