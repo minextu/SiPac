@@ -3,6 +3,9 @@
 	background: gray;
 	height: 100%;
 	width: 100%;
+	min-width: 515px;
+	min-height: 200px;
+	font-size: 20px;
 }
 
 .chat_channels_nav
@@ -59,6 +62,7 @@
 	border-radius: 10px;
 	border: 1px solid #d7dbdc;
 	padding-bottom: 5px;
+	font-size: 15px;
 }
 .chat_element_head
 {
@@ -67,6 +71,7 @@
 	color: #222;
 	text-shadow: 0px 0px 5px #fff;
 	margin-bottom: 5px;
+	font-size: 20px;
 }
 .chat_conversation
 {
@@ -78,21 +83,22 @@
 .chat_user_input
 {
 	width: 100%;
-	background: #eaedef;
-	height: 50px;
+	background: #eaeeef;
+	height: 45px;
 	padding-top: 10px;
 }
 .chat_message
 {
-	width: calc(100% - 10px); 
+	width: calc(100% - 20px); 
 	padding:10px 90px 10px 10px;
 	margin-left: 5px;
 	background:#fff; 
 	border:1px solid #bbb;
-	height: 40px;
+	height: 35px;
 }
 .chat_send_button
 {
+	height: 35px;
 	width:80px; 
 	margin-left:-87px; 
 	padding:8px; 
@@ -102,6 +108,7 @@
 	text-shadow:0px -1px 2px rgba(0,0,0,.7);
 	cursor:pointer;
 	border-radius:2px;
+	font-size: 15px;
 }
 .chat_channels_ul
 {
@@ -153,6 +160,7 @@
 	padding-right: 10px;
 	margin-right: 10px;
 	border-right: 1px solid gray;
+	font-size: 15px;
 }
 /* Chat-Entries */
 .chat_entry_own, .chat_entry_others
@@ -168,18 +176,18 @@
 {
 	font-weight: bold;
 	color: #225bb1;
-	font-size: 12pt;
+	font-size: 16px;
 }
 
 .chat_entry_message
 {
-	font-size: 11pt;
+	font-size: 15px;
 }
 
 .chat_entry_date
 {
 	float: right;
-	font-size: 10pt;
+	font-size: 12px;
 	line-height: 20px;
 	/*background: rgba(194,217,238,0.2);*/
 	color: #81766c;
@@ -205,12 +213,12 @@
 .chat_entry_notify .chat_entry_user
 {
 	font-weight: bold;
-	font-size: 12pt;
+	font-size: 14px;
 }
 
 .chat_entry_notify .chat_entry_message
 {
-	font-size: 11pt;
+	font-size: 13px;
 	font-style: italic;
 }
 
@@ -230,7 +238,7 @@
 
 .chat_user .chat_user_name
 {
-	font-size: 14pt;
+	font-size: 20px;
 	color: #fff;
 	text-shadow: 0px 0px 2px #000;
 }
@@ -239,7 +247,7 @@
 {
 	float: right;
 	text-shadow: none;
-	font-size: 10pt;
+	font-size: 15px;
 	color: #5372a1;
 	font-weight: bold;
 }

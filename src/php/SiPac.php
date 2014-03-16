@@ -46,9 +46,12 @@ function check_mobile() {
   //Check Browseragent, for a mobile browser
   for ($i=0; $i<count($agents); $i++) {
     if(isset($_SERVER["HTTP_USER_AGENT"]) && strpos($_SERVER["HTTP_USER_AGENT"], $agents[$i]) !== false)
-      return true;
+    {
+		if (!isset($_GET['mobile']) OR $_GET['mobile'] != "false")
+			return true;
+	}
   }
-  if (isset($_GET['mobile']) == true)
+  if (isset($_GET['mobile']) AND $_GET['mobile'] != "false")
     return true;
     
   return false;
