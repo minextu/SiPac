@@ -105,22 +105,4 @@ function layout_user_writing_status (status, username, user_id)
   }
 }
 ';
-
-$chat_layout_functions['smiley_bar'] = '
-function smiley_bar(smiley_button)
-	{
-		if(smiley_button.className == "chat_smiley_bar_button_closed")
-			{
-				smiley_button.className = "chat_smiley_bar_button_opened";
-				document.getElementsByClassName("chat_smiley_bar")[0].style.width = "50%";
-				document.getElementsByClassName("chat_smiley_bar")[0].style.display = "block";
-			}
-		else if(smiley_button.className == "chat_smiley_bar_button_opened")
-			{
-				smiley_button.className = "chat_smiley_bar_button_closed";
-				document.getElementsByClassName("chat_smiley_bar")[0].style.width = "0%";
-				document.getElementsByClassName("chat_smiley_bar")[0].style.display = "none";
-			}
-	}
-';
 ?>

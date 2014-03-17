@@ -1,4 +1,4 @@
-<?php // !!SMILEYS!! -> Smileys, <||t20||> -> Loading the Chat. Please wait..., <||t12||> -> send !!ID!! -> chat id
+<?php // !!SMILEYS!! -> Smileys
 $default_smiley_height = 30;
 
 /*
@@ -24,38 +24,40 @@ $chat_layout_user_entry = "
 ";
 $chat_layout_post_entry = "
 <div class='chat_entry_!!TYPE!!'>
-  <div class='chat_entry_content'>
-  <div class='chat_entry_info'>
-  <span class='chat_entry_user'>!!USER!!</span><span class='chat_entry_date'>!!TIME!!</span>
-  </div>
+  <span class='chat_entry_user'>!!USER!!</span>
   <span class='chat_entry_message'>!!MESSAGE!!</span>
-  </div>
+  <span class='chat_entry_date'>!!TIME!!</span>
 </div>
 ";
 $chat_layout_notify_entry = "
-<div class='chat_entry_!!TYPE!!'>
-  <div class='chat_entry_content'>
-  <div class='chat_entry_info'>
-  <span class='chat_entry_user'>!!USER!!</span><span class='chat_entry_date'>!!TIME!!</span>
-  </div>
+<div class='chat_entry_notify'>
+  <span class='chat_entry_user'>!!USER!!</span>
   <span class='chat_entry_message'>!!MESSAGE!!</span>
-  </div>
+  <span class='chat_entry_date'>!!TIME!!</span>
 </div>
 ";
 $chat_layout = "
 <meta name='viewport' content='width=device-width, height=device-height, user-scalable=no'>
 <div class='chat_main'>
-    <div class='chat_top'><ul><li class='chat_userlist_closed' onclick='chat_objects[!!NUM!!].layout_show_userlist(this)'>Userlist (!!USER_NUM!! Online)</li><li class='chat_top_n'>Channel</li></ul></div>
-    <div class='chat_conversation'></div>
-    <div class='chat_user_writing'></div>
-        <div class='chat_userlist'></div>
-    <div class='chat_user_area'>
-		<div class='chat_notice_msg'></div>
-      <div class='chat_user_input'>
-	<input type='text' class='chat_message' placeholder='<||message-input-placeholder||>'>
-	<button class='chat_send_button'><||send-button-text||></button><!-- end: chat_send_button-class -->
-      </div><!-- end: chat_user_input-class -->
-    </div><!-- end: chat_user_area-class -->
+	<nav class='chat_channels_nav'>
+		<span class='chat_header'>SiPac</span>
+		<ul class='chat_channels_ul'>
+		</ul>
+		<span class='chat_add_channel'><a href='javascript:void(0);' onclick='chat_objects[!!NUM!!].insert_command(\"join \" + prompt(\"Please enter a channel name\"), true);'>+</a></span>
+	<span class='chat_userlist_closed'  onclick='chat_objects[!!NUM!!].layout_show_userlist(this)'>Userlist (!!USER_NUM!! Online)</span>
+	</nav>
+	<div class='chat_userlist'></div>
+	<div class='chat_container'>
+		<div class='chat_left'>
+			<div class='chat_conversation'></div>
+			<div class='chat_user_input'>
+			    <div class='chat_user_writing'></div>
+				<div class='chat_notice_msg'></div>
+				<input type='text' class='chat_message' placeholder='<||message-input-placeholder||>'>
+				<button class='chat_send_button'><||send-button-text||></button>
+			</div>
+		</div>
+	</div>
 </div><!-- end: chat_main-class -->
 ";
 $chat_layout_functions['layout_init'] = '
@@ -80,55 +82,55 @@ function user_options(user_id, action)
 $chat_layout_functions['layout_user_writing_status'] = '
 function layout_user_writing_status (status, username, user_id)
 {
-  if (user_id != this.id + "_" + this.active_channel + "_user_" + this.username_key)
-  {
+	if (user_id != this.id + "_" + this.active_channel + "_user_" + this.username_key)
+	{
     
-    if (status == 1)
-    {
-      var is_writing = false;
-      for (var i = 0; i < this.user_writing.length; i++)
-      {
-	if (this.user_writing[i] == username)
-	{
-	  is_writing = true;
-	}
-      }
-      if (is_writing == false)
-	this.user_writing[this.user_writing.length] = username;
-      var writing_text = "";
-      for (var i = 0; i < this.user_writing.length; i++)
-      {
-	if (i != 0)
-	{
-	  if (i = this.user_writing.length - 1)
-	    writing_text += " and ";
-	  else
-	    writing_text += ", ";
-	}
-	writing_text += this.user_writing[i];
-      }
-      if (this.user_writing.length > 1)
-	writing_text += " are writing...";
-      else
-	writing_text+= " is writing...";
+		if (status == 1)
+		{
+			var is_writing = false;
+			for (var i = 0; i < this.user_writing.length; i++)
+			{
+				if (this.user_writing[i] == username)
+				{
+					is_writing = true;
+				}
+			}
+			if (is_writing == false)
+				this.user_writing[this.user_writing.length] = username;
+			var writing_text = "";
+			for (var i = 0; i < this.user_writing.length; i++)
+			{
+				if (i != 0)
+				{
+					if (i = this.user_writing.length - 1)
+						writing_text += " and ";
+					else
+						writing_text += ", ";
+				}
+				writing_text += this.user_writing[i];
+			}
+			if (this.user_writing.length > 1)
+				writing_text += " are writing...";
+			else
+				writing_text+= " is writing...";
 	
-      this.chat.getElementsByClassName("chat_user_writing")[0].innerHTML = writing_text;
-    }
-    else
-    {
-      for (var i = 0; i < this.user_writing.length; i++)
-      {
-	if (this.user_writing[i] == username)
-	{
-	  this.user_writing = new Array();
-	  break;
-	}
-      }
+			this.chat.getElementsByClassName("chat_user_writing")[0].innerHTML = writing_text;
+		}
+		else
+		{
+			for (var i = 0; i < this.user_writing.length; i++)
+			{
+				if (this.user_writing[i] == username)
+				{
+					this.user_writing = new Array();
+					break;
+				}
+			}
 	
-      if (this.user_writing.length == 0)
-	this.chat.getElementsByClassName("chat_user_writing")[0].innerHTML = "";
-    }
-  }
+			if (this.user_writing.length == 0)
+				this.chat.getElementsByClassName("chat_user_writing")[0].innerHTML = "";
+		}
+	}
 }
 ';
 

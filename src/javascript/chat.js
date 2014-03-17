@@ -347,11 +347,11 @@ Chat.prototype.handle_chat_tasks = function (answer)
   catch (e)
   {}
   
-  try{
-    this.layout_user_writing_status(this.is_writing, this.username, this.id + "_" + this.active_channel + "_user_" + this.username_key);
-  }catch(e){}
-  
-  try{this.layout_tasks();}catch(e){}
+	if (typeof this.layout_user_writing_status != "undefined")
+		this.layout_user_writing_status(this.is_writing, this.username, this.id + "_" + this.active_channel + "_user_" + this.username_key);
+
+	if (typeof this.layout_tasks != "undefined")
+		this.layout_tasks();
 };
 
 Chat.prototype.handle_userlist = function (userlist_arr, channel)
@@ -401,12 +401,8 @@ Chat.prototype.handle_userlist = function (userlist_arr, channel)
   {
     for (var i = 0; i < userlist_arr['user_writing']['id'].length; i++)
     {
-      try
-      {
-	this.layout_user_writing_status(userlist_arr['user_writing']['status'][i], userlist_arr['users'][userlist_arr['user_writing']['id'][i]], this.id + "_" + channel + "_user_" + userlist_arr['user_writing']['id'][i]);
-      }
-      catch(e){}
-      
+		if (typeof this.layout_user_writing_status != "undefined")
+			this.layout_user_writing_status(userlist_arr['user_writing']['status'][i], userlist_arr['users'][userlist_arr['user_writing']['id'][i]], this.id + "_" + channel + "_user_" + userlist_arr['user_writing']['id'][i]);
     }
   }
 };

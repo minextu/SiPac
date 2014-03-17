@@ -26,90 +26,88 @@ If you want to change theese settings, use "$chat_settings[setting_name_here] = 
 */
 date_default_timezone_set('Europe/Berlin');
 
+
 function return_default_settings()
 {
-  global $chat_default_settings;
-  return  $chat_default_settings;
+	$chat_default_settings = array(
+	"default_user_infos" => array(),
+	"language" => "en",
+	"log_language" => "en",
+	"html_path" => "!!AUTO!!",
+	"theme" => "default",
+	"rows" => '1',
+	"replace_own_username" => false,
+	"deactivate_afk" => false,
+	"auto_detect_no_afk" => true,
+	"smileys" => array(
+		':)' => "happy.png",
+		';)' => "winking.png",
+		":D" => "smile.png",
+		":(" => "sad.png",
+		":'(" => "cry.png",
+		">:|" => "angry.png",
+		":O" => "huh.png",
+		"o_o" => "glasses.png",
+		":/" => "worried.png",
+		"*?*" => "question.png"
+	),
+	"smiley_width" => "!!AUTO!!",
+	"smiley_height" => "!!AUTO!!",
+	"time_24_hours" => true,
+	"date_format" => "d.m.y",
+	"channels" => array(
+		"Main"
+	),
+	"can_join_channels" => true,
+	"max_ping_remove" => 30,
+	"username_var" => "!!AUTO!!",
+	"custom_status" => "!!AUTO!!",
+	"start_as_afk" => false,
+	"can_rename" => true,
+	"can_kick" => true,
+	"can_ban" => true,
+	"show_kick_user" => true,
+	"show_ban_user" => true,
+	"can_write_as_fake_user" => true,
+	"can_rename_others" => true,
+	"can_see_ip" => false,
+	"user_infos" => array(
+	),
+	"replace_commands" => array(
+		'/link:#1#,#2#' => "<a href='#1#' target='_blank'>#2#</a>",
+		'/picture:#1#' => "<img src='#1#'>"
+	),
+	"special_commands" => array(),
+	"can_see_debug" => true,
+	"default_debug" => "warn",
+	"own_log_folder_for_chat_id" => true,
+	"max_messages" => "50",
+	
+	
+	
+	"include_file" => false,
+	"user_afk_class" => "!!AUTO!!",
+	"user_online_class" => "!!AUTO!!"
+	);
+
+
+
+	/* !!!!!!!!!!!!!!!!!!!!!! chat command functions !!!!!!!!!!!!!!!!!!!!*/
+
+	$chat_default_settings["default_special_commands"] = array(
+	'/help command' => "command_help('#1#');",
+	'/me message,user' => "command_me('#1#', '#2#');",
+	'/afk reason' => "command_afk('#1#');",
+	'/name new name,user' => "command_name('#1#', '#2#');",
+	"/join channel" => "command_join('#1#');",
+	'/systemmessage message' => "command_systemmessage('#1#');",
+	"/kick name,reason" => "command_kick('#1#', '#2#');",
+	//"/ban name,time(in days),reason" => "command_ban('#1#', '#2#', '#3#');",
+	"/about" => "command_about();",
+	"/debug type" => "command_debug('#1#');"
+	);
+	return  $chat_default_settings;
 }
-
-$chat_default_settings = array(
-  "default_user_infos" => array(),
-  "language" => "en",
-  "log_language" => "en",
-  "html_path" => "!!AUTO!!",
-  "theme" => "default",
-  "rows" => '1',
-  "replace_own_username" => false,
-  "deactivate_afk" => false,
-  "auto_detect_no_afk" => true,
-  "smileys" => array(
-    ':)' => "happy.png",
-    ';)' => "winking.png",
-    ":D" => "smile.png",
-    ":(" => "sad.png",
-    ":'(" => "cry.png",
-    ">:|" => "angry.png",
-    ":O" => "huh.png",
-    "o_o" => "glasses.png",
-    ":/" => "worried.png",
-    "*?*" => "question.png"
-  ),
-  "smiley_width" => "!!AUTO!!",
-  "smiley_height" => "!!AUTO!!",
-  "time_24_hours" => true,
-  "date_format" => "d.m.y",
-  "channels" => array(
-    "Main"
-  ),
-  "can_join_channels" => true,
-  "max_ping_remove" => 30,
-  "username_var" => "!!AUTO!!",
-  "custom_status" => "!!AUTO!!",
-  "start_as_afk" => false,
-  "can_rename" => true,
-  "can_kick" => true,
-  "can_ban" => true,
-  "show_kick_user" => true,
-  "show_ban_user" => true,
-  "can_write_as_fake_user" => true,
-  "can_rename_others" => true,
-  "can_see_ip" => false,
-  "user_infos" => array(
-  ),
-  "replace_commands" => array(
-    '/link:#1#,#2#' => "<a href='#1#' target='_blank'>#2#</a>",
-    '/picture:#1#' => "<img src='#1#'>"
-  ),
-  "special_commands" => array(),
-  "can_see_debug" => true,
-  "default_debug" => "warn",
-  "own_log_folder_for_chat_id" => true,
-  "max_messages" => "50",
-  
-  
-  
-  "include_file" => false,
-  "user_afk_class" => "!!AUTO!!",
-  "user_online_class" => "!!AUTO!!"
-);
-
-
-
-/* !!!!!!!!!!!!!!!!!!!!!! chat command functions !!!!!!!!!!!!!!!!!!!!*/
-
-$chat_default_settings["default_special_commands"] = array(
-  '/help command' => "command_help('#1#');",
-  '/me message,user' => "command_me('#1#', '#2#');",
-  '/afk reason' => "command_afk('#1#');",
-  '/name new name,user' => "command_name('#1#', '#2#');",
-  "/join channel" => "command_join('#1#');",
-  '/systemmessage message' => "command_systemmessage('#1#');",
-  "/kick name,reason" => "command_kick('#1#', '#2#');",
-  //"/ban name,time(in days),reason" => "command_ban('#1#', '#2#', '#3#');",
-  "/about" => "command_about();",
-  "/debug type" => "command_debug('#1#');"
-);
-
 function command_help($command_syntax = false)
 {
   global $chat_settings;
