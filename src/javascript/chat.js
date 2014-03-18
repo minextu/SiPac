@@ -60,7 +60,7 @@ function chat_ajax()
   if (chat_objects.length != 0 && chat_is_ajax == false)
   {
     chat_is_ajax = true;
-    chat_error_timeout = window.setTimeout(chat_error, 2000);
+    chat_error_timeout = window.setTimeout(chat_error, 20000);
 
 
     var chat_ajax_text = "";
@@ -113,7 +113,7 @@ function chat_ajax()
           }
 
           window.clearTimeout(chat_error_timeout);
-          chat_timeout = window.setTimeout(chat_ajax, 10000);
+          chat_timeout = window.setTimeout(chat_ajax, 1000);
           chat_is_ajax = false;
        // }
         //catch (e)
