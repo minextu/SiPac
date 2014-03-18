@@ -274,11 +274,11 @@ class SiPac_Chat
 	}
   public function check_changes()
   {
-    $this->check_name();
-    $this->check_afk_change();
-    
     //get tasks (kick, ban, etc.)
     $task_answer = $this->get_tasks();
+    
+    $this->check_name();
+    $this->check_afk_change();
     
     return $task_answer;
   }
@@ -330,9 +330,9 @@ class SiPac_Chat
 					
 					//add new user
 					$ip = $_SERVER['REMOTE_ADDR'];
-					$user_array = array("id" => "user", "name" => $this->nickname, "writing" => false, "afk" => false, "info" => "", "ip" => $ip, "channel" => $this->active_channel);
+					$user_array = array("id" => "user", "name" => $this->nickname, "writing" => false, "afk" => false, "info" => "", "ip" => $ip, "channel" => $channel);
 					$user = new SiPac_User($user_array, $this);
-					$user->save_user($channel, false);
+					$user->save_user( false);
 			}
 		}
        
