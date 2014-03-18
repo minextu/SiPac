@@ -24,18 +24,17 @@
 .chat_left
 {
 	margin-top: 20px;
+	margin-right: 20px;
 	background: #fff;
-	width: 70%;
+	width: 75%;
 	height: calc(100% - 40px);
-	margin-left: 10px;
+	margin-left: 20px;
 	box-shadow: 0px 4px 8px 4px rgba(0,0,0,0.10);
 	border-radius: 2px;
 	float: left;
 }
 .chat_vr
 {
-	position: relative;
-	left: 4%;
 	height: 100%;
 	width: 1px;
 	float: left;
@@ -44,10 +43,11 @@
 .chat_right
 {
 	margin-top: 20px;
-	margin-right: 10px;
-	float: right;
+	margin-left: 20px;
+	margin-right: 20px;
+	float: left;
 	height: calc(100% - 40px);
-	width: 20%;
+	width: calc(25% - 81px);
 }
 .chat_userlist
 {
@@ -144,7 +144,7 @@
 	border-color:  #394446;
 	border-bottom: 0px;
 }
-.chat_channels_ul li .chat_channel_selected
+.chat_channels_ul .chat_channel_selected a
 {
 	background: #edf1f5;
 	color: black;
@@ -212,8 +212,10 @@
 
 .chat_entry_notify .chat_entry_user
 {
+	text-decoration: none;
 	font-weight: bold;
 	font-size: 14px;
+	color: #575757;
 }
 
 .chat_entry_notify .chat_entry_message

@@ -31,10 +31,12 @@ $chat_layout_post_entry = "
 ";
 $chat_layout_notify_entry = "
 <div class='chat_entry_notify'>
-  <span class='chat_entry_user'>!!USER!!</span>
   <span class='chat_entry_message'>!!MESSAGE!!</span>
   <span class='chat_entry_date'>!!TIME!!</span>
 </div>
+";
+$chat_layout_notify_user = "
+<span class='chat_entry_user'>!!USER!!</span>
 ";
 $chat_layout = "
 <meta name='viewport' content='width=device-width, height=device-height, user-scalable=no'>
@@ -44,7 +46,7 @@ $chat_layout = "
 		<ul class='chat_channels_ul'>
 		</ul>
 		<span class='chat_add_channel'><a href='javascript:void(0);' onclick='chat_objects[!!NUM!!].insert_command(\"join \" + prompt(\"Please enter a channel name\"), true);'>+</a></span>
-	<span class='chat_userlist_closed'  onclick='chat_objects[!!NUM!!].layout_show_userlist(this)'>Userlist (!!USER_NUM!! Online)</span>
+	<span class='chat_userlist_closed'  onclick='chat_objects[!!NUM!!].layout_show_userlist(this)'><||userlist-head|!!USER_NUM!!||></span>
 	</nav>
 	<div class='chat_userlist'></div>
 	<div class='chat_container'>

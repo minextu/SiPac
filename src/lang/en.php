@@ -18,18 +18,18 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 $chat_text = array(
-"rename-notification" => "%1 is now %2",
-"user-left-notification" =>"%1 has left",
-"user-join-notification" => "%1 has joined",
+"rename-notification" => "[user]%1[/user] is now [user]%2[/user]",
+"user-left-notification" =>"[user]%1[/user] has left",
+"user-join-notification" => "[user]%1[/user] has joined",
 "command-list-head" => "You can use the following Commands:",
+"command-syntax-head" => "Command Syntax:",
 "command-not-found-text" => "Command %1 not found! (Use /help for a command list)",
 "no-permissions-text" => "No permissions!",
-//"User %1 not found",
+"no-permissions-rename-other-user" => "No permissions to rename an other user!",
+"user-not-found-text" => "User %1 not found",
 "newname-not-entered-text" => "You didn't enter a new name!",
 "message-empty-text" => "Nothing entered",
 "send-button-text" => "send",
-//"is now away",
-//"is back again",
 "room-loading-text" => "Loading the Room. Please wait...",
 //"User %1 will be kicked",
 //"no reason",
@@ -44,18 +44,29 @@ $chat_text = array(
 "error-head" => "Error:",
 "warning-head" => "Warning:",
 "success-head" => "Success:",	
-//"has something better to do",
-//"has fallen in love with %1",
-//"wishes he had not forgotten the text",
-//"thinks he/she is beautiful",
-//"is watching for %1",
-//"You can't give a reason for not being afk!",
-//"afk is not enable",
+
+"no-reason-for-not-afk-text" => "You can't give a reason for not being afk!",
+"user-now-afk-no-reason-text" => "[user]%1[/user] is now away",
+"user-now-afk-text" => "[user]%1[/user] is now away (%2)",
+"user-now-not-afk-text" => "[user]%1[/user] is back again",
 //"You must enter a channel!",
 //"no user specified",
 "writing-status" => "Writing...",
 
 "log-message" => "Message",
-"log-info"=>"Info"
+"log-info"=>"Info",
+
+
+/* theme translations */
+"userlist-head" => "Userlist (%1)",
+"settings-head" => "Settings",
+"smileys-head" => "Smileys",
+
+/*me random text*/
+"me-random-text-1" => "has something better to do",
+"me-random-text-2" => "has fallen in love with %1",
+"me-random-text-3" => "wishes he had not forgotten the text",
+"me-random-text-4" => "thinks he/she is beautiful",
+"me-random-text-5" => "is watching for %1"
 );
 ?>

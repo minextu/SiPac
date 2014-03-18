@@ -161,6 +161,10 @@ trait SiPac_layout
     $layout_array['user_html'] = $chat_layout_user_entry;
     $layout_array['default_smiley_height'] = $default_smiley_height;
     $layout_array['post_html'] = $chat_layout_post_entry;
+    
+    if (isset($chat_layout_notify_user))
+		$layout_array['notify_user'] = $chat_layout_notify_user;
+		    
     $layout_array['notify_html'] = $chat_layout_notify_entry;
     $layout_array['javascript_functions'] = $chat_layout_functions;
     

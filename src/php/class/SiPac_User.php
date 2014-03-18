@@ -25,6 +25,7 @@ class SiPac_User
   {
     $this->id = $array['id'];
     $this->nickname = $array['name'];
+    $this->channel = $array['channel'];
     $this->is_writing = $array['writing'];
     $this->afk = $array['afk'];
     $this->info = $array['info'];
@@ -80,14 +81,14 @@ class SiPac_User
       return array();
   }
   
-	public function save_user($channel, $add_notify)
+	public function save_user($add_notify)
 	{
-		$this->chat->db->save_user($this->nickname, $channel, $this->ip, $this->chat->id);
+		$this->chat->db->save_user($this->nickname, $this->channel, $this->ip, $this->chat->id);
 		
 		if ($add_notify)
 		{
 			//send a message, that this user jas joined the channel
-			$this->chat->send_message("<||user-join-notification|".$this->nickname. "||>", $channel, 1, 0);
+			$this->chat->send_message("<||user-join-notification|".$this->nickname. "||>", $this->channel, 1, 0);
 		}
 	}
   

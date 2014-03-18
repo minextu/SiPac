@@ -88,10 +88,10 @@ class SiPac_MySQL
     return mysql_fetch_assoc($user_info);
   }
   
-  public function update_user($nickname, $channel, $chat_id, $time, $is_writing)
+  public function update_user($nickname, $channel, $chat_id, $time, $is_writing, $afk)
   {
     //variables to add later
-    $is_afk = false;
+    $is_afk = $afk;
     $user_info = "";
     $user_style = "";
     $channel = $channel;
@@ -132,7 +132,14 @@ class SiPac_MySQL
     if ($user === false)
       $user = $this->nickname;
       
-    $add_task = mysql_query("UPDATE chat_users SET action = '".mysql_real_escape_string($task)."' WHERE name LIKE '".mysql_real_escape_string($user)."' AND channel LIKE '".mysql_real_escape_string($channel)."' AND chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
+	$count = mysql_query("SELECT * from chat_users WHERE  name LIKE '".mysql_real_escape_string($user)."' AND channel LIKE '".mysql_real_escape_string($channel)."' AND chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
+	if (mysql_num_rows($count) > 0)
+	{
+		$add_task = mysql_query("UPDATE chat_users SET action = '".mysql_real_escape_string($task)."' WHERE name LIKE '".mysql_real_escape_string($user)."' AND channel LIKE '".mysql_real_escape_string($channel)."' AND chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
+		return true;
+    }
+    else
+		return false;
   }
   
   public function update_nickname($nickname)

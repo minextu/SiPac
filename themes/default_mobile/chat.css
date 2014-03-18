@@ -144,7 +144,7 @@
 	border-color:  #394446;
 	border-bottom: 0px;
 }
-.chat_channels_ul li .chat_channel_selected
+.chat_channels_ul .chat_channel_selected a
 {
 	background: #edf1f5;
 	color: black;
@@ -222,8 +222,10 @@
 
 .chat_entry_notify .chat_entry_user
 {
+	text-decoration: none;
 	font-weight: bold;
 	font-size: 14px;
+	color: #575757;
 }
 
 .chat_entry_notify .chat_entry_message

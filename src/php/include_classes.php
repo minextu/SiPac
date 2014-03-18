@@ -22,6 +22,7 @@ require_once("class/SiPac/layout.php");
 require_once("class/SiPac/language.php");
 require_once("class/SiPac/command.php");
 require_once("class/SiPac/proxy.php");
+require_once("class/SiPac/afk.php");
 require_once("class/SiPac.php");
 
 require_once("class/SiPac_MySQL.php");

@@ -24,6 +24,7 @@ class SiPac_Chat
 	use SiPac_language;
 	use SiPac_command;
 	use SiPac_proxy;
+	use SiPac_afk;
 	
 	//define all private variables
 	public $client_num;
@@ -31,8 +32,10 @@ class SiPac_Chat
 	public $chat_num;
 	public $settings = array();
 	public $channels;
+	public $new_channels = array();
 	public $html_path;
 	public $nickname;
+	public $afk;
 	public $new_nickname;
 	private $html_code;
 	public $layout;
@@ -89,10 +92,12 @@ class SiPac_Chat
 			if ($this->db_error !==  true)
 				die($this->db_error);
 		}
-		if ($this->channels == false)
+		if ($channels == false)
 			$this->channels = $this->settings['channels'];
 		else
 			$this->channels = $channels;
+		
+		$this->check_channels();
 		
 		if ($chat_num ===false)
 			$this->chat_num =  $GLOBALS['global_chat_num'] ;
@@ -102,7 +107,7 @@ class SiPac_Chat
 		$this->include_language();
 		
 		$this->include_layout();
-    
+
   }
   public function get_posts($last_id)
   {
@@ -118,13 +123,13 @@ class SiPac_Chat
     foreach ($db_response as $post)
     {
       //check if the post is new
-      if ($post['id'] > $last_id)
+      if ($post['id'] > $last_id OR in_array($post['channel'], $this->new_channels))
       {
 		$post_array = array("message"=>$post['message'], "extra"=>$post['extra'], "channel"=>$post['channel'],"user"=>$post['user'],"time"=>$post['time']);
 		$post_array = $this->check_proxy($post_array, "client");
 		
       	$post_user_name = $post_array['user'];
-		if ($post_array['extra'] == 0)
+		if ($post_array['extra'] == 0) //normal post
 		{
 			$post_user = $post_array['user'].": ";
 	  
@@ -133,11 +138,16 @@ class SiPac_Chat
 			else
 				$post_type = "others";
 		}
-		else 
+		else if ($post_array['extra'] == 1) //notify
 		{
 			$post_user = "";
 			$post_type = "notify";
 			$post_array['message'] = $this->translate($post_array['message']);
+			
+			if (isset($this->layout['notify_user']))
+				$post_array['message'] =   preg_replace('#\[user\](.*)\[/user\]#isU', str_replace("!!USER!!", "$1", $this->layout['notify_user']), $post_array['message']);
+			else
+				$post_array['message'] =   preg_replace('#\[user\](.*)\[/user\]#isU', "$1", $post_array['message']);
 		}
 	
 	if ($post_type == "notify")
@@ -209,35 +219,107 @@ class SiPac_Chat
   public function handle_userlist()
   {
     $this->userlist = new SiPac_Userlist($this);
+    
+    //delete all old user
+    $this->userlist->delete_old_users();
+    
     //save the user in the db
     $this->userlist->save_user();
-    
-    //get tasks (kick, ban, etc.)
-    $this->userlist->get_tasks();
     
     //get other users
     $userlist_answer = $this->userlist->get_users();
     
-    return $userlist_answer;
+    $userlist_array = $userlist_answer;
+    
+    return $userlist_array;
   }
+	public function get_tasks()
+	{
+		$array = array();
+		//go through every channel, the user has joined
+		foreach ($this->channels as $channel)
+		{
+			//get user information
+			$user_info = $this->db->get_user($this->nickname, $channel, $this->id);
+      
+			if (!empty($user_info['action']))
+			{
+				$action_parts = explode("|", $user_info['action']);
+				if ($action_parts[0] == "new_name")
+					$this->new_nickname = $action_parts[1];
+				else if ($action_parts[0] == "join")
+					$array['actions'][] = "join|" . $action_parts[1];
+				/*
+				else if ($action_parts[0] == "kick")
+				{
+				$array['actions'][] = "kick|<||t23|" . $action_parts[1] . "||>";
+				if (!empty($action_parts[2]))
+					save_message("<||t24|" . $get_user->name . "|" . $action_parts[1] . "|" . $action_parts[2] . "||>", $get_user->channel, 1); //%1 was kicked by %3. Reason: %2
+				else
+					save_message("<||t25|" . $get_user->name . "|" . $action_parts[1] . "||>", $get_user->channel, 1); //%1 was kicked. Reason: %2
+				$delete_user                   = mysql_query("DELETE FROM chat_users WHERE id LIKE '" . $get_user->id . "'");
+				$_SESSION[$chat_id]['is_kick'] = true;
+				$chat_no_save_user             = true;
+				}
+				else if ($action_parts[0] == "message")
+				$array['actions'][] = "message|" . $action_parts[1];
+				else
+					$chat_debug['warn'][] = "Action " . $action_parts[0] . " not defined!";*/
+	      
+	      
+				$this->db->add_task("", $this->nickname, $channel, $this->id);
+			}
+		}
+		return $array;
+	}
   public function check_changes()
   {
     $this->check_name();
-    return array();
+    $this->check_afk_change();
+    
+    //get tasks (kick, ban, etc.)
+    $task_answer = $this->get_tasks();
+    
+    return $task_answer;
+  }
+  public function check_channels()
+  {		
+	if (isset($_SESSION['SiPac'][$this->id]['old_channels']))
+	{
+		foreach ($this->channels as $channel)
+		{
+			if (!in_array($channel, $_SESSION['SiPac'][$this->id]['old_channels']))
+				$this->new_channels[] = $channel;
+		}
+	}
+	
+	if ($this->settings['can_join_channels'] == false)
+	{
+		foreach ($this->new_channels as $channel)
+		{
+			if (array_search($channel, $this->settings['channels']) == false)
+			{
+				$this->channels = $_SESSION['SiPac'][$this->id]['old_channels'];
+				DIE("You are not allowed to join this channel!");
+			}
+		}
+	}
+	
+	$_SESSION['SiPac'][$this->id]['old_channels'] = $this->channels;
   }
   public function check_name()
   {
 		if (!empty($this->new_nickname))
 		{
-		$this->nickname =$this->new_nickname;
+		$this->nickname =htmlentities($this->new_nickname);
 		unset($this->new_nickname);
 		}
 		else if (!empty($_SESSION['SiPac'][$this->id]['nickname']) AND $this->settings['username_var'] == $_SESSION['SiPac'][$this->id]['username_var'] )
 		$this->nickname = $_SESSION['SiPac'][$this->id]['nickname'];
 		else if ($this->settings['username_var'] == "!!AUTO!!")
-		$this->nickname = "Guest " . mt_rand(1, 1000);
+		$this->nickname = "Guest" . mt_rand(1, 1000);
 		else
-		$this->nickname = $this->settings['username_var'];
+		$this->nickname = htmlentities($this->settings['username_var']);
     
 		if (!empty($_SESSION['SiPac'][$this->id]['nickname'] ) AND $_SESSION['SiPac'][$this->id]['nickname']  != $this->nickname)
 		{
@@ -248,7 +330,7 @@ class SiPac_Chat
 					
 					//add new user
 					$ip = $_SERVER['REMOTE_ADDR'];
-					$user_array = array("id" => "user", "name" => $this->nickname, "writing" => false, "afk" => false, "info" => "", "ip" => $ip);
+					$user_array = array("id" => "user", "name" => $this->nickname, "writing" => false, "afk" => false, "info" => "", "ip" => $ip, "channel" => $this->active_channel);
 					$user = new SiPac_User($user_array, $this);
 					$user->save_user($channel, false);
 			}

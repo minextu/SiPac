@@ -29,9 +29,11 @@ $chat_layout_post_entry = "
   <span class='chat_entry_date'>!!TIME!!</span>
 </div>
 ";
+$chat_layout_notify_user = "
+<span class='chat_entry_user'>!!USER!!</span>
+";
 $chat_layout_notify_entry = "
 <div class='chat_entry_notify'>
-  <span class='chat_entry_user'>!!USER!!</span>
   <span class='chat_entry_message'>!!MESSAGE!!</span>
   <span class='chat_entry_date'>!!TIME!!</span>
 </div>
@@ -56,16 +58,16 @@ $chat_layout = "
 		<div class='chat_vr'></div>
 		<div class='chat_right'>
 			<div class='chat_element'>
-				<div class='chat_element_head'>User</div>
+				<div class='chat_element_head'><||userlist-head|!!USER_NUM!!||></div>
 				<div class='chat_userlist'></div>
 			</div>
 			<div class='chat_element'>
-				<div class='chat_element_head'>Settings</div>
+				<div class='chat_element_head'><||settings-head||></div>
 				<input type ='checkbox' checked='checked' onclick='if (chat_objects[!!NUM!!].enable_sound == true) { chat_objects[!!NUM!!].enable_sound = false; } else { chat_objects[!!NUM!!].enable_sound = true; } ''>Enable Sound
 				<br><input type ='checkbox' onclick='if (chat_objects[!!NUM!!].enable_notifications == true) { chat_objects[!!NUM!!].enable_notifications= false; } else { chat_objects[!!NUM!!].enable_notifications = true; chat_objects[!!NUM!!].show_notification(\"Success\", \"Notifications are now enabled\");} ''>Enable Desktop Notifications (experimental)
 			</div>
 			<div class='chat_element' style='text-align: center;'>
-				<div class='chat_element_head'>Smileys</div>
+				<div class='chat_element_head'><||smileys-head||></div>
 				<span>!!SMILEYS!!</span>
 			</div>
 		</div>

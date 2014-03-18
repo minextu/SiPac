@@ -60,7 +60,7 @@ function chat_ajax()
   if (chat_objects.length != 0 && chat_is_ajax == false)
   {
     chat_is_ajax = true;
-    chat_error_timeout = window.setTimeout(chat_error, 20000);
+    chat_error_timeout = window.setTimeout(chat_error, 2000);
 
 
     var chat_ajax_text = "";
@@ -113,7 +113,7 @@ function chat_ajax()
           }
 
           window.clearTimeout(chat_error_timeout);
-          chat_timeout = window.setTimeout(chat_ajax, 1000);
+          chat_timeout = window.setTimeout(chat_ajax, 10000);
           chat_is_ajax = false;
        // }
         //catch (e)
@@ -306,14 +306,16 @@ Chat.prototype.handle_chat_tasks = function (answer)
     for (var i = 0; i < this.channels.length; i++)
     {
       if (this.new_channels[this.channels[i]] == true)
-      {
         this.chat.getElementsByClassName('chat_conversation_channel_' + this.channels[i])[0].innerHTML = "";
-        this.new_channels[this.channels[i]] = false;
-      }
-
+      
       if (answer['get']['posts'][this.channels[i]] != undefined)
       {
         this.add_entries(this.channels[i], answer['get']['posts'][this.channels[i]], answer['get']['post_users'][this.channels[i]], answer['get']['post_messages'][this.channels[i]]);
+      }
+      if (this.new_channels[this.channels[i]] == true)
+      {
+        this.new_channels[this.channels[i]] = false;
+		scroll(this.chat, "chat_conversation", 0, true);
       }
     }
   }
@@ -334,10 +336,6 @@ Chat.prototype.handle_chat_tasks = function (answer)
   if (answer['execute_custom_js'] == true)
     chat_custom_js(answer);
 
-
-  if (answer['get']['afk'] != undefined)
-    this.chat_afk = answer['get']['afk'];
-
  try
   {
     var user_num = 0;
@@ -347,8 +345,8 @@ Chat.prototype.handle_chat_tasks = function (answer)
   catch (e)
   {}
   
-	if (typeof this.layout_user_writing_status != "undefined")
-		this.layout_user_writing_status(this.is_writing, this.username, this.id + "_" + this.active_channel + "_user_" + this.username_key);
+	//if (typeof this.layout_user_writing_status != "undefined")
+		//this.layout_user_writing_status(this.is_writing, this.username, this.id + "_" + this.active_channel + "_user_" + this.username_key);
 
 	if (typeof this.layout_tasks != "undefined")
 		this.layout_tasks();
@@ -482,14 +480,14 @@ Chat.prototype.change_channel = function (channel)
   {
     if (this.channels[i] == channel)
     {
-      try{document.getElementById(this.id + "_channel_" + this.channels[i]).className = "chat_channel_selected";}catch(e){}
+      document.getElementById(this.id + "_channel_" + this.channels[i]).className = "chat_channel_selected";
       this.chat.getElementsByClassName("chat_conversation_channel_" + this.channels[i])[0].style.display = "block";
       this.chat.getElementsByClassName("chat_userlist_channel_" + this.channels[i])[0].style.display = "block";
       this.active_channel = this.channels[i];
     }
     else
     {
-      try{document.getElementById(this.id + "_channel_" + this.channels[i]).className = "";}catch(e){}
+      document.getElementById(this.id + "_channel_" + this.channels[i]).className = "";
       this.chat.getElementsByClassName("chat_conversation_channel_" + this.channels[i])[0].style.display = "none";
       this.chat.getElementsByClassName("chat_userlist_channel_" + this.channels[i])[0].style.display = "none";
     }

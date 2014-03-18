@@ -31,10 +31,12 @@ $chat_layout_post_entry = "
 ";
 $chat_layout_notify_entry = "
 <div class='chat_entry_notify'>
-  <span class='chat_entry_user'>!!USER!!</span>
   <span class='chat_entry_message'>!!MESSAGE!!</span>
   <span class='chat_entry_date'>!!TIME!!</span>
 </div>
+";
+$chat_layout_notify_user = "
+<span class='chat_entry_user'>!!USER!!</span>
 ";
 $chat_layout = "
 <div class='chat_main'>

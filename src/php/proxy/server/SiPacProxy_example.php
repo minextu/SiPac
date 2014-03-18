@@ -10,11 +10,11 @@ class SiPacProxy_example implements SiPacProxy
 	}
 	public function execute()
 	{
-		$post_type = $this->post['extra']; // 
+		$post_type = $this->post['extra'];
 		if ($post_type == 0)
 			$post_type_name = "Normal Message"; 
 		else if ($post_type == 1)
-			$post_type_name = "Info"; //Info
+			$post_type_name = "Info";
 			
 		$post_user = $this->post['user'];
 		
