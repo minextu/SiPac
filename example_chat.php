@@ -12,15 +12,15 @@ SiPac minimal config
 
 $chat_settings['chat_id'] = "example_id"; //replace exmaple_id with a custom id for the chat
 
-//mysql config (fill out everything right here)
+//mysql config (fill out everything here)
 $chat_settings['mysql_hostname'] = "localhost";
-$chat_settings['mysql_username'] = "exmaple_user";
-$chat_settings['mysql_password'] = "exmaple_password";
-$chat_settings['mysql_database'] = "exmaple_database";
+$chat_settings['mysql_username'] = "example_user";
+$chat_settings['mysql_password'] = "example_password";
+$chat_settings['mysql_database'] = "example_database";
 
 
-require_once dirname(__FILE__)."/src/php/SiPac.php";
-$chat = new Chat($chat_settings);
+require_once dirname(__FILE__)."/src/php/SiPac.php"; //correct the path, if the src folder is not next to this file
+$chat = new SiPac_Chat($chat_settings);
 
 
 

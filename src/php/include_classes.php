@@ -18,11 +18,19 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-require_once("class/Chat.php");
-require_once("class/Chat_MySQL.php");
-require_once("class/Chat_User.php");
-require_once("class/Chat_Userlist.php");
-require_once("class/Chat_Command.php");
+require_once("class/SiPac/layout.php");
+require_once("class/SiPac/language.php");
+require_once("class/SiPac/command.php");
+require_once("class/SiPac/proxy.php");
+require_once("class/SiPac/afk.php");
+require_once("class/SiPac.php");
+
+require_once("class/SiPac_MySQL.php");
+require_once("class/SiPac_User.php");
+require_once("class/SiPac_Userlist.php");
+
+require_once("class/Interface/SiPac_Command.php");
+require_once("class/Interface/SiPac_Proxy.php");
 
 ?>
 

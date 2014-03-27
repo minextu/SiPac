@@ -192,7 +192,8 @@ function Chat(theme, id, client_num, channels, texts)
   this.first_start = true;
   this.new_channels = new Array();
   this.active_channel = "";
-  this.enable_sound = false; //change to true
+  this.enable_sound = true;
+  this.enable_notifications = false;
   this.add_channel(undefined, true);
   this.change_channel(this.channels[0]);
 
@@ -305,14 +306,16 @@ Chat.prototype.handle_chat_tasks = function (answer)
     for (var i = 0; i < this.channels.length; i++)
     {
       if (this.new_channels[this.channels[i]] == true)
-      {
         this.chat.getElementsByClassName('chat_conversation_channel_' + this.channels[i])[0].innerHTML = "";
-        this.new_channels[this.channels[i]] = false;
-      }
-
+      
       if (answer['get']['posts'][this.channels[i]] != undefined)
       {
-        this.add_entries(this.channels[i], answer['get']['posts'][this.channels[i]], answer['get']['post_users'][this.channels[i]], answer['get']['highlight']);
+        this.add_entries(this.channels[i], answer['get']['posts'][this.channels[i]], answer['get']['post_users'][this.channels[i]], answer['get']['post_messages'][this.channels[i]]);
+      }
+      if (this.new_channels[this.channels[i]] == true)
+      {
+        this.new_channels[this.channels[i]] = false;
+		scroll(this.chat, "chat_conversation", 0, true);
       }
     }
   }
@@ -333,10 +336,6 @@ Chat.prototype.handle_chat_tasks = function (answer)
   if (answer['execute_custom_js'] == true)
     chat_custom_js(answer);
 
-
-  if (answer['get']['afk'] != undefined)
-    this.chat_afk = answer['get']['afk'];
-
  try
   {
     var user_num = 0;
@@ -346,11 +345,11 @@ Chat.prototype.handle_chat_tasks = function (answer)
   catch (e)
   {}
   
-  try{
-    this.layout_user_writing_status(this.is_writing, this.username, this.id + "_" + this.active_channel + "_user_" + this.username_key);
-  }catch(e){}
-  
-  try{this.layout_tasks();}catch(e){}
+	//if (typeof this.layout_user_writing_status != "undefined")
+		//this.layout_user_writing_status(this.is_writing, this.username, this.id + "_" + this.active_channel + "_user_" + this.username_key);
+
+	if (typeof this.layout_tasks != "undefined")
+		this.layout_tasks();
 };
 
 Chat.prototype.handle_userlist = function (userlist_arr, channel)
@@ -400,17 +399,13 @@ Chat.prototype.handle_userlist = function (userlist_arr, channel)
   {
     for (var i = 0; i < userlist_arr['user_writing']['id'].length; i++)
     {
-      try
-      {
-	this.layout_user_writing_status(userlist_arr['user_writing']['status'][i], userlist_arr['users'][userlist_arr['user_writing']['id'][i]], this.id + "_" + channel + "_user_" + userlist_arr['user_writing']['id'][i]);
-      }
-      catch(e){}
-      
+		if (typeof this.layout_user_writing_status != "undefined")
+			this.layout_user_writing_status(userlist_arr['user_writing']['status'][i], userlist_arr['users'][userlist_arr['user_writing']['id'][i]], this.id + "_" + channel + "_user_" + userlist_arr['user_writing']['id'][i]);
     }
   }
 };
 
-Chat.prototype.add_entries = function (channel, entries, users, highlight)
+Chat.prototype.add_entries = function (channel, entries, users, messages)
 {
   if (entries != undefined && entries.length > 0)
   {
@@ -418,6 +413,8 @@ Chat.prototype.add_entries = function (channel, entries, users, highlight)
     for (var i = 0; i < entries.length; i++)
     {
       chat_window.innerHTML += entries[i];
+	  if (users[i] != this.username && this.enable_notifications == true)
+		this.show_notification(users[i], messages[i]);
     }
     if (this.first_start)
       scroll(this.chat, "chat_conversation", 0, true);
@@ -460,14 +457,14 @@ Chat.prototype.add_channel = function (channel, noadd)
   else if (channel != undefined)
   {
     if (this.chat.getElementsByClassName("chat_channels_ul")[0] != undefined)
-      this.chat.getElementsByClassName("chat_channels_ul")[0].innerHTML += "<li id='" + this.id + "_channel_" + channel + "'><a href='javascript:void(0);' onclick='chat_objects[" + this.num + "].change_channel(this.innerHTML)'>" + channel + "</a></li>";
+      this.chat.getElementsByClassName("chat_channels_ul")[0].innerHTML += "<li id='" + this.id + "_channel_" + channel + "'><a class='chat_channel_selected' href='javascript:void(0);' onclick='chat_objects[" + this.num + "].change_channel(this.innerHTML)'>" + channel + "</a></li>";
     else
       this.add_debug_entry("warn", "Missing chat_channels_ul in theme!");
     
     this.chat.getElementsByClassName("chat_conversation")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative;' class='chat_conversation_channel_" + channel + "'></div>";
     this.chat.getElementsByClassName("chat_userlist")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative;' class='chat_userlist_channel_" + channel + "'></div>";
 
-    this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].innerHTML = "Loading the Chat...";
+    this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].innerHTML = this.texts['room-loading-text'];
 
     this.new_channels[channel] = true;
 
@@ -483,14 +480,14 @@ Chat.prototype.change_channel = function (channel)
   {
     if (this.channels[i] == channel)
     {
-      try{document.getElementById(this.id + "_channel_" + this.channels[i]).className = "chat_channel_selected";}catch(e){}
+      document.getElementById(this.id + "_channel_" + this.channels[i]).className = "chat_channel_selected";
       this.chat.getElementsByClassName("chat_conversation_channel_" + this.channels[i])[0].style.display = "block";
       this.chat.getElementsByClassName("chat_userlist_channel_" + this.channels[i])[0].style.display = "block";
       this.active_channel = this.channels[i];
     }
     else
     {
-      try{document.getElementById(this.id + "_channel_" + this.channels[i]).className = "";}catch(e){}
+      document.getElementById(this.id + "_channel_" + this.channels[i]).className = "";
       this.chat.getElementsByClassName("chat_conversation_channel_" + this.channels[i])[0].style.display = "none";
       this.chat.getElementsByClassName("chat_userlist_channel_" + this.channels[i])[0].style.display = "none";
     }
@@ -559,13 +556,13 @@ Chat.prototype.information = function (info, type, nohide, onlyhide, noclose)
     info = "<br>" + info;
 
     if (type == "info")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/information.png' alt='I'> " + this.texts[37] + info; //Info:
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/information.png' alt='I'> " + this.texts['info-head'] + info; //Info:
     else if (type == "error")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/exclamation.png' alt='I'> " + this.texts[38] + info; //Error:
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/exclamation.png' alt='I'> " + this.texts['error-head'] + info; //Error:
     else if (type == "warn")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/error.png' alt='I'> " + this.texts[39] + info; //Warning: 
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/error.png' alt='I'> " + this.texts['warning-head'] + info; //Warning: 
     else if (type == "success")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/check.png' alt='I'> " + this.texts[40] + info; //Success:
+      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/check.png' alt='I'> " + this.texts['success-head'] + info; //Success:
 
     info_msg_element_sub.innerHTML = info;
     var chat_num = this.num;
@@ -576,6 +573,35 @@ Chat.prototype.information = function (info, type, nohide, onlyhide, noclose)
       }, 5000);
   }
 };
+Chat.prototype.show_notification = function(user, message)
+{
+	var Notification = window.Notifications || window.mozNotifications || window.webkitNotifications;
+
+	Notification.requestPermission(function (permission) {
+		 console.log(permission);
+	});
+
+
+	var instance = Notification.createNotification("", user, message);
+
+	setTimeout(function(){
+			instance.cancel();
+			}, '5000');
+
+		instance.onclick = function () {
+			// Something to do
+		};
+		instance.onerror = function () {
+			// Something to do
+		};
+		instance.onshow = function () {
+			// Something to do
+		};
+		instance.onclose = function () {
+			// Something to do
+		};
+	instance.show();
+}
 Chat.prototype.add_smiley = function (code)
 {
   this.chat.getElementsByClassName("chat_message")[0].value += code;
