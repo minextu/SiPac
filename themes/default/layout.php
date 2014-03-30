@@ -38,6 +38,13 @@ $chat_layout_notify_entry = "
   <span class='chat_entry_date'>!!TIME!!</span>
 </div>
 ";
+$chat_layout_channel_tab = "
+<li id='!!ID!!'>
+	<span class='chat_channel_span'>
+		<a class='chat_channel' href='javascript:void(0);' onclick='!!CHANNEL_CHANGE_FUNCTION!!'>!!CHANNEL!!</a><a href='javascript:void(0);' onclick='!!CHANNEL_CLOSE_FUNCTION!!' class='chat_channel_close'>X</a>
+	</span>
+</li>
+";
 $chat_layout = "
 <div class='chat_main'>
 	<nav class='chat_channels_nav'>

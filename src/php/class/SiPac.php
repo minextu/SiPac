@@ -62,7 +62,6 @@ class SiPac_Chat
 		generate random id for this tab/window of the client
 		(so the chat can be opened more than once in different tabs, but same with the same session)
 		*/
-		
 		if ($chat_variables == false)
 		{
 			$this->client_num = "n" . time() . mt_rand(0, 10000);
@@ -97,14 +96,30 @@ class SiPac_Chat
 		else
 			$this->channels = $channels;
 		
-		$this->check_channels();
-		
-		//check log folder permissions
-		$log_folder = "/../../../log/";	
-		if (substr(decoct(fileperms(dirname(__FILE__).$log_folder)), -3) != 777)
+		if ($is_new == true)
 		{
-			die("Wrong Permissions for the log folder. Please change it to 777");
+			//check log folder permissions
+			$log_folder = "/../../../log/";	
+			if (substr(decoct(fileperms(dirname(__FILE__).$log_folder)), -3) != 777)
+			{
+				die("Wrong Permissions for the log folder. Please change it to 777");
+			}
+			//restore old channels
+			if (isset($_SESSION['SiPac'][$this->id]['old_channels'] ))
+			{
+				foreach ($_SESSION['SiPac'][$this->id]['old_channels'] as $channel)
+				{
+					if (array_search($channel, $this->channels) === false AND $this->settings['can_join_channels'] == true)
+					{
+						$this->channels[] = $channel;
+					}
+				}
+			}
+			
+			//clean the db (remove old messages)
+			$this->db->clean_up($this->channels, $this->settings['max_messages'], $this->id);
 		}
+		$this->check_channels();
 		
 		if ($chat_num ===false)
 			$this->chat_num =  $GLOBALS['global_chat_num'] ;
@@ -193,6 +208,9 @@ class SiPac_Chat
 		//remove uneeded space
 		$message = trim($message);
 		
+		if ($extra == 0)
+			$message =  htmlspecialchars($message);
+			
 		if (empty($user))
 			$user = $this->nickname;
 	
@@ -304,7 +322,7 @@ class SiPac_Chat
 	{
 		foreach ($this->new_channels as $channel)
 		{
-			if (array_search($channel, $this->settings['channels']) == false)
+			if (array_search($channel, $this->settings['channels']) === false)
 			{
 				$this->channels = $_SESSION['SiPac'][$this->id]['old_channels'];
 				DIE("You are not allowed to join this channel!");
@@ -318,7 +336,7 @@ class SiPac_Chat
   {
 		if (!empty($this->new_nickname))
 		{
-		$this->nickname =htmlentities($this->new_nickname);
+		$this->nickname =$this->new_nickname;
 		unset($this->new_nickname);
 		}
 		else if (!empty($_SESSION['SiPac'][$this->id]['nickname']) AND $this->settings['username_var'] == $_SESSION['SiPac'][$this->id]['username_var'] )
@@ -326,7 +344,7 @@ class SiPac_Chat
 		else if ($this->settings['username_var'] == "!!AUTO!!")
 		$this->nickname = "Guest" . mt_rand(1, 1000);
 		else
-		$this->nickname = htmlentities($this->settings['username_var']);
+		$this->nickname = htmlspecialchars($this->settings['username_var']);
     
 		if (!empty($_SESSION['SiPac'][$this->id]['nickname'] ) AND $_SESSION['SiPac'][$this->id]['nickname']  != $this->nickname)
 		{

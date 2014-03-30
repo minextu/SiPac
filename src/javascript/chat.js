@@ -45,11 +45,11 @@ if (typeof chat_objects == 'undefined')
 
 
 
-function add_chat(html_path, theme, id, client_num, channels, texts)
+function add_chat(html_path, theme, id, client_num, channels, texts, layout)
 {
   chat_html_path = html_path;
   chat_objects_id[id] = chat_objects.length;
-  chat_objects[chat_objects.length] = new Chat(theme, id, client_num, channels, texts);
+  chat_objects[chat_objects.length] = new Chat(theme, id, client_num, channels, texts, layout);
 }
 
 function chat_ajax()
@@ -179,11 +179,12 @@ function chat_error(error, clear)
   }
 }
 
-function Chat(theme, id, client_num, channels, texts)
+function Chat(theme, id, client_num, channels, texts, layout)
 {
   this.chat = document.getElementById(id);
   this.num = chat_objects.length;
   this.theme = theme;
+  this.layout_array  = layout;
   this.id = id;
   this.client_num = client_num;
   this.channels = channels;
@@ -457,12 +458,12 @@ Chat.prototype.add_channel = function (channel, noadd)
   else if (channel != undefined)
   {
     if (this.chat.getElementsByClassName("chat_channels_ul")[0] != undefined)
-      this.chat.getElementsByClassName("chat_channels_ul")[0].innerHTML += "<li id='" + this.id + "_channel_" + channel + "'><a class='chat_channel_selected' href='javascript:void(0);' onclick='chat_objects[" + this.num + "].change_channel(this.innerHTML)'>" + channel + "</a></li>";
+		this.chat.getElementsByClassName("chat_channels_ul")[0].innerHTML += this.layout_array['channel_tab'].replace("!!ID!!", this.id + "_channel_" + channel).replace("!!CHANNEL_CHANGE_FUNCTION!!", "chat_objects[" + this.num + "].change_channel(\"" +  channel + "\")").replace("!!CHANNEL_CLOSE_FUNCTION!!", "chat_objects[" + this.num + "].close_channel(\"" + channel + "\")").replace("!!CHANNEL!!", channel);
     else
       this.add_debug_entry("warn", "Missing chat_channels_ul in theme!");
     
-    this.chat.getElementsByClassName("chat_conversation")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative;' class='chat_conversation_channel_" + channel + "'></div>";
-    this.chat.getElementsByClassName("chat_userlist")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative;' class='chat_userlist_channel_" + channel + "'></div>";
+    this.chat.getElementsByClassName("chat_conversation")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative; display: none;' class='chat_conversation_channel_" + channel + "'></div>";
+    this.chat.getElementsByClassName("chat_userlist")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative; display: none;' class='chat_userlist_channel_" + channel + "'></div>";
 
     this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].innerHTML = this.texts['room-loading-text'];
 
@@ -487,14 +488,25 @@ Chat.prototype.change_channel = function (channel)
     }
     else
     {
-      document.getElementById(this.id + "_channel_" + this.channels[i]).className = "";
+      document.getElementById(this.id + "_channel_" + this.channels[i]).className = "chat_channel";
       this.chat.getElementsByClassName("chat_conversation_channel_" + this.channels[i])[0].style.display = "none";
       this.chat.getElementsByClassName("chat_userlist_channel_" + this.channels[i])[0].style.display = "none";
     }
   }
   scroll(this.chat, "chat_conversation", 0, true);
 };
-
+Chat.prototype.close_channel = function (channel)
+{
+	console.debug(channel);
+      document.getElementById(this.id + "_channel_" +channel).parentNode.removeChild(document.getElementById(this.id + "_channel_" + channel));
+      this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].parentNode.removeChild(this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0]);
+      this.chat.getElementsByClassName("chat_userlist_channel_" + channel)[0].parentNode.removeChild(this.chat.getElementsByClassName("chat_userlist_channel_" + channel)[0]);
+	  
+	  this.channels.splice(this.channels.indexOf(channel),1);
+	  
+      if (this.active_channel = channel)
+		  this.change_channel(this.channels[0]);
+};
 Chat.prototype.handle_server_actions = function (actions)
 {
   for (var i = 0; i < actions.length; i++)

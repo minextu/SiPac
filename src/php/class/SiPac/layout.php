@@ -59,16 +59,19 @@ trait SiPac_layout
       $this->js_chat = $this->js_chat."chat_text['$key'] = '".addslashes($text)."';";
     }
     
+    $this->js_chat = $this->js_chat."var chat_layout = new Array();";
+      $this->js_chat = $this->js_chat."chat_layout['channel_tab'] = '".addslashes(trim(str_replace("	", " ", str_replace("\n", " ", $this->layout['channel_tab']))))."';";
+      
      /* generate js function arguments, to start the chat*/
     $this->js_chat =$this->js_chat. "add_chat('".$this->html_path."','" . $this->settings['theme'] . "','".$this->id."', '".$this->client_num."',";
     $this->js_chat = $this->js_chat."new Array(";
-    foreach ($this->settings['channels'] as $key => $channel)
+    foreach ($this->channels as $key => $channel)
     {
       if ($key != 0)
 	$this->js_chat = $this->js_chat.",";
       $this->js_chat = $this->js_chat."\"$channel\"";  
     }
-    $this->js_chat = $this->js_chat."), chat_text";
+    $this->js_chat = $this->js_chat."), chat_text, chat_layout";
     
 
     
@@ -134,7 +137,7 @@ trait SiPac_layout
 	{
 		if (strpos($smiley_url, "http://") === false)
 			$smiley_url = $this->html_path . "themes/" . $this->settings['theme'] . "/smileys/" . $smiley_url;
-		$smiley_code  = htmlentities(str_replace('"', 'lol', addslashes($smiley_code)), ENT_QUOTES);
+		$smiley_code  = htmlentities($smiley_code);
 		$chat_smileys = $chat_smileys . "<span style='margin-right: 3px; cursor: pointer;' onclick='chat_objects[chat_objects_id[\"".$this->id."\"]].add_smiley(\" " . $smiley_code . "\");'><img$width$height src='" . $smiley_url . "' title='" . $smiley_code . "' alt='" . $smiley_code . "'></span>";
 	}
 	return $chat_smileys;
@@ -164,6 +167,11 @@ trait SiPac_layout
     
     if (isset($chat_layout_notify_user))
 		$layout_array['notify_user'] = $chat_layout_notify_user;
+		
+	if (isset($chat_layout_channel_tab))
+		$layout_array['channel_tab'] = $chat_layout_channel_tab;
+	else
+		$layout_array['channel_tab'] = "<li id='!!ID!!'><a href='javascript:void(0);' onclick='!!CHANNEL_CHANGE_FUNCTION!!'>!!CHANNEL!!</a></li>";
 		    
     $layout_array['notify_html'] = $chat_layout_notify_entry;
     $layout_array['javascript_functions'] = $chat_layout_functions;

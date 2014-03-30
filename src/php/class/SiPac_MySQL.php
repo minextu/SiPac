@@ -155,6 +155,26 @@ class SiPac_MySQL
 		return false;
   }
   
+	public function clean_up($channels, $max_messages, $chat_id)
+	{
+		foreach ($channels as $channel)
+		{
+			$remove_old_posts = mysql_query
+			("DELETE from chat_entries 
+				WHERE id IN (select id from (select id from chat_entries 
+					WHERE chat_id LIKE '".mysql_real_escape_string($chat_id)."' AND channel LIKE '".mysql_real_escape_string($channel)."' ORDER BY id DESC LIMIT $max_messages, 1000) 
+				x) ");
+			
+			if ($remove_old_posts == false)
+			{
+				echo mysql_error();
+				break;
+				return false;
+			}
+		}
+		return true;
+	}
+  
   public function update_nickname($nickname)
   {
     $this->nickname = $nickname;

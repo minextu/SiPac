@@ -51,7 +51,7 @@ trait SiPac_afk
 						if (empty($this->afk_reason))
 							$afk_text = "<||user-now-afk-no-reason-text|".$this->nickname."||>";
 						else
-							$afk_text = "<||user-now-afk-text|".$this->nickname."|".htmlentities($this->afk_reason)."||>";
+							$afk_text = "<||user-now-afk-text|".$this->nickname."|".$this->afk_reason."||>";
 							
 						$this->send_message($afk_text, $channel, 1);
 					}
