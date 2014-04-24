@@ -51,7 +51,7 @@ $chat_layout = "
 		<span class='chat_header'>SiPac</span>
 		<ul class='chat_channels_ul'>
 		</ul>
-		<span class='chat_add_channel'><a href='javascript:void(0);' onclick='chat_objects[!!NUM!!].insert_command(\"join \" + prompt(\"Please enter a channel name\"), true);'>+</a></span>
+		<span class='chat_add_channel'><a href='javascript:void(0);' onclick='var channel_name = prompt(\"Please enter a channel name\"); if (channel_name != null) { chat_objects[!!NUM!!].insert_command(\"join \" + channel_name, true); }'>+</a></span>
 	</nav>
 	<div class='chat_container'>
 		<div class='chat_left'>

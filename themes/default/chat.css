@@ -122,7 +122,6 @@
 	text-align: center;
 	padding-right: 10px;
 	height: 25px;
-	
 }
 ##CHAT_MAIN## .chat_channels_ul li .chat_channel_span, .chat_add_channel a
 {
@@ -143,6 +142,12 @@
 	border-style: solid;
 	border-color:  #d0d3d4;
 	border-bottom: 0px;
+	
+	transition: all 0.2s;
+}
+##CHAT_MAIN## .chat_channels_ul li .chat_channel_span:hover, .chat_add_channel a:hover
+{
+	box-shadow: inset -2px 4px 21px #ffffff;
 }
 ##CHAT_MAIN## .chat_channels_ul li a, .chat_add_channel a
 {
@@ -153,6 +158,10 @@
 {
 	background: #f0f0f0;
 	border-color:  #c9ccd0;
+}
+##CHAT_MAIN## .chat_channels_ul .chat_channel_selected .chat_channel_span:hover
+{
+	box-shadow: none;
 }
 ##CHAT_MAIN## .chat_channels_ul .chat_channel_unread .chat_channel_span
 {
@@ -168,6 +177,7 @@ to { background: #e4e8ad; }
 ##CHAT_MAIN## .chat_channels_ul .chat_channel_selected .chat_channel_span .chat_channel
 {
 	color: black;
+	transition: all 5s;
 }
 ##CHAT_MAIN## .chat_channels_ul li .chat_channel_close
 {
@@ -179,6 +189,7 @@ to { background: #e4e8ad; }
 	font-size: 10px;
 	line-height: 10px;
 	padding: 2px;
+	transition: all 0.3s;
 }
 ##CHAT_MAIN## .chat_channels_ul li .chat_channel_close:hover
 {
@@ -289,6 +300,12 @@ to { background: #e4e8ad; }
 	border-bottom: 1px solid #d7dbdc;
 	margin-bottom: 5px;
 	min-height: 40px;
+	padding: 0 0px;
+    transition: all 0.1s;
+}
+##CHAT_MAIN## .chat_user:hover
+{
+	padding: 10px 0px;
 }
 ##CHAT_MAIN## .chat_user .chat_user_name
 {
