@@ -54,7 +54,7 @@ trait SiPac_layout
 	}
   }
 
-	private function generate_layout_html($css_code)
+	private function generate_layout_html($css_code=false)
 	{
 	//save the html code of the layout
     $html_code = $this->layout['html'];
