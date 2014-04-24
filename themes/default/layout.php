@@ -12,15 +12,15 @@ $default_smiley_height = 30;
 
 $chat_layout_user_entry = "
 <div class='chat_user' id='!!USER_ID!!' onmouseover='chat_objects[!!NUM!!].user_options(\"!!USER_ID!!\", \"show\");' onmouseout='chat_objects[!!NUM!!].user_options(\"!!USER_ID!!\", \"hide\");'>
-	<div class='chat_user_top'>
-		<div class='chat_user_name'>!!USER!!<span class='chat_user_status'>[!!USER_STATUS!!]</span></div>
-	</div><!-- end: chat_user_top-class -->
+	<div class='chat_user_name'>!!USER!!<span class='chat_user_status'>[!!USER_STATUS!!]</span></div>
+
 	<div class='chat_user_bottom' style='display: none;'>
-		<ul>
-		!!USER_INFO!!
-		</ul>
-	</div><!-- end: chat_user_bottom-class -->
-</div><!-- end: chat_user-class -->
+		<div class='chat_user_info'>!!USER_INFO!!</div>
+	</div>
+</div>
+";
+$chat_layout_user_info_entry = "
+<div><span>!!INFO_HEAD!!:</span><span style='float: right'>!!INFO!!</span></div>
 ";
 $chat_layout_post_entry = "
 <div class='chat_entry_!!TYPE!!'>

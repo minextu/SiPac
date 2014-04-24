@@ -57,18 +57,31 @@ class SiPac_User
   
   public function generate_user_info()
   {
-		$user_info_tmp = $this->info;
-        if ($this->settings['can_see_ip'])
-          $user_info_tmp = "IP:" . $this->ip . "|||" . $user_info_tmp;
-        
+		$user_info_tmp = array();
         if ($this->settings['can_kick'])
-          $user_info_tmp = "<a href='javascript:void(null);' onclick='chat_objects[".$this->chat_num."].kick_user(\"".addslashes($this->nickname) . "\");'><||kick-user|" . $this->nickname . "||></a>|||" . $user_info_tmp;
-        
-        $user_info = "";
-        foreach (explode("|||", $user_info_tmp) as $info)
+			$user_info_tmp['Kick'] = "<a href='javascript:void(null);' onclick='chat_objects[".$this->chat_num."].kick_user(\"".addslashes($this->nickname) . "\");'><||kick-user|" . $this->nickname . "||></a>";
+			
+        if ($this->settings['can_see_ip'])
+			$user_info_tmp['IP'] = $this->ip;
+       
+		if (!empty($this->info))
+		{
+			$infos = explode("|||", $this->info);
+			foreach ($infos as $info)
+			{
+				if (!empty($info))
+				{
+					$info_parts = explode("||", $info);
+					$user_info_tmp[$info_parts[0]] = $info_parts[1];
+				}
+			}
+		}
+		
+		$user_info = "";
+        foreach ($user_info_tmp as $info_head => $info)
         {
           //user dropdown infos
-          $user_info = $user_info . "<li>" . $info . "</li>";
+          $user_info = $user_info .str_replace("!!INFO_HEAD!!", $info_head, str_replace("!!INFO!!", $info, $this->layout['user_info_entry']));
         }
 		return $user_info;
   }
@@ -83,7 +96,18 @@ class SiPac_User
   
 	public function save_user($add_notify)
 	{
-		$this->chat->db->save_user($this->nickname, $this->channel, $this->ip, $this->chat->id);
+		if (is_array($this->info))
+		{
+			$user_info = "";
+			foreach ($this->info as $info_head => $info)
+			{
+				$user_info = $user_info.$info_head."||".$info."|||";
+			}
+		}
+		else
+			$user_info =$this->info;
+		
+		$this->chat->db->save_user($this->nickname, $this->channel, $user_info, $this->ip, $this->chat->id);
 		
 		if ($add_notify)
 		{

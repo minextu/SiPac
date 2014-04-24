@@ -100,7 +100,7 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 					$chat = new SiPac_Chat(false, false, $chat_variables, $chat_channels, $chat_num);
 					
 					//active channel has to be a valid channel
-					if (array_search($chat_variables['active_channel'], $chat->channels) === false)
+					if (array_search($chat_variables['active_channel'], $chat->channel_ids) === false)
 						DIE("You haven't joined this channel!");
 						
 					//obtain a nickname or load the old

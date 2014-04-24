@@ -10,23 +10,22 @@ class SiPacProxy_log implements SiPacProxy
 	}
 	public function execute()
 	{
-		$extra = $this->post['extra'];
+		$type = $this->post['type'];
 		$chat_user = $this->post['user'];
 		$message = $this->post['message'];
+		$channel = $this->chat->get_channel_name($this->post['channel']);
 		
-		$log_date     = date("d.m.Y", time());
-		$log_time     = date("H:i:s", time());
-		$log_year   = date("Y", time());
-		$log_filename = date("m", time());
+		$log_date     = date("Y-m-d H:i:s", $this->post['time']);
+		$log_time     = date("H:i:s", $this->post['time']);
+		$log_year   = date("Y", $this->post['time']);
+		$log_filename = date("m", $this->post['time']);
+		
   
 		$log_folder = "../../log/";
 		
 		if (substr(decoct(fileperms($log_folder)), -3) == 777)
 		{
-			if ($this->chat->settings['own_log_folder_for_chat_id'] == true)
-				$log_folder = $log_folder . $this->chat->id . "/";
-			else
-				$log_folder = $log_folder . "global/";
+			$log_folder = $log_folder . $this->chat->id . "/";
 				
 			if (is_dir($log_folder) == false)
 				mkdir($log_folder, 0777);
@@ -41,22 +40,20 @@ class SiPacProxy_log implements SiPacProxy
 				else
 					$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 				
-				if ($extra == 0)
-					$extra_name = "<||log-message||>"; //Message
-				else if ($extra == 1)
-					$extra_name = "<||log-info||>"; //Info
+				if ($type == 0)
+					$type_name = "<||log-message||>"; //Message
+				else if ($type == 1)
+					$type_name = "<||log-info||>"; //Info
 				else
-					$extra_name = "?";
+					$type_name = "?";
 				
 				if (is_dir($log_folder) == false)
 					mkdir($log_folder, 0777);
 				
 				$chat_log_file = fopen($log_folder . '/' . $log_filename . '.log', "a+");
-				$chat_log      = "\n" . $extra_name . " | ";
 				
-				$chat_log = $chat_log . $chat_user . ": ";
+				$chat_log      = "\n[$log_date] [$channel] $chat_user: ". html_entity_decode($message) . "		| $ip";
 				
-				$chat_log = $chat_log . html_entity_decode($message) . "		|$log_date, $log_time		$ip";
 				fwrite($chat_log_file, $this->chat->translate($chat_log, $this->chat->settings['log_language']));
 				fclose($chat_log_file);
 				}

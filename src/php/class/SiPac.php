@@ -20,34 +20,24 @@
  $GLOBALS['global_chat_num'] = 0;
 class SiPac_Chat
 {
+	use SiPac_settings;
 	use SiPac_layout;
+	use SiPac_channel;
 	use SiPac_language;
 	use SiPac_command;
 	use SiPac_proxy;
 	use SiPac_afk;
 	
-	//define all private variables
+	//define all variables
 	public $client_num;
 	public $id;
 	public $chat_num;
-	public $settings = array();
-	public $channels;
-	public $new_channels = array();
-	public $html_path;
+
 	public $nickname;
 	public $afk;
 	public $new_nickname;
-	private $html_code;
-	public $layout;
 	
 	private $db_error;
-	private $text;
-	
-	public $active_channel;
-	
-	private $js_chat;
-	public $is_writing = false;
-	public $is_mobile = false;
 	
 	public function __construct($settings=false, $is_new=true, $chat_variables=false, $channels=false, $chat_num=false)
 	{
@@ -84,40 +74,52 @@ class SiPac_Chat
 		else
 		{
 			//start mysql connection
-			$this->db = new SiPac_MySQL($this->settings['mysql_hostname'], $this->settings['mysql_username'], $this->settings['mysql_password'], $this->settings['mysql_database']);
-		
+			if ($this->settings['database_type'] == "mysqli")
+				$this->db = new SiPac_MySQLi($this->settings['mysql_hostname'], $this->settings['mysql_username'], $this->settings['mysql_password'], $this->settings['mysql_database']);
+			else if ($this->settings['database_type'] == "mysql")
+				$this->db = new SiPac_MySQL($this->settings['mysql_hostname'], $this->settings['mysql_username'], $this->settings['mysql_password'], $this->settings['mysql_database']);
+			else
+				die("Unknown database type!");
+				
 			//check the connection
 			$this->db_error = $this->db->check();
 			if ($this->db_error !==  true)
 				die($this->db_error);
 		}
 		if ($channels == false)
-			$this->channels = $this->settings['channels'];
+			$this->add_channels($this->settings['channels']);
 		else
-			$this->channels = $channels;
+			$this->add_channels($channels, true);
 		
 		if ($is_new == true)
 		{
+			//check for the update.php
+			if ($this->settings['debug'] == false)
+			{
+				$update_file = dirname(__FILE__)."/../../update.php";	
+				if (file_exists($update_file))
+				{
+					die("Please delete the update.php inside folder 'src' where SiPac is installed!");
+				}
+			}
+			//check cache folder permissions
+			$cache_folder = "/../../../cache/";	
+			if (substr(decoct(fileperms(dirname(__FILE__).$cache_folder)), -3) != 777)
+			{
+				die("Wrong Permissions for the cache folder. Please change it to 777");
+			}
 			//check log folder permissions
 			$log_folder = "/../../../log/";	
 			if (substr(decoct(fileperms(dirname(__FILE__).$log_folder)), -3) != 777)
 			{
 				die("Wrong Permissions for the log folder. Please change it to 777");
 			}
+			
 			//restore old channels
-			if (isset($_SESSION['SiPac'][$this->id]['old_channels'] ))
-			{
-				foreach ($_SESSION['SiPac'][$this->id]['old_channels'] as $channel)
-				{
-					if (array_search($channel, $this->channels) === false AND $this->settings['can_join_channels'] == true)
-					{
-						$this->channels[] = $channel;
-					}
-				}
-			}
+			$this->restore_old_channels();
 			
 			//clean the db (remove old messages)
-			$this->db->clean_up($this->channels, $this->settings['max_messages'], $this->id);
+			$this->db->clean_up($this->channel_ids, $this->settings['max_messages'], $this->id);
 		}
 		$this->check_channels();
 		
@@ -134,7 +136,7 @@ class SiPac_Chat
   public function get_posts($last_id)
   {
     //load all posts
-    $db_response = $this->db->get_posts($this->id, $this->channels);
+    $db_response = $this->db->get_posts($this->id, $this->channel_ids);
  
     $new_posts = array();
     $new_post_users = array();
@@ -147,11 +149,11 @@ class SiPac_Chat
       //check if the post is new
       if ($post['id'] > $last_id OR in_array($post['channel'], $this->new_channels))
       {
-		$post_array = array("message"=>$post['message'], "extra"=>$post['extra'], "channel"=>$post['channel'],"user"=>$post['user'],"time"=>$post['time']);
+		$post_array = array("message"=>$post['message'], "type"=>$post['type'], "channel"=>$post['channel'],"user"=>$post['user'],"time"=>$post['time']);
 		$post_array = $this->check_proxy($post_array, "client");
 		
       	$post_user_name = $post_array['user'];
-		if ($post_array['extra'] == 0) //normal post
+		if ($post_array['type'] == 0) //normal post
 		{
 			$post_user = $post_array['user'].": ";
 	  
@@ -160,7 +162,7 @@ class SiPac_Chat
 			else
 				$post_type = "others";
 		}
-		else if ($post_array['extra'] == 1) //notify
+		else if ($post_array['type'] == 1) //notify
 		{
 			$post_user = "";
 			$post_type = "notify";
@@ -203,12 +205,12 @@ class SiPac_Chat
     //return all new posts and the highest id
     return array('posts' => $new_posts, 'post_users' => $new_post_users, 'post_messages' => $new_post_messages, 'last_id' => $last_id, 'username' => $this->nickname);
   }
-  public function send_message($message, $channel, $extra = 0, $user = 0, $time = 0)
+  public function send_message($message, $channel, $type = 0, $user = 0, $time = 0)
   {
 		//remove uneeded space
 		$message = trim($message);
 		
-		if ($extra == 0)
+		if ($type == 0)
 			$message =  htmlspecialchars($message);
 			
 		if (empty($user))
@@ -227,10 +229,10 @@ class SiPac_Chat
 			else
 			{
 			
-				$post_array = array("message"=>$message, "extra"=>$extra, "channel"=>$channel,"user"=>$user,"time"=>$time);
+				$post_array = array("message"=>$message, "type"=>$type, "channel"=>$channel,"user"=>$user,"time"=>$time);
 				$post_array = $this->check_proxy($post_array, "server");
 				
-				$db_response = $this->db->save_post($post_array['message'], $this->id, $post_array['channel'], $post_array['extra'], $post_array['user'], $post_array['time']);
+				$db_response = $this->db->save_post($post_array['message'], $this->id, $post_array['channel'], $post_array['type'], $post_array['user'], $post_array['time']);
 				if ($db_response !== true)
 					return array('info_type' => "error", 'info_text' => $db_response);
 				else
@@ -262,18 +264,18 @@ class SiPac_Chat
 	{
 		$array = array();
 		//go through every channel, the user has joined
-		foreach ($this->channels as $channel)
+		foreach ($this->channel_ids as $channel)
 		{
 			//get user information
 			$user_info = $this->db->get_user($this->nickname, $channel, $this->id);
-      
-			if (!empty($user_info['action']))
+			
+			if (!empty($user_info['task']))
 			{
-				$action_parts = explode("|", $user_info['action']);
-				if ($action_parts[0] == "new_name")
-					$this->new_nickname = $action_parts[1];
-				else if ($action_parts[0] == "join")
-					$array['actions'][] = "join|" . $action_parts[1];
+				$task_parts = explode("|", $user_info['task']);
+				if ($task_parts[0] == "new_name")
+					$this->new_nickname = $task_parts[1];
+				else if ($task_parts[0] == "join")
+					$array['tasks'][] = "join|" . $task_parts[1] . "|" . $task_parts[2];
 				/*
 				else if ($action_parts[0] == "kick")
 				{
@@ -307,31 +309,6 @@ class SiPac_Chat
     
     return $task_answer;
   }
-  public function check_channels()
-  {		
-	if (isset($_SESSION['SiPac'][$this->id]['old_channels']))
-	{
-		foreach ($this->channels as $channel)
-		{
-			if (!in_array($channel, $_SESSION['SiPac'][$this->id]['old_channels']))
-				$this->new_channels[] = $channel;
-		}
-	}
-	
-	if ($this->settings['can_join_channels'] == false)
-	{
-		foreach ($this->new_channels as $channel)
-		{
-			if (array_search($channel, $this->settings['channels']) === false)
-			{
-				$this->channels = $_SESSION['SiPac'][$this->id]['old_channels'];
-				DIE("You are not allowed to join this channel!");
-			}
-		}
-	}
-	
-	$_SESSION['SiPac'][$this->id]['old_channels'] = $this->channels;
-  }
   public function check_name()
   {
 		if (!empty($this->new_nickname))
@@ -348,14 +325,14 @@ class SiPac_Chat
     
 		if (!empty($_SESSION['SiPac'][$this->id]['nickname'] ) AND $_SESSION['SiPac'][$this->id]['nickname']  != $this->nickname)
 		{
-			foreach($this->channels as $channel)
+			foreach($this->channel_ids as $channel)
 			{
 					$this->send_message("<||rename-notification|".$_SESSION['SiPac'][$this->id]['nickname']." |".$this->nickname."||>", $channel, 1, 0);
 					$this->db->delete_user($_SESSION['SiPac'][$this->id]['nickname'], $channel, $this->id);
 					
 					//add new user
 					$ip = $_SERVER['REMOTE_ADDR'];
-					$user_array = array("id" => "user", "name" => $this->nickname, "writing" => false, "afk" => false, "info" => "", "ip" => $ip, "channel" => $channel);
+					$user_array = array("id" => "user", "name" => $this->nickname, "writing" => false, "afk" => false, "info" => $this->settings['user_infos'], "ip" => $ip, "channel" => $channel);
 					$user = new SiPac_User($user_array, $this);
 					$user->save_user( false);
 			}
@@ -365,46 +342,6 @@ class SiPac_Chat
 		$_SESSION['SiPac'][$this->id]['username_var'] = $this->settings['username_var'];;
 		
 		$this->db->update_nickname($this->nickname);
-  }
-  private function load_settings($settings=false, $id=false)
-  {
-    //get the chat id, either from the settings or the function variable $id
-    if ($id !== false)
-      $this->id = $id;
-    else if ($settings !== false AND isset($settings['chat_id']))
-      $this->id = $settings['chat_id'];
-    else
-      die("No chat id specified!");
-    
-    //if the settings are already given, load them
-    if ($settings !== false)
-      $this->settings = $settings;
-    else if (isset($_SESSION['SiPac'][$this->id]['settings'])) //else load them from the php session (if set)
-      $this->settings = $_SESSION['SiPac'][$this->id]['settings'];
-    else
-      die("No settings found!");
-    
- 
-    
-    $default_settings = return_default_settings();
-    //if some settings are not set, load them from the default config
-    foreach ($default_settings as $setting => $default)
-    {
-      if (!isset($this->settings[$setting]))
-      {
-	$this->settings[$setting]  = $default;
-	//$chat_debug['all_once'][] = "Setting $setting is unused!";
-      }
-    }
-    //save the settings in the session
-    $_SESSION['SiPac'][$this->id]['settings'] = $this->settings;
-
-    //get the correct html path or load a custom
-    if ($this->settings['html_path'] == "!!AUTO!!")
-      $this->html_path = str_replace("//", "/", "/" . str_replace($_SERVER['DOCUMENT_ROOT'], "", realpath(dirname(__FILE__)."/../../..") . "/"));
-    else
-      $this->html_path = $this->settings['html_path'];
-    
   }
   
 }

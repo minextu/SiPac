@@ -45,11 +45,11 @@ if (typeof chat_objects == 'undefined')
 
 
 
-function add_chat(html_path, theme, id, client_num, channels, texts, layout)
+function add_chat(html_path, theme, id, client_num, channels,channel_titles, texts, layout)
 {
   chat_html_path = html_path;
   chat_objects_id[id] = chat_objects.length;
-  chat_objects[chat_objects.length] = new Chat(theme, id, client_num, channels, texts, layout);
+  chat_objects[chat_objects.length] = new Chat(theme, id, client_num, channels,channel_titles, texts, layout);
 }
 
 function chat_ajax()
@@ -179,7 +179,7 @@ function chat_error(error, clear)
   }
 }
 
-function Chat(theme, id, client_num, channels, texts, layout)
+function Chat(theme, id, client_num, channels, channel_titles, texts, layout)
 {
   this.chat = document.getElementById(id);
   this.num = chat_objects.length;
@@ -188,6 +188,7 @@ function Chat(theme, id, client_num, channels, texts, layout)
   this.id = id;
   this.client_num = client_num;
   this.channels = channels;
+  this.channel_titles = channel_titles;
   this.texts = texts;
   this.last_id = 0;
   this.first_start = true;
@@ -195,7 +196,7 @@ function Chat(theme, id, client_num, channels, texts, layout)
   this.active_channel = "";
   this.enable_sound = true;
   this.enable_notifications = false;
-  this.add_channel(undefined, true);
+  this.add_channel(undefined, undefined, true);
   this.change_channel(this.channels[0]);
 
 
@@ -331,8 +332,8 @@ Chat.prototype.handle_chat_tasks = function (answer)
 
   this.add_debug_entries(answer['debug']);
 
-  if (answer['get']['actions'] != undefined)
-    this.handle_server_actions(answer['get']['actions']);
+  if (answer['get']['tasks'] != undefined)
+    this.handle_server_tasks(answer['get']['tasks']);
 
   if (answer['execute_custom_js'] == true)
     chat_custom_js(answer);
@@ -422,6 +423,9 @@ Chat.prototype.add_entries = function (channel, entries, users, messages)
     else
       scroll(this.chat, "chat_conversation", 20, true);
 
+	if (channel != this.active_channel && !this.first_start)
+		this.channel_new_messages(channel, this.channel_titles[this.channels.indexOf(channel)]);
+	
     if (this.first_start != true)
     {
       var no_sound = true;
@@ -446,19 +450,32 @@ Chat.prototype.add_entries = function (channel, entries, users, messages)
   }
 };
 
-Chat.prototype.add_channel = function (channel, noadd)
+Chat.prototype.channel_new_messages = function(channel, channel_title)
+{
+	document.getElementById(this.id + "_channel_" +channel).className = "chat_channel_unread";
+};
+
+Chat.prototype.generate_channel_html = function(channel, channel_title)
+{
+	return this.layout_array['channel_tab'].replace(
+		"!!ID!!", this.id + "_channel_" + channel).replace(
+		"!!CHANNEL_CHANGE_FUNCTION!!", "chat_objects[" + this.num + "].change_channel(\"" +  channel + "\")").replace(
+		"!!CHANNEL_CLOSE_FUNCTION!!", "chat_objects[" + this.num + "].close_channel(\"" + channel + "\")").replace(
+		"!!CHANNEL!!", channel_title);
+};
+Chat.prototype.add_channel = function (channel, channel_title, noadd)
 {
   if (noadd == true && channel == undefined)
   {
     for (var i = 0; i < this.channels.length; i++)
     {
-      this.add_channel(this.channels[i], true);
+      this.add_channel(this.channels[i], this.channel_titles[i], true);
     }
   }
   else if (channel != undefined)
   {
     if (this.chat.getElementsByClassName("chat_channels_ul")[0] != undefined)
-		this.chat.getElementsByClassName("chat_channels_ul")[0].innerHTML += this.layout_array['channel_tab'].replace("!!ID!!", this.id + "_channel_" + channel).replace("!!CHANNEL_CHANGE_FUNCTION!!", "chat_objects[" + this.num + "].change_channel(\"" +  channel + "\")").replace("!!CHANNEL_CLOSE_FUNCTION!!", "chat_objects[" + this.num + "].close_channel(\"" + channel + "\")").replace("!!CHANNEL!!", channel);
+		this.chat.getElementsByClassName("chat_channels_ul")[0].innerHTML +=	 this.generate_channel_html(channel, channel_title);
     else
       this.add_debug_entry("warn", "Missing chat_channels_ul in theme!");
     
@@ -470,67 +487,71 @@ Chat.prototype.add_channel = function (channel, noadd)
     this.new_channels[channel] = true;
 
     if (noadd != true)
+	{
       this.channels[this.channels.length] = channel;
+	  this.channel_titles[this.channel_titles.length] = channel_title;
+	}
   }
   else
     alert("no channel name!");
 };
 Chat.prototype.change_channel = function (channel)
 {
-  for (var i = 0; i < this.channels.length; i++)
-  {
-    if (this.channels[i] == channel)
-    {
-      document.getElementById(this.id + "_channel_" + this.channels[i]).className = "chat_channel_selected";
-      this.chat.getElementsByClassName("chat_conversation_channel_" + this.channels[i])[0].style.display = "block";
-      this.chat.getElementsByClassName("chat_userlist_channel_" + this.channels[i])[0].style.display = "block";
-      this.active_channel = this.channels[i];
-    }
-    else
-    {
-      document.getElementById(this.id + "_channel_" + this.channels[i]).className = "chat_channel";
-      this.chat.getElementsByClassName("chat_conversation_channel_" + this.channels[i])[0].style.display = "none";
-      this.chat.getElementsByClassName("chat_userlist_channel_" + this.channels[i])[0].style.display = "none";
-    }
-  }
+	try
+	{
+	document.getElementById(this.id + "_channel_" + this.active_channel).className = "chat_channel";
+	this.chat.getElementsByClassName("chat_conversation_channel_" + this.active_channel)[0].style.display = "none";
+	this.chat.getElementsByClassName("chat_userlist_channel_" + this.active_channel)[0].style.display = "none";
+	}catch(e){}
+	
+	document.getElementById(this.id + "_channel_" + channel).className = "chat_channel_selected";
+	this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].style.display = "block";
+	this.chat.getElementsByClassName("chat_userlist_channel_" + channel)[0].style.display = "block";
+	this.active_channel = channel;
+ 
   scroll(this.chat, "chat_conversation", 0, true);
 };
 Chat.prototype.close_channel = function (channel)
 {
-	console.debug(channel);
+	if (this.channels.length > 1)
+	{
       document.getElementById(this.id + "_channel_" +channel).parentNode.removeChild(document.getElementById(this.id + "_channel_" + channel));
       this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].parentNode.removeChild(this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0]);
       this.chat.getElementsByClassName("chat_userlist_channel_" + channel)[0].parentNode.removeChild(this.chat.getElementsByClassName("chat_userlist_channel_" + channel)[0]);
 	  
 	  this.channels.splice(this.channels.indexOf(channel),1);
-	  
+	  this.channel_titles.splice(this.channel_titles.indexOf(channel),1);
+		  
       if (this.active_channel = channel)
 		  this.change_channel(this.channels[0]);
+	}
+	else
+		alert("You can't close the last channel left!");
 };
-Chat.prototype.handle_server_actions = function (actions)
+Chat.prototype.handle_server_tasks = function (tasks)
 {
-  for (var i = 0; i < actions.length; i++)
+  for (var i = 0; i < tasks.length; i++)
   {
-    var action_parts = actions[i].split("|");
+    var task_parts = tasks[i].split("|");
 
-    if (action_parts[0] == "message" || action_parts[0] == "kick")
-      this.alert(action_parts[1]);
-    if (action_parts[0] == "join")
+    if (task_parts[0] == "message" || task_parts[0] == "kick")
+      this.alert(task_parts[1]);
+    if (task_parts[0] == "join")
     {
-      this.add_channel(action_parts[1]);
-      this.change_channel(action_parts[1]);
+      this.add_channel(task_parts[1], task_parts[2]);
+      this.change_channel(task_parts[1]);
     }
-    if (action_parts[0] == "kick")
+    if (task_parts[0] == "kick")
     {
       chat_is_kicked = true;
       window.setTimeout(function ()
       {
         chat_stop();
       }, 100);
-      this.information(action_parts[1], "error", true, false, true);
+      this.information(task_parts[1], "error", true, false, true);
     }
 
-    if (action_parts[0] != "message" && action_parts[0] != "kick" && action_parts[0] != "join")
+    if (task_parts[0] != "message" && task_parts[0] != "kick" && task_parts[0] != "join")
       this.add_debug_entries(new Array("warn", "Unknown Action!"));
   }
 }

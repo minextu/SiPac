@@ -34,7 +34,7 @@ class SiPacCommand_name implements SiPacCommand
 		$rename_return = $this->chat->db->add_task("new_name|".$parameter_parts[0], $user, $this->chat->active_channel, $this->chat->id);
 		
 		if ($rename_return == false)
-			return array("info_type"=>"error", "info_text"=>"$rename_return <||user-not-found-text|".$user."||>");
+			return array("info_type"=>"error", "info_text"=>"<||user-not-found-text|".$user."||>");
     }
     else
        return array("info_type"=>"error", "info_text"=>"<||newname-not-entered-text||>");

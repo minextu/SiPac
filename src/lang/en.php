@@ -49,7 +49,9 @@ $chat_text = array(
 "user-now-afk-no-reason-text" => "[user]%1[/user] is now away",
 "user-now-afk-text" => "[user]%1[/user] is now away (%2)",
 "user-now-not-afk-text" => "[user]%1[/user] is back again",
-//"You must enter a channel!",
+
+"no-channel-entered" =>"You must enter a channel!",
+"arguments-missing-text" => "Missing argument! Type /help for the syntax.",
 //"no user specified",
 "writing-status" => "Writing...",
 

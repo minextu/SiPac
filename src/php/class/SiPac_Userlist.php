@@ -29,7 +29,7 @@ class SiPac_Userlist
 	public function save_user()
 	{
 		//go through every channel, the user has joined
-		foreach ($this->chat->channels as $channel)
+		foreach ($this->chat->channel_ids as $channel)
 		{
 			//try to get user information
 			$user_info = $this->chat->db->get_user($this->chat->nickname, $channel, $this->chat->id);
@@ -39,7 +39,7 @@ class SiPac_Userlist
 			{
 				//save the user
 				$ip = $_SERVER['REMOTE_ADDR'];
-				$user_array = array("id" => "user", "name" => $this->chat->nickname, "writing" => false, "afk" => $this->chat->settings['start_as_afk'], "info" => "", "ip" => $ip, "channel" => $channel);
+				$user_array = array("id" => "user", "name" => $this->chat->nickname, "writing" => false, "afk" => $this->chat->settings['start_as_afk'], "info" => $this->chat->settings['user_infos'], "ip" => $ip, "channel" => $channel);
 				$user = new SiPac_User($user_array, $this->chat);
 		
 				$user->save_user(true);
@@ -53,19 +53,19 @@ class SiPac_Userlist
 	public function delete_old_users()
 	{
 		//search for users in every channel the user is online
-		foreach ($this->chat->channels as $channel)
+		foreach ($this->chat->channel_ids as $channel)
 		{
 			//get all users
 			$users = $this->chat->db->get_all_users($channel, $this->chat->id);
 			foreach($users as $user)
 			{
 				//if the last connection is too long ago
-				if (time() - $user['last_time'] > $this->chat->settings['max_ping_remove'])
+				if (time() - $user['online'] > $this->chat->settings['max_ping_remove'])
 				{
 					//delete the user
 					$this->chat->db->delete_user($user['name'], $user['channel'], $this->chat->id);
 					//save a message, that the user has left
-					$this->chat->send_message("<||user-left-notification|".$user['name']. "||>", $user['channel'], 1, 0, $user['last_time']);
+					$this->chat->send_message("<||user-left-notification|".$user['name']. "||>", $user['channel'], 1, 0, $user['online']);
 				}
 			}
 		}
@@ -82,7 +82,7 @@ class SiPac_Userlist
 			$_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num] = array();
     
 		//search for users in every channel the user is online
-		foreach ($this->chat->channels as $channel)
+		foreach ($this->chat->channel_ids as $channel)
 		{
 			//get all users
 			$users = $this->chat->db->get_all_users($channel, $this->chat->id);
@@ -117,15 +117,15 @@ class SiPac_Userlist
 					$user_array[$channel]['change_user_id'][] = $user['id'];
 					$_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$user['id']] = $user_html;
 				}
-				foreach ($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel] as $id => $user)
-				{
-					//if a user isn't in the db anymore but on the client
-					if (!isset($user_class[$id]))
-					{	
-						//delete him with javascript
-						$user_array[$channel]['delete_user'][] = $id;
-						unset($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$id]);
-					}
+			}
+			foreach ($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel] as $id => $user)
+			{
+				//if a user isn't in the db anymore but on the client
+				if (!isset($user_class[$id]))
+				{	
+					//delete him with javascript
+					$user_array[$channel]['delete_user'][] = $id;
+					unset($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$id]);
 				}
 			}
 		}

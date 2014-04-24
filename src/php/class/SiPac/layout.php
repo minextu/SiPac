@@ -19,107 +19,138 @@
  */
 trait SiPac_layout
 {
+	private $js_chat;
+	private $html_code;
+	
+	public $is_writing = false;
+	public $is_mobile = false;
+	public $layout;
+	
   //generate and return the html code for the chat
   public function draw()
   {   
-    $css_file = str_replace("\n", " ", file_get_contents($this->layout['path']."/chat.css"));
+    $GLOBALS['global_chat_num']  = $GLOBALS['global_chat_num'] + 1;
+  	if ($this->settings['use_cache'])
+	{
+		$cache_folder = dirname(__FILE__) . "/../../../../cache/".md5($this->id)."/";	
+		if ($this->is_mobile)
+			$cache_folder = $cache_folder."mobile/";
+			
+		if (is_dir($cache_folder) == false)
+		{
+			mkdir($cache_folder, 0777);
+			
+			$html_code = $this->translate($this->generate_layout_html());
+			file_put_contents($cache_folder."layout.html", $html_code);
+			file_put_contents($cache_folder."layout.css", $this->generate_layout_css());
+		}
+		
+		return file_get_contents($cache_folder."layout.html").$this->generate_js();
+	}
+	else
+	{
+		$css = $this->generate_layout_css();
+		return  $this->translate($this->generate_layout_html($css)).$this->generate_js();
+	}
+  }
+
+	private function generate_layout_html($css_code)
+	{
+	//save the html code of the layout
+    $html_code = $this->layout['html'];
+    
+    //add the chat id to the div with the class 'chat_main'
+    $html_code =str_replace('"chat_main"', '"chat_main" id="' . $this->id . '"', str_replace("'chat_main'", "'chat_main' id='".$this->id."'", $html_code));
+    
+    //load the chat.js
+    $html_code = $html_code."<script class='sipac_script' type='text/javascript' src='".$this->html_path."src/javascript/chat.js'></script>";
+    if (empty($css_code))
+    {
+		$cache_folder = $this->html_path."cache/".md5($this->id)."/";
+		if ($this->is_mobile)
+			$cache_folder = $cache_folder."mobile/";
+		$html_code = "<link rel='stylesheet' type='text/css' href='".$cache_folder."layout.css'>".$html_code;
+	}
+	else
+	{
+		//load the layout css file via javascript
+		$html_code = $html_code."
+		<script class='sipac_script' type='text/javascript'>
+		var style_obj = document.createElement('style');
+		var text_obj = document.createTextNode('".trim($css_code)."');
+		style_obj.appendChild(text_obj);
+		document.getElementById('".$this->id."').appendChild(style_obj);
+		</script>";
+	}
+    $html_code = str_replace("!!NUM!!", $this->chat_num, $html_code);
+    $html_code = str_replace("!!USER_NUM!!", "<span class='chat_user_num'>?</span>", $html_code);
+    $html_code = str_replace("!!SMILEYS!!", $this->generate_smileys(), $html_code);
+
+    return $html_code;
+  }
+  
+  private function generate_layout_css()
+  {
+  $css_file = str_replace("\n", " ", file_get_contents($this->layout['path']."/chat.css"));
     $id_css   = "#".$this->id;
     
     $css_files_parts = explode("{", $css_file);
+    $new_css_file = str_replace("##CHAT_MAIN##", $id_css, $css_file);
     
-    $new_css_file = "";
-    foreach ($css_files_parts as $part_num => $css_part)
-    {
-		if (!empty($css_part))
-		{
-			$css_parts = explode("}", $css_part);
-			if (count($css_parts) == 1)
-				$css_elements = explode(",",$css_parts[0]);
-			else
-			{
-				$new_css_file = $new_css_file.$css_parts[0]."} ";
-				$css_elements = explode( ",", $css_parts[1]);
-			}
-			foreach ($css_elements as  $element_key => $element)
-			{
-				if ($element_key > 0 )
-					$new_css_file = $new_css_file.","; 
-				if (strpos($element, ".chat_main") === false)
-					$new_css_file = $new_css_file.$id_css.$element; 
-				else
-					$new_css_file = $new_css_file.str_replace(".chat_main", $id_css, $element);
-			}
-			$new_css_file = $new_css_file." { ";
-		}
-    }
-    
-    $this->js_chat = "var chat_text = new Array();";
-    foreach ($this->text as $key => $text)
-    {
-      $this->js_chat = $this->js_chat."chat_text['$key'] = '".addslashes($text)."';";
-    }
-    
-    $this->js_chat = $this->js_chat."var chat_layout = new Array();";
-      $this->js_chat = $this->js_chat."chat_layout['channel_tab'] = '".addslashes(trim(str_replace("	", " ", str_replace("\n", " ", $this->layout['channel_tab']))))."';";
-      
-     /* generate js function arguments, to start the chat*/
-    $this->js_chat =$this->js_chat. "add_chat('".$this->html_path."','" . $this->settings['theme'] . "','".$this->id."', '".$this->client_num."',";
-    $this->js_chat = $this->js_chat."new Array(";
-    foreach ($this->channels as $key => $channel)
-    {
-      if ($key != 0)
-	$this->js_chat = $this->js_chat.",";
-      $this->js_chat = $this->js_chat."\"$channel\"";  
-    }
-    $this->js_chat = $this->js_chat."), chat_text, chat_layout";
-    
-
-    
-    $this->js_chat = $this->js_chat.");";
-    
-    //save the html code of the layout
-    $this->html_code = $this->layout['html'];
-    
-    //add the chat id to the div with the class 'chat_main'
-    $this->html_code =str_replace('"chat_main"', '"chat_main" id="' . $this->id . '"', str_replace("'chat_main'", "'chat_main' id='".$this->id."'", $this->html_code));
-    
-    //load the chat.js
-    $this->html_code = $this->html_code."<script class='sipac_script' type='text/javascript' src='".$this->html_path."src/javascript/chat.js'></script>";
-    
-    //load the layout css file via javascript
-    $this->html_code = $this->html_code."
-		<script class='sipac_script' type='text/javascript'>
-		var style_obj = document.createElement('style');
-		var text_obj = document.createTextNode('".trim($new_css_file)."');
-		style_obj.appendChild(text_obj);
-		document.getElementById('".$this->id."').appendChild(style_obj);
-		".
-		//start the chat, by calling the add_chat function
-		$this->js_chat;
-		
-    //load all javascript functions by the layout
-		
-    if (!empty($this->layout['javascript_functions']))
-    {
-      foreach ($this->layout['javascript_functions'] as $name => $function)
-      {
-	$this->html_code = $this->html_code."chat_objects[chat_objects.length-1].$name = $function;";
-	if ($name == "layout_init")
-	  $this->html_code = $this->html_code."chat_objects[chat_objects.length-1].$name();";
-      }
-    }
-    $this->html_code = $this->html_code."</script>";
-
-    $this->html_code = str_replace("!!NUM!!", $this->chat_num, $this->html_code);
-    $this->html_code = str_replace("!!USER_NUM!!", "<span class='chat_user_num'>?</span>", $this->html_code);
-    $this->html_code = str_replace("!!SMILEYS!!", $this->generate_smileys(), $this->html_code);
-    
-    $GLOBALS['global_chat_num']  = $GLOBALS['global_chat_num'] + 1;
-    
-    $this->html_code = $this->translate($this->html_code);
-    return $this->html_code;
+    return $new_css_file;
   }
   
+  private function generate_js()
+  {
+	$js_chat = "<script type='text/javascript'>
+	var chat_text = new Array();";
+	foreach ($this->text as $key => $text)
+	{
+		$js_chat = $js_chat."chat_text['$key'] = '".addslashes($text)."';";
+	}
+    
+	$js_chat = $js_chat."var chat_layout = new Array();";
+	$js_chat = $js_chat."chat_layout['channel_tab'] = '".addslashes(trim(str_replace("	", " ", str_replace("\n", " ", $this->layout['channel_tab']))))."';";
+    
+	$js_chat = $js_chat."var chat_channels = new Array(";
+	foreach ($this->channels as $key => $channel)
+    {
+		if ($key != 0)
+			$js_chat = $js_chat.",";
+		$js_chat = $js_chat."\"".$channel['id']."\"";  
+    }
+    $js_chat = $js_chat.");";
+    
+    $js_chat = $js_chat."var chat_channel_titles = new Array(";
+    foreach ($this->channels as $key => $channel)
+    {
+		if ($key != 0)
+			$js_chat = $js_chat.",";
+		$js_chat = $js_chat."\"".$channel['title']."\"";  
+    }
+    $js_chat = $js_chat.");";
+    
+     /* generate js function arguments, to start the chat*/
+    $js_chat =$js_chat. "add_chat('".$this->html_path."','" . $this->settings['theme'] . "','".$this->id."', '".$this->client_num."', chat_channels, chat_channel_titles, chat_text, chat_layout";
+    
+
+    
+	$js_chat = $js_chat.");";
+	
+	 //load all javascript functions of the layout
+	if (!empty($this->layout['javascript_functions']))
+    {
+		foreach ($this->layout['javascript_functions'] as $name => $function)
+		{
+		$js_chat = $js_chat."chat_objects[chat_objects.length-1].$name = $function;";
+			if ($name == "layout_init")
+				$js_chat = $js_chat."chat_objects[chat_objects.length-1].$name();";
+		}
+    }
+    $js_chat = $js_chat."</script>";
+    
+    return $js_chat;
+  }
   private function generate_smileys()
   {
 	$chat_smileys = "";
@@ -165,6 +196,11 @@ trait SiPac_layout
     $layout_array['default_smiley_height'] = $default_smiley_height;
     $layout_array['post_html'] = $chat_layout_post_entry;
     
+	if (isset($chat_layout_user_info_entry))
+		$layout_array['user_info_entry'] = $chat_layout_user_info_entry;
+	else
+		$layout_array['user_info_entry'] = "<li>!!INFO_HEAD!!: !!INFO!!</li>";
+		
     if (isset($chat_layout_notify_user))
 		$layout_array['notify_user'] = $chat_layout_notify_user;
 		

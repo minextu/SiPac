@@ -34,6 +34,7 @@ function return_default_settings()
 	"language" => "en",
 	"log_language" => "en",
 	"html_path" => "!!AUTO!!",
+	"database_type" => "mysqli",
 	"theme" => "default",
 	"rows" => '1',
 	"replace_own_username" => false,
@@ -72,13 +73,13 @@ function return_default_settings()
 	"can_see_ip" => false,
 	"user_infos" => array(
 	),
-	"can_see_debug" => true,
-	"default_debug" => "warn",
-	"own_log_folder_for_chat_id" => true,
+	"use_cache" => true,
+	"can_reload_cache" => true,
+	
 	"max_messages" => "50",
 	
 	
-	
+	"debug" => false,
 	"include_file" => false,
 	"user_afk_class" => "!!AUTO!!",
 	"user_online_class" => "!!AUTO!!"
