@@ -30,8 +30,8 @@ class SiPac_MySQLi
   
   private $nickname;
   
-  private $columns = array("entries" => array("id", "user", "message", "type", "time", "channel", "chat_id"),
-														   "users" =>  array("id", "name", "task", "info", "style", "afk", "writing", "ip", "online", "channel", "chat_id"));
+  private $columns = array("sipac_entries" => array("id", "user", "message", "type", "time", "channel", "chat_id"),
+														   "sipac_users" =>  array("id", "name", "task", "info", "style", "afk", "writing", "ip", "online", "channel", "chat_id"));
   
   public function __construct($host, $user, $pw, $db)
   {
@@ -98,7 +98,7 @@ class SiPac_MySQLi
   public function get_posts($chat_id, $channels)
   {
     $this->connect();
-    $chat_mysql = mysqli_query($this->link, "SELECT * FROM entries WHERE chat_id LIKE '".mysqli_real_escape_string($this->link, $chat_id)."' ORDER BY id ASC");
+    $chat_mysql = mysqli_query($this->link, "SELECT * FROM sipac_entries WHERE chat_id LIKE '".mysqli_real_escape_string($this->link, $chat_id)."' ORDER BY id ASC");
     
     $posts = array();
     
@@ -119,7 +119,7 @@ class SiPac_MySQLi
   {
     $this->connect();
       
-    $save_message_mysql = mysqli_query($this->link, "INSERT INTO entries (user, message, type, time, channel, chat_id) VALUES('" . mysqli_real_escape_string($this->link, $user) . "', '" . mysqli_real_escape_string($this->link, $message) . "','$type', '$time', '" . mysqli_real_escape_string($this->link, $channel) . "', '$chat_id')");
+    $save_message_mysql = mysqli_query($this->link, "INSERT INTO sipac_entries (user, message, type, time, channel, chat_id) VALUES('" . mysqli_real_escape_string($this->link, $user) . "', '" . mysqli_real_escape_string($this->link, $message) . "','$type', '$time', '" . mysqli_real_escape_string($this->link, $channel) . "', '$chat_id')");
     if ($save_message_mysql == false)
       return mysqli_error($this->link);
     else
@@ -129,7 +129,7 @@ class SiPac_MySQLi
   public function get_all_users($channel,$chat_id)
   {
     //get all users in the chat
-    $users_mysql = mysqli_query($this->link, "SELECT * FROM users WHERE chat_id LIKE '".mysqli_real_escape_string($this->link, $chat_id)."' AND channel LIKE '".mysqli_real_escape_string($this->link, $channel)."'");
+    $users_mysql = mysqli_query($this->link, "SELECT * FROM sipac_users WHERE chat_id LIKE '".mysqli_real_escape_string($this->link, $chat_id)."' AND channel LIKE '".mysqli_real_escape_string($this->link, $channel)."'");
     
     $users = array();
     
@@ -148,7 +148,7 @@ class SiPac_MySQLi
   public function get_user($nickname, $channel, $chat_id)
   {
     //get all values of the user with the given nickname
-    $user_info = mysqli_query($this->link, "SELECT * FROM users WHERE name LIKE '".mysqli_real_escape_string($this->link, $nickname)."' AND channel LIKE '".mysqli_real_escape_string($this->link, $channel)."' AND chat_id LIKE '".mysqli_real_escape_string($this->link, $chat_id)."'");
+    $user_info = mysqli_query($this->link, "SELECT * FROM sipac_users WHERE name LIKE '".mysqli_real_escape_string($this->link, $nickname)."' AND channel LIKE '".mysqli_real_escape_string($this->link, $channel)."' AND chat_id LIKE '".mysqli_real_escape_string($this->link, $chat_id)."'");
     if ($user_info == false)
       echo mysqli_error($this->link);
     else
@@ -168,7 +168,7 @@ class SiPac_MySQLi
       $is_writing = 0;
       
     //update the user entry with all new values
-    $update_user_mysql = mysqli_query($this->link, "UPDATE users SET online = '" . $time . "', afk = '" . $is_afk . "', writing = '" . mysqli_real_escape_string($this->link, $is_writing) . "', style = '" . $user_style . "' WHERE name = '" . mysqli_real_escape_string($this->link, $nickname) . "' AND channel = '" . mysqli_real_escape_string($this->link, $channel) . "' AND chat_id = '" . mysqli_real_escape_string($this->link, $chat_id) . "'");
+    $update_user_mysql = mysqli_query($this->link, "UPDATE sipac_users SET online = '" . $time . "', afk = '" . $is_afk . "', writing = '" . mysqli_real_escape_string($this->link, $is_writing) . "', style = '" . $user_style . "' WHERE name = '" . mysqli_real_escape_string($this->link, $nickname) . "' AND channel = '" . mysqli_real_escape_string($this->link, $channel) . "' AND chat_id = '" . mysqli_real_escape_string($this->link, $chat_id) . "'");
     
     
     
@@ -182,14 +182,14 @@ class SiPac_MySQLi
     $is_afk = "";
     
     //save the user with all given values
-    $add_user_mysql = mysqli_query($this->link, "INSERT INTO users (name, info, style, afk, writing, ip, online, channel, chat_id) VALUES ('" . mysqli_real_escape_string($this->link, $nickname) . "', '" . mysqli_real_escape_string($this->link, $user_info) . "', '" . $user_style . "', '" . $is_afk . "', 'false', '" . $user_ip . "', '" . time() . "', '" . mysqli_real_escape_string($this->link, $channel) . "', '$chat_id')");
+    $add_user_mysql = mysqli_query($this->link, "INSERT INTO sipac_users (name, info, style, afk, writing, ip, online, channel, chat_id) VALUES ('" . mysqli_real_escape_string($this->link, $nickname) . "', '" . mysqli_real_escape_string($this->link, $user_info) . "', '" . $user_style . "', '" . $is_afk . "', 'false', '" . $user_ip . "', '" . time() . "', '" . mysqli_real_escape_string($this->link, $channel) . "', '$chat_id')");
   }
   
   public function delete_user($nickname, $channel, $chat_id)
   {
   
   
-    $delete_user = mysqli_query($this->link, "DELETE FROM users WHERE name LIKE '" . mysqli_real_escape_string($this->link, $nickname) . "' AND channel LIKE '".mysqli_real_escape_string($this->link, $channel)."' AND chat_id LIKE '".mysqli_real_escape_string($this->link, $chat_id)."'");
+    $delete_user = mysqli_query($this->link, "DELETE FROM sipac_users WHERE name LIKE '" . mysqli_real_escape_string($this->link, $nickname) . "' AND channel LIKE '".mysqli_real_escape_string($this->link, $channel)."' AND chat_id LIKE '".mysqli_real_escape_string($this->link, $chat_id)."'");
   }
   
   public function add_task($task, $user, $channel, $chat_id)
@@ -197,10 +197,10 @@ class SiPac_MySQLi
     if ($user === false)
       $user = $this->nickname;
       
-	$count = mysqli_query($this->link, "SELECT * from users WHERE  name LIKE '".mysqli_real_escape_string($this->link, $user)."' AND channel LIKE '".mysqli_real_escape_string($this->link, $channel)."' AND chat_id LIKE '".mysqli_real_escape_string($this->link, $chat_id)."'");
+	$count = mysqli_query($this->link, "SELECT * from sipac_users WHERE  name LIKE '".mysqli_real_escape_string($this->link, $user)."' AND channel LIKE '".mysqli_real_escape_string($this->link, $channel)."' AND chat_id LIKE '".mysqli_real_escape_string($this->link, $chat_id)."'");
 	if (mysqli_num_rows($count) > 0)
 	{
-		$add_task = mysqli_query($this->link, "UPDATE users SET task = '".mysqli_real_escape_string($this->link, $task)."' WHERE name LIKE '".mysqli_real_escape_string($this->link, $user)."' AND channel LIKE '".mysqli_real_escape_string($this->link, $channel)."' AND chat_id LIKE '".mysqli_real_escape_string($this->link, $chat_id)."'");
+		$add_task = mysqli_query($this->link, "UPDATE sipac_users SET task = '".mysqli_real_escape_string($this->link, $task)."' WHERE name LIKE '".mysqli_real_escape_string($this->link, $user)."' AND channel LIKE '".mysqli_real_escape_string($this->link, $channel)."' AND chat_id LIKE '".mysqli_real_escape_string($this->link, $chat_id)."'");
 		return true;
     }
     else
@@ -212,8 +212,8 @@ class SiPac_MySQLi
 		foreach ($channels as $channel)
 		{
 			$remove_old_posts = mysqli_query($this->link, 
-			"DELETE from entries 
-				WHERE id IN (select id from (select id from entries 
+			"DELETE from sipac_entries 
+				WHERE id IN (select id from (select id from sipac_entries 
 					WHERE chat_id LIKE '".mysqli_real_escape_string($this->link, $chat_id)."' AND channel LIKE '".mysqli_real_escape_string($this->link, $channel)."' ORDER BY id DESC LIMIT $max_messages, 1000) 
 				x) ");
 			

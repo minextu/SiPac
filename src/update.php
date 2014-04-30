@@ -37,12 +37,12 @@ if (isset($_POST['mysql_send']))
 				echo "<div style='background:orange; color: white'>Your MySQL tables are already up to date!</div>";
 			else
 			{
-				echo $db->query ("ALTER TABLE chat_users RENAME TO users");
-				echo $db->query ("ALTER TABLE chat_entries RENAME TO entries");
-				echo $db->query("ALTER TABLE entries DROP highlight");
-				echo $db->query("ALTER TABLE entries CHANGE extra type INT(3)");
-				echo $db->query("ALTER TABLE users CHANGE action task mediumtext");
-				echo $db->query("ALTER TABLE users CHANGE last_time online INT(10)");
+				echo $db->query ("ALTER TABLE chat_users RENAME TO sipac_users");
+				echo $db->query ("ALTER TABLE chat_entries RENAME TO sipac_entries");
+				echo $db->query("ALTER TABLE sipac_entries DROP highlight");
+				echo $db->query("ALTER TABLE sipac_entries CHANGE extra type INT(3)");
+				echo $db->query("ALTER TABLE sipac_users CHANGE action task mediumtext");
+				echo $db->query("ALTER TABLE sipac_users CHANGE last_time online INT(10)");
 				echo "<div style='background:orange; color: white'>Update done Successfully! Please delete this file, after you are done!</div>";
 			}
 		}
