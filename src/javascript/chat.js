@@ -834,7 +834,7 @@ SiPacHttpRequest.prototype.send = function(post)
 		this.post = post;
 		if (chat_extra_send != "")
 			chat_extra_send += "&";
-		chat_extra_send += post + "&SiPacHttpFile=" + this.file;
+		chat_extra_send += post + "&SiPacHttpFile=" + encodeURIComponent(this.file);
 		
 		chat_extra_send_objects[chat_extra_send_objects.length] = this;
 	}

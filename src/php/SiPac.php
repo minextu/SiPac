@@ -156,7 +156,7 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 	if (isset($_POST['SiPacHttpFile']))
 	{
 		ob_start();
-		$http_url = $_SERVER['DOCUMENT_ROOT'].$_POST['SiPacHttpFile'];
+		$http_url = $_SERVER['DOCUMENT_ROOT'].urldecode($_POST['SiPacHttpFile']);
 		$http_url_parts = explode("?", $http_url);
 		
 		if (!empty($http_url_parts[1]))
