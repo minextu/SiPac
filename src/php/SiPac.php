@@ -156,7 +156,19 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 	if (isset($_POST['SiPacHttpFile']))
 	{
 		ob_start();
-		include($_SERVER['DOCUMENT_ROOT'].$_POST['SiPacHttpFile']);
+		$http_url = $_SERVER['DOCUMENT_ROOT'].$_POST['SiPacHttpFile'];
+		$http_url_parts = explode("?", $http_url);
+		
+		if (!empty($http_url_parts[1]))
+		{
+			$http_get = explode("&", $http_url_parts[1]);
+			foreach ($http_get as $get_var)
+			{
+				$get_parts = explode("=", $get_var);
+				$_GET[$get_parts[0]] = $get_parts[1];
+			}
+		}
+		include($http_url_parts[0]);
 		$json_answer_fin['SiPac_custom_request_answer'] = ob_get_clean();
 	}
 	
