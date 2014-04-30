@@ -40,7 +40,7 @@ trait SiPac_afk
 		if ($_SESSION['SiPac'][$this->id]['afk'] != $this->afk)
 		{
 			$_SESSION['SiPac'][$this->id]['afk'] = $this->afk;
-			foreach ($this->channels as $channel)
+			foreach ($this->channel_ids as $channel)
 			{
 				if ($this->settings['deactivate_afk'] == false)
 				{
