@@ -21,12 +21,9 @@
 /* GLOBAL CONFIG 
 
 Please don't change anything here. 
-If you want to change theese settings, use "$chat_settings[setting_name_here] = setting;" like in the sample index.php
+If you want to change theese settings, use "$chat_settings[setting_name_here] = setting;" like in the example_ chat.php
 
 */
-date_default_timezone_set('Europe/Berlin');
-
-
 function return_default_settings()
 {
 	$chat_default_settings = array(
@@ -59,6 +56,11 @@ function return_default_settings()
 	"channels" => array(
 		"Main"
 	),
+	
+	"custom_commands" => array(),
+	"custom_client_proxies" => array(),
+	"custom_server_proxies" => array(),
+	
 	"can_join_channels" => true,
 	"max_ping_remove" => 30,
 	"username_var" => "!!AUTO!!",

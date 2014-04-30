@@ -19,6 +19,9 @@
 //AJAX//
 httpobject = new XMLHttpRequest();
 
+chat_extra_send = "";
+chat_extra_send_objects = new Array();
+
 function chat_init()
 {
   chat_objects = new Array();
@@ -31,8 +34,6 @@ function chat_init()
   chat_is_ajax = false;
   old_title = document.title;
   new_messages = 0;
-  
-  chat_extra_send = "";
   
   old_title = document.title;
   chat_ajax();
@@ -91,17 +92,18 @@ function chat_ajax()
           try
           {
             var answer = JSON.parse(httpobject.responseText);
+			var chat_object_answer = answer['SiPac'];
           }
           catch (e)
           {
             chat_error("Wrong answer: " + httpobject.responseText);
           }
-          if (answer != undefined)
+          if (chat_object_answer != undefined)
           {
 
-            for (var i = 0; i < answer.length; i++)
+            for (var i = 0; i < chat_object_answer.length; i++)
             {
-              chat_objects[i].handle_chat_tasks(answer[i]);
+              chat_objects[i].handle_chat_tasks(chat_object_answer[i]);
               if (chat_objects[i].first_start == true)
               {
                 console.debug("chat " + i + " ready!");
@@ -112,6 +114,13 @@ function chat_ajax()
               chat_error(undefined, true);
           }
 
+          for (var i = 0; i < chat_extra_send_objects.length; i++)
+		  {
+			chat_extra_send_objects[i].responseText = answer['SiPac_custom_request_answer'];
+			chat_extra_send_objects[i].onreadystatechange();
+		  }
+          chat_extra_send_objects = new Array();
+          
           window.clearTimeout(chat_error_timeout);
           chat_timeout = window.setTimeout(chat_ajax, 1000);
           chat_is_ajax = false;
@@ -125,9 +134,11 @@ function chat_ajax()
     httpobject.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
     var chat_ajax_text_comp = "chat_string=" + encodeURIComponent(chat_ajax_text);
-    if (chat_extra_send != undefined)
+    if (chat_extra_send != "")
       chat_ajax_text_comp += "&" + chat_extra_send;
     
+	chat_extra_send = "";
+	
     httpobject.send(chat_ajax_text_comp);
 
   }
@@ -788,3 +799,48 @@ function addslashes(str)
   str = str.replace(/\0/g, '\\0');
   return str;
 }
+
+function SiPacHttpRequest()
+{
+	this.readyState = 4;
+	this.status = 200;
+	this.file = false;
+	this.responseText = "";
+	this.location = location.pathname;
+	this.location = this.location.substring(0, this.location.lastIndexOf('/'));
+}
+SiPacHttpRequest.prototype.open = function(type, file, async)
+{
+	if (async != true)
+		alert("only async ajax supported");
+	else
+	{
+		if (file.search("http://") != -1)
+			alert("Only internal links supported")
+		if (file.charAt(0) == "/")
+			this.file = file;
+		else
+			this.file = this.location + "/" + file;
+	}
+};
+SiPacHttpRequest.prototype.onreadystatechange = function()
+{
+	
+};
+SiPacHttpRequest.prototype.send = function(post)
+{
+	if (chat_is_ajax == false)
+	{
+		this.post = post;
+		if (chat_extra_send != "")
+			chat_extra_send += "&";
+		chat_extra_send += post + "&SiPacHttpFile=" + this.file;
+		
+		chat_extra_send_objects[chat_extra_send_objects.length] = this;
+	}
+	else
+	{
+		var httpobject = this;
+		window.setTimeout(function() { httpobject.send(post) }, 10);
+	}
+};

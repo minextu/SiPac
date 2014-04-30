@@ -44,6 +44,35 @@ trait SiPac_proxy
 			}
 			closedir($handle);
 		}
+		
+		$post_array = $this->check_custom_proxy($post_array, $type);
+		
+		return $post_array;
+	}
+	
+	private function check_custom_proxy($post_array, $type)
+	{
+		if ($type == "client")
+			$custom_proxy_array = $this->settings['custom_client_proxies'];
+		else
+			$custom_proxy_array = $this->settings['custom_server_proxies'];
+		
+		$proxy_folder = dirname(__FILE__)."/../../../../conf/proxy";
+		
+		foreach ($custom_proxy_array as $proxy_name)
+		{
+			include_once($proxy_folder."/SiPacProxy_".$proxy_name.".php");
+			$class_name = "SiPacProxy_".$proxy_name;
+			if (class_exists($class_name))
+			{
+				$proxy = new $class_name;
+				$proxy->set_variables($this, $post_array);
+					
+				$post_array = $proxy->execute();
+			}
+			else
+				die('Classname is not "'.$proxy_name.'"');
+		}
 		return $post_array;
 	}
 }

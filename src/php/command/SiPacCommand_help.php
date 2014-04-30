@@ -15,15 +15,13 @@ class SiPacCommand_help implements SiPacCommand
   }
   public function execute()
   {
-	if ($handle = opendir(dirname(__FILE__)))
+  
+	$command_files = $this->get_default_commands();
+	$command_files = array_merge($command_files, $this->get_custom_commands());
+	
+	foreach ($command_files as $class_name => $file)
 	{
-		while (false !== ($file = readdir($handle)))
-		{
-			if ($file != "." && $file != "..") 
-			{
 				include_once($file);
-				$class_name = str_replace(".php", "", $file);
-				
 				if (class_exists($class_name) AND empty($this->parameters) OR class_exists($class_name) AND str_replace("SiPacCommand_", "", $class_name)  == $this->parameters)
 				{
 					$check_comment = new $class_name;
@@ -38,10 +36,7 @@ class SiPacCommand_help implements SiPacCommand
 						$command_syntax = $command_syntax.htmlentities($check_comment->usage);
 					}
 				}
-			}
-		}
-		closedir($handle);
-    }
+	}
 
      if (empty($command_syntax))
       $command_syntax = "<||command-not-found-text|".htmlentities($this->parameters)."||>";
@@ -52,6 +47,34 @@ class SiPacCommand_help implements SiPacCommand
 	
     return array("info_type"=>"info", "info_text"=>$command_syntax, "info_nohide"=>true);
   }
+	private function get_custom_commands()
+	{
+		$command_files = array();
+		foreach ($this->chat->settings['custom_commands'] as $command)
+		{
+			$class_name = "SiPacCommand_".$command;
+			$command_files[$class_name] = dirname(__FILE__)."/../../../conf/command/".$class_name.".php";
+		}
+		return $command_files;
+	}
+	private function get_default_commands()
+	{
+		$command_files = array();
+		if ($handle = opendir(dirname(__FILE__)))
+		{
+			while (false !== ($file = readdir($handle)))
+			{
+				if ($file != "." && $file != "..") 
+				{
+					$class_name = str_replace(".php", "", $file);
+					$command_files[$class_name] = $file;
+				}
+			}
+		}
+		closedir($handle);
+		
+		return $command_files;
+	}
 }
 
 ?>

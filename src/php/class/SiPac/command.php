@@ -39,30 +39,60 @@ trait SiPac_command
 				if (class_exists($command_class))
 				{
 					$command = new $command_class;
-					$command->set_variables($this, $command_parameters);
-					if ($command->check_permission() == true)
-					{
-						$command_return = $command->execute();
-	      
-						if (is_array($command_return))
-						{
-							if (isset($command_return['info_text']))
-								$command_return['info_text'] = $this->translate($command_return['info_text']);
-							return $command_return;
-						}
-						else
-							return array();
-					}
-					else
-						return array("info_type"=>"warn", "info_text" =>$this->translate( '<||no-permissions-text||>'));
+					return $this->execute_command($command, $command_parameters);
 				}
 				else
 					return array("info_type"=>"error", "info_text" => 'Classname is not "'.$command_class.'"');
 			}
 			else
-				return array("info_type"=>"warn", "info_text" => $this->translate("<||command-not-found-text|".$command_name."||>"));
+			{
+				$command_return = $this->check_custom_command($command_name, $command_parts);
+				
+				if ($command_return !== false)
+					return $command_return;
+				else
+					return array("info_type"=>"warn", "info_text" => $this->translate("<||command-not-found-text|".$command_name."||>"));
+			}
 		}
 		else
 			return false;
 	} 
+	private function check_custom_command($command_name, $command_parameters)
+	{
+		if (in_array($command_name, $this->settings['custom_commands']))
+		{
+			$command_class = "SiPacCommand_".$command_name;
+			$command_path = dirname(__FILE__) ."/../../../../conf/command/".$command_class.".php";
+			if (file_exists($command_path))
+			{
+				include_once($command_path);
+				$command = new $command_class;
+				return $this->execute_command($command, $command_parameters);
+			}
+			else
+				die($command_class." doesn't exist!");
+		}
+		else
+			return false;
+	}
+	
+	private function execute_command($command, $command_parameters)
+	{
+		$command->set_variables($this, $command_parameters);
+		if ($command->check_permission() == true)
+		{
+			$command_return = $command->execute();
+	      
+			if (is_array($command_return))
+			{
+				if (isset($command_return['info_text']))
+					$command_return['info_text'] = $this->translate($command_return['info_text']);
+				return $command_return;
+			}
+			else
+				return array();
+			}
+			else
+				return array("info_type"=>"warn", "info_text" =>$this->translate( '<||no-permissions-text||>'));
+	}
 }

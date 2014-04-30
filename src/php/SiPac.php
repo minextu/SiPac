@@ -151,6 +151,15 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 		}
     
 	}
-	echo json_encode($json_answer);
+	$json_answer_fin['SiPac'] = $json_answer;
+	
+	if (isset($_POST['SiPacHttpFile']))
+	{
+		ob_start();
+		include($_SERVER['DOCUMENT_ROOT'].$_POST['SiPacHttpFile']);
+		$json_answer_fin['SiPac_custom_request_answer'] = ob_get_clean();
+	}
+	
+	echo json_encode($json_answer_fin);
 }
 ?>

@@ -1,6 +1,6 @@
 <?php
 
-class SiPacProxy_example implements SiPacProxy
+class SiPacProxy_test implements SiPacProxy
 {
   
 	public function set_variables($chat, $post)

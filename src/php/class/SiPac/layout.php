@@ -102,7 +102,7 @@ trait SiPac_layout
   
   private function generate_js()
   {
-	$js_chat = "<script type='text/javascript'>
+	$js_chat = "<script class='sipac_script' type='text/javascript'>
 	var chat_text = new Array();";
 	foreach ($this->text as $key => $text)
 	{
