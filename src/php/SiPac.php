@@ -165,6 +165,7 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 				$_GET[$get_parts[0]] = $get_parts[1];
 			}
 		}
+		chdir(dirname($http_url_parts[0]));
 		include($http_url_parts[0]);
 		$json_answer_fin['SiPac_custom_request_answer'] = ob_get_clean();
 	}
