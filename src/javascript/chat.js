@@ -827,6 +827,10 @@ SiPacHttpRequest.prototype.onreadystatechange = function()
 {
 	
 };
+SiPacHttpRequest.prototype.setRequestHeader = function(x, y)
+{
+	
+};
 SiPacHttpRequest.prototype.send = function(post)
 {
 	if (chat_is_ajax == false)

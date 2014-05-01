@@ -24,14 +24,6 @@ $chat_version = "0.0.4.0";
 if (strlen(session_id()) < 1)
   session_start();
 
-
-//Tell the Browser, to not use cache
-Header("Pragma: no-cache");
-Header("Cache-Control: no-store, no-cache, max-age=0, must-revalidate");
-Header("Content-Type: text/html");
-
-
-
 //Thanks to selfhtml.org for this function
 function check_mobile() 
 {
@@ -68,6 +60,11 @@ require_once(dirname(__FILE__)."/include_classes.php");
 //if this is an AJAX Connection
 if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 {
+	//Tell the Browser, to not use cache
+	Header("Pragma: no-cache");
+	Header("Cache-Control: no-store, no-cache, max-age=0, must-revalidate");
+	Header("Content-Type: text/html");
+
 	$json_answer = array();
 	if (isset($_POST['chat_string']))
 	{
