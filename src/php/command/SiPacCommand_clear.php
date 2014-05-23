@@ -20,7 +20,7 @@ class SiPacCommand_clear implements SiPacCommand
 	}
 	public function execute()
 	{
-		$cache_folder = dirname(__FILE__) . "/../../../cache/".md5($this->chat->id)."/";	
+		$cache_folder = dirname(__FILE__) . "/../../../cache/";	
 		if (is_dir($cache_folder))
 			rrmdir($cache_folder);
 			
