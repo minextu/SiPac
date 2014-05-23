@@ -56,6 +56,7 @@ function return_default_settings()
 	"channels" => array(
 		"Main"
 	),
+	"show_private_message_link" => true,
 	
 	"custom_commands" => array(),
 	"custom_client_proxies" => array(),
@@ -72,11 +73,13 @@ function return_default_settings()
 	"show_kick_user" => true,
 	"show_ban_user" => true,
 	"can_rename_others" => true,
+	"can_invite" => true,
+	"can_force_invite" => true,
 	"can_see_ip" => false,
 	"user_infos" => array(
 	),
 	"use_cache" => true,
-	"can_reload_cache" => true,
+	"can_clear_cache" => true,
 	
 	"max_messages" => "50",
 	

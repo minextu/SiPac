@@ -3,6 +3,7 @@
 class SiPacCommand_join implements SiPacCommand
 {
 	public $usage = "/join <channel>";
+	public $description = "Makes the client to join the given channel.";
   
 	public function set_variables($chat, $parameters)
 	{

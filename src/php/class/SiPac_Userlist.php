@@ -45,7 +45,13 @@ class SiPac_Userlist
 				$user->save_user(true);
 			}
 			else //if the user is already in the db, just update the information
-				$this->chat->db->update_user($this->chat->nickname, $channel, $this->chat->id, time(), $this->chat->is_writing, $this->chat->afk);
+			{
+				$ip = $_SERVER['REMOTE_ADDR'];
+				$user_array = array("id" => "user", "name" => $this->chat->nickname, "writing" => $this->chat->is_writing, "afk" => $this->chat->afk, "info" => $this->chat->settings['user_infos'], "ip" => $ip, "channel" => $channel);
+				$user = new SiPac_User($user_array, $this->chat);
+	
+				$user->update_user();
+			}
 	
 			unset($user_info);
 		}

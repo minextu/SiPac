@@ -275,7 +275,9 @@ class SiPac_Chat
 				if ($task_parts[0] == "new_name")
 					$this->new_nickname = $task_parts[1];
 				else if ($task_parts[0] == "join")
-					$array['tasks'][] = "join|" . $task_parts[1] . "|" . $task_parts[2];
+					$array['tasks'][] = $user_info['task'];
+				else if ($task_parts[0] == "invite")
+					$array['tasks'][] = $user_info['task'];
 				/*
 				else if ($action_parts[0] == "kick")
 				{

@@ -155,22 +155,14 @@ class SiPac_MySQLi
       return mysqli_fetch_assoc($user_info);
   }
   
-  public function update_user($nickname, $channel, $chat_id, $time, $is_writing, $afk)
+  public function update_user($nickname, $channel, $chat_id, $time, $is_writing, $is_afk, $user_info)
   {
     //variables to add later
-    $is_afk = $afk;
     $user_style = "";
-    $channel = $channel;
-    
-    if ($is_writing == "true")
-      $is_writing = 1;
-    else
-      $is_writing = 0;
-      
+   
+	$is_writing =  $is_writing == "true" ? 1 : 0;
     //update the user entry with all new values
-    $update_user_mysql = mysqli_query($this->link, "UPDATE sipac_users SET online = '" . $time . "', afk = '" . $is_afk . "', writing = '" . mysqli_real_escape_string($this->link, $is_writing) . "', style = '" . $user_style . "' WHERE name = '" . mysqli_real_escape_string($this->link, $nickname) . "' AND channel = '" . mysqli_real_escape_string($this->link, $channel) . "' AND chat_id = '" . mysqli_real_escape_string($this->link, $chat_id) . "'");
-    
-    
+    $update_user_mysql = mysqli_query($this->link, "UPDATE sipac_users SET online = '" . $time . "', afk = '" . $is_afk ."', writing = '$is_writing', style = '" . $user_style . "', info = '". mysqli_real_escape_string($this->link, $user_info)."' WHERE name = '" . mysqli_real_escape_string($this->link, $nickname) . "' AND channel = '" . mysqli_real_escape_string($this->link, $channel) . "' AND chat_id = '" . mysqli_real_escape_string($this->link, $chat_id) . "'");
     
     return $update_user_mysql;
   }

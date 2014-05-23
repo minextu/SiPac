@@ -4,9 +4,10 @@ function rrmdir($dir) {
     if(is_dir($file)) rrmdir($file); else unlink($file); 
   } rmdir($dir); 
 }
-class SiPacCommand_reload implements SiPacCommand
+class SiPacCommand_clear implements SiPacCommand
 {
-	public $usage = "/reload";
+	public $usage = "/clear";
+	public $description = "Deletes the cached themes.";
   
 	public function set_variables($chat, $parameters)
 	{
@@ -15,7 +16,7 @@ class SiPacCommand_reload implements SiPacCommand
 	}
 	public function check_permission()
 	{
-		return $this->chat->settings['can_reload_cache'];
+		return $this->chat->settings['can_clear_cache'];
 	}
 	public function execute()
 	{
@@ -25,7 +26,7 @@ class SiPacCommand_reload implements SiPacCommand
 			
 		return array(
 			"info_type" => "info",
-			"info_text" => "Successfully deleted the cache for this chat! Please reload.",
+			"info_text" => "Successfully deleted the cache. Please reload!",
 			"info_nohide" => true
 		);
 	}

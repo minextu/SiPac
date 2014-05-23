@@ -25,14 +25,17 @@ trait SiPac_layout
 	public $is_writing = false;
 	public $is_mobile = false;
 	public $layout;
+	public $cache_folder;
 	
   //generate and return the html code for the chat
   public function draw()
   {   
+	$this->cache_folder = md5($this->id.$this->html_path.$this->settings['theme']);
+	
     $GLOBALS['global_chat_num']  = $GLOBALS['global_chat_num'] + 1;
   	if ($this->settings['use_cache'])
 	{
-		$cache_folder = dirname(__FILE__) . "/../../../../cache/".md5($this->id)."/";	
+		$cache_folder = dirname(__FILE__) . "/../../../../cache/".$this->cache_folder."/";	
 		if ($this->is_mobile)
 			$cache_folder = $cache_folder."mobile/";
 			
@@ -53,7 +56,6 @@ trait SiPac_layout
 		return  $this->translate($this->generate_layout_html($css)).$this->generate_js();
 	}
   }
-
 	private function generate_layout_html($css_code=false)
 	{
 	//save the html code of the layout
@@ -66,7 +68,7 @@ trait SiPac_layout
     $html_code = $html_code."<script class='sipac_script' type='text/javascript' src='".$this->html_path."src/javascript/chat.js'></script>";
     if (empty($css_code))
     {
-		$cache_folder = $this->html_path."cache/".md5($this->id)."/";
+		$cache_folder = $this->html_path."cache/".$this->cache_folder."/";
 		if ($this->is_mobile)
 			$cache_folder = $cache_folder."mobile/";
 		$html_code = "<link rel='stylesheet' type='text/css' href='".$cache_folder."layout.css'>".$html_code;

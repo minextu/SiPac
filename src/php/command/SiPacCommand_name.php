@@ -3,6 +3,7 @@
 class SiPacCommand_name implements SiPacCommand
 {
   public $usage = "/name <new name> [<user>]";
+  public $description = "Gives the  user a new nickname. If <user> is not given, your own nickname will be renamed.";
   public function set_variables($chat, $parameters)
   {
     $this->chat= $chat;

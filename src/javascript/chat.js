@@ -116,7 +116,7 @@ function chat_ajax()
 
           for (var i = 0; i < chat_extra_send_objects.length; i++)
 		  {
-			chat_extra_send_objects[i].responseText = answer['SiPac_custom_request_answer'];
+			chat_extra_send_objects[i].responseText = answer['SiPac_custom_request_answer'][i];
 			chat_extra_send_objects[i].onreadystatechange();
 		  }
           chat_extra_send_objects = new Array();
@@ -547,12 +547,27 @@ Chat.prototype.handle_server_tasks = function (tasks)
 
     if (task_parts[0] == "message" || task_parts[0] == "kick")
       this.alert(task_parts[1]);
-    if (task_parts[0] == "join")
+    else if (task_parts[0] == "join")
     {
       this.add_channel(task_parts[1], task_parts[2]);
       this.change_channel(task_parts[1]);
     }
-    if (task_parts[0] == "kick")
+   else  if (task_parts[0] == "invite")
+	{
+        if (this.enable_sound == true)
+          chat_play_sound(this.new_post_audio);
+		
+		new_messages++;
+        new_messages_status(false);
+		
+		var confirm_return = confirm(task_parts[3] + " wants to invite you to the channel \"" + task_parts[2] + "\". Do you want to join this channel?");
+		if (confirm_return == true)
+		{
+			this.add_channel(task_parts[1], task_parts[2]);
+			this.change_channel(task_parts[1]);
+		}
+	}
+    else if (task_parts[0] == "kick")
     {
       chat_is_kicked = true;
       window.setTimeout(function ()
@@ -561,9 +576,8 @@ Chat.prototype.handle_server_tasks = function (tasks)
       }, 100);
       this.information(task_parts[1], "error", true, false, true);
     }
-
-    if (task_parts[0] != "message" && task_parts[0] != "kick" && task_parts[0] != "join")
-      this.add_debug_entries(new Array("warn", "Unknown Action!"));
+   else 
+      console.debug("Unknown task '" + task_parts[0] + "'!"); 
   }
 }
 
@@ -725,7 +739,16 @@ Chat.prototype.prompt = function(text, id, action, button_text)
 
 Chat.prototype.kick_user = function(user)
 {			//Reason for the Kick:																																		kick user
-  this.prompt(this.texts[35], "chat_kick_reason", "chat_objects[" + this.num + "].insert_command(\"kick " + user + ",\" + document.getElementById(\"chat_kick_reason\").value, true);", this.texts[36]);
+   var reason = prompt("Reason for the kick:");
+   if (reason != null)
+	this.insert_command("kick " + user + " " + reason, true);
+}
+
+Chat.prototype.msg_user = function(user)
+{			//Reason for the Kick:																																		kick user
+   var message = prompt("Message:");
+   if (message != null)
+	this.insert_command("msg " + user + " " + message, true);
 }
 
 Chat.prototype.sound_status = function(status)

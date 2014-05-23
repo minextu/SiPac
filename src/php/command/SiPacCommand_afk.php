@@ -3,6 +3,7 @@
 class SiPacCommand_afk implements SiPacCommand
 {
 	public $usage = "/afk [<reason>]";
+	public $description = "Notifies everyone that you are away from your keyboard (AFK). Can also combined with a message.";
 	public function set_variables($chat, $parameters)
 	{
 		$this->chat= $chat;

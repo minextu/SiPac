@@ -60,7 +60,8 @@ class SiPac_User
 		$user_info_tmp = array();
         if ($this->settings['can_kick'])
 			$user_info_tmp['Kick'] = "<a href='javascript:void(null);' onclick='chat_objects[".$this->chat_num."].kick_user(\"".addslashes($this->nickname) . "\");'><||kick-user|" . $this->nickname . "||></a>";
-			
+		if ($this->settings['show_private_message_link'])
+			$user_info_tmp['Message'] = "<a href='javascript:void(null);' onclick='chat_objects[".$this->chat_num."].msg_user(\"".addslashes($this->nickname) . "\");'>Send a private message</a>";
         if ($this->settings['can_see_ip'])
 			$user_info_tmp['IP'] = $this->ip;
        
@@ -94,7 +95,7 @@ class SiPac_User
       return array();
   }
   
-	public function save_user($add_notify)
+	public function get_user_info_string()
 	{
 		if (is_array($this->info))
 		{
@@ -106,6 +107,16 @@ class SiPac_User
 		}
 		else
 			$user_info =$this->info;
+		return $user_info;
+	}
+	public function update_user()
+	{
+		$user_info = $this->get_user_info_string();
+		$this->chat->db->update_user($this->nickname, $this->channel, $this->chat->id, time(), $this->is_writing, $this->afk, $user_info);
+	}
+	public function save_user($add_notify)
+	{
+		$user_info = $this->get_user_info_string();
 		
 		$this->chat->db->save_user($this->nickname, $this->channel, $user_info, $this->ip, $this->chat->id);
 		

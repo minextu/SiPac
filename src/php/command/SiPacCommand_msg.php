@@ -1,8 +1,9 @@
 <?php
 
-class SiPacCommand_pn implements SiPacCommand
+class SiPacCommand_msg implements SiPacCommand
 {
-	public $usage = "/pn <user> <message>";
+	public $usage = "/msg <user> [<message>]";
+	public $description = "Starts  a private chat with a specific user. Optionally the chat will start with a given message.";
   
 	public function set_variables($chat, $parameters)
 	{
@@ -17,10 +18,15 @@ class SiPacCommand_pn implements SiPacCommand
 	{
 		$parameters = explode(" ", $this->parameters);
 		
-		if (isset($parameters[1]))
+		if (!empty($parameters[0]))
 		{
 			$user = $parameters[0];
-			$message = $parameters[1];
+			
+			if (isset($parameters[1]))
+				$message = $parameters[1];
+			else
+				$message = false;
+				
 			foreach ($parameters as $key => $parameter)
 			{
 				if ($key > 1)
@@ -38,7 +44,8 @@ class SiPacCommand_pn implements SiPacCommand
 			else
 			{	
 				$join_return = $this->chat->db->add_task("join|".$channel_id."|".$channel_name_self, $this->chat->nickname, $this->chat->active_channel, $this->chat->id);
-				$this->chat->send_message($message, $channel_id);
+				if ($message !== false)
+					$this->chat->send_message($message, $channel_id);
 			}
 		}
 		else

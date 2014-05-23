@@ -3,6 +3,7 @@
 class SiPacCommand_me implements SiPacCommand
 {
 	public $usage = "/me <message>";
+	public $description = "Displays the  given message with your name at the beginning, like the announcement when someone has left or joined the chat.";
 	public function set_variables($chat, $parameters)
 	{
 		$this->chat= $chat;
