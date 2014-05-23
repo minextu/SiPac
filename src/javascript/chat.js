@@ -485,23 +485,32 @@ Chat.prototype.add_channel = function (channel, channel_title, noadd)
   }
   else if (channel != undefined)
   {
-    if (this.chat.getElementsByClassName("chat_channels_ul")[0] != undefined)
-		this.chat.getElementsByClassName("chat_channels_ul")[0].innerHTML +=	 this.generate_channel_html(channel, channel_title);
-    else
-      this.add_debug_entry("warn", "Missing chat_channels_ul in theme!");
-    
-    this.chat.getElementsByClassName("chat_conversation")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative; display: none;' class='chat_conversation_channel_" + channel + "'></div>";
-    this.chat.getElementsByClassName("chat_userlist")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative; display: none;' class='chat_userlist_channel_" + channel + "'></div>";
+	  var channel_exist = false;
+	  for (var ii = 0; ii < this.channels.length; ii++)
+	  {
+		if (this.channels[ii] == channel)
+			channel_exist = true;
+	  }
+	  if (channel_exist == false || noadd == true)
+	  {
+			if (this.chat.getElementsByClassName("chat_channels_ul")[0] != undefined)
+				this.chat.getElementsByClassName("chat_channels_ul")[0].innerHTML +=	 this.generate_channel_html(channel, channel_title);
+			else
+			this.add_debug_entry("warn", "Missing chat_channels_ul in theme!");
+			
+			this.chat.getElementsByClassName("chat_conversation")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative; display: none;' class='chat_conversation_channel_" + channel + "'></div>";
+			this.chat.getElementsByClassName("chat_userlist")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative; display: none;' class='chat_userlist_channel_" + channel + "'></div>";
 
-    this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].innerHTML = this.texts['room-loading-text'];
+			this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].innerHTML = this.texts['room-loading-text'];
 
-    this.new_channels[channel] = true;
+			this.new_channels[channel] = true;
 
-    if (noadd != true)
-	{
-      this.channels[this.channels.length] = channel;
-	  this.channel_titles[this.channel_titles.length] = channel_title;
-	}
+			if (noadd != true)
+			{
+			this.channels[this.channels.length] = channel;
+			this.channel_titles[this.channel_titles.length] = channel_title;
+			}
+	  }
   }
   else
     alert("no channel name!");
