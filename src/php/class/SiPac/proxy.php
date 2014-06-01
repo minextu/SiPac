@@ -75,4 +75,28 @@ trait SiPac_proxy
 		}
 		return $post_array;
 	}
+	
+	public function check_custom_functions($values, $function)
+	{
+		$function_folder = dirname(__FILE__)."/../../../../conf/functions";
+		if ($this->settings[$function."_function"] != false)
+		{
+			$function_name = $this->settings[$function."_function"];
+			
+			include_once($function_folder."/SiPacFunction_".$function_name.".php");
+			$class_name = "SiPacFunction_".$function_name;
+			
+			if (class_exists($class_name))
+			{
+				$function = new $class_name;
+				$function->set_variables($this, $values);
+					
+				return $function->execute();
+			}
+			else
+				die('Classname is not "'.$function_name.'"');
+		}
+		else
+			return true;
+	}
 }

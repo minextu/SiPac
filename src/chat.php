@@ -34,6 +34,9 @@ function draw_chat($chat_id)
   $chat_settings['mysql_password'] = $chat_settings['pw'];
   $chat_settings['mysql_database'] = $chat_settings['db'];
   
+  if (isset($chat_settings['design']))
+	$chat_settings['theme'] = $chat_settings['design'];
+  
   $chat = new SiPac_Chat($chat_settings);
   
   return $chat->draw();

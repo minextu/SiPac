@@ -21,6 +21,7 @@ class SiPac_Userlist
 {
 	private $chat;
 	public $users;
+	public $users_info;
   
 	public function __construct($chat)
 	{
@@ -68,10 +69,14 @@ class SiPac_Userlist
 				//if the last connection is too long ago
 				if (time() - $user['online'] > $this->chat->settings['max_ping_remove'])
 				{
-					//delete the user
-					$this->chat->db->delete_user($user['name'], $user['channel'], $this->chat->id);
-					//save a message, that the user has left
-					$this->chat->send_message("<||user-left-notification|".$user['name']. "||>", $user['channel'], 1, 0, $user['online']);
+					$values = array("user" => $user['name'], "channel" => $user['channel'], "last_update" => $user['online']);	
+					if ($this->chat->check_custom_functions($values, "user_left") == true)
+					{
+						//delete the user
+						$this->chat->db->delete_user($user['name'], $user['channel'], $this->chat->id);
+						//save a message, that the user has left
+						$this->chat->send_message("<||user-left-notification|".$user['name']. "||>", $user['channel'], 1, 0, $user['online']);
+					}
 				}
 			}
 		}
@@ -96,7 +101,7 @@ class SiPac_Userlist
 			{
 				$user_class[$user['id']] = new SiPac_User($user, $this->chat);
 				$this->users[$channel][] = $user_class[$user['id']];
-	
+				$this->users_info[$user['id']] = array("name" => $user['name'], "afk" => $user['afk']); 
 				//add the status, if a user is writing
 				$user_array[$channel]['user_writing']['id'][] = $user['id'];
 				$user_array[$channel]['user_writing']['status'][] = $user_class[$user['id']]->is_writing;

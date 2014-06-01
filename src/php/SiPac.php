@@ -18,7 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-$SiPac_version = "0.0.4-git";
+$SiPac_version = "0.0.4-git (alpha1)";
 
 //initiate the session, if not already started
 if (strlen(session_id()) < 1)
@@ -96,6 +96,10 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 					//create the Chat class
 					$SiPac = new SiPac_Chat(false, false, $chat_variables, $chat_channels, $chat_num);
 					
+					//if the chat is started for the first time, delete the old cached userlist
+					if (isset($chat_variables['first_start']) AND $chat_variables['first_start'] == "true")
+						unset($_SESSION['SiPac'][$SiPac->id]['userlist'][$SiPac->client_num]);
+						
 					//active channel has to be a valid channel
 					if (array_search($chat_variables['active_channel'], $SiPac->channel_ids) === false)
 						DIE("You haven't joined this channel!");

@@ -49,6 +49,12 @@ class SiPac_User
       $user_status = "<||afk-status-text||>";
     
     $user_html = str_replace("!!USER_STATUS!!", $user_status, $user_html);
+    if ($this->afk == 0)
+      $user_afk = "online";
+    else
+      $user_afk = "afk";
+      
+    $user_html = str_replace("!!USER_AFK!!", $user_afk, $user_html);
     $user_html = str_replace("!!NUM!!", $this->chat_num, $user_html);
     $user_html = str_replace("!!USER_ID!!", "user_".$this->id, $user_html);
     $user_html = str_replace("!!USER_INFO!!", $this->generate_user_info(), $user_html);

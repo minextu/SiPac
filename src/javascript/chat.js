@@ -44,7 +44,13 @@ if (typeof chat_objects == 'undefined')
   chat_init();
 }
 
-
+window.chat_stop = function()
+{
+	delete chat_objects;
+	window.clearTimeout(chat_timeout);
+	window.clearTimeout(chat_error_timeout);
+	delete SiPacHttpRequest;
+}
 
 function add_chat(html_path, theme, id, client_num, channels,channel_titles, texts, layout)
 {
@@ -522,9 +528,9 @@ Chat.prototype.change_channel = function (channel)
 	document.getElementById(this.id + "_channel_" + this.active_channel).className = "chat_channel";
 	this.chat.getElementsByClassName("chat_conversation_channel_" + this.active_channel)[0].style.display = "none";
 	this.chat.getElementsByClassName("chat_userlist_channel_" + this.active_channel)[0].style.display = "none";
+	document.getElementById(this.id + "_channel_" + channel).className = "chat_channel_selected";
 	}catch(e){}
 	
-	document.getElementById(this.id + "_channel_" + channel).className = "chat_channel_selected";
 	this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].style.display = "block";
 	this.chat.getElementsByClassName("chat_userlist_channel_" + channel)[0].style.display = "block";
 	this.active_channel = channel;
@@ -832,7 +838,7 @@ function addslashes(str)
   return str;
 }
 
-function SiPacHttpRequest()
+window.SiPacHttpRequest = function ()
 {
 	this.readyState = 4;
 	this.status = 200;

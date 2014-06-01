@@ -61,6 +61,7 @@ function return_default_settings()
 	"custom_commands" => array(),
 	"custom_client_proxies" => array(),
 	"custom_server_proxies" => array(),
+	"user_left_function" => false,
 	
 	"can_join_channels" => true,
 	"max_ping_remove" => 30,
