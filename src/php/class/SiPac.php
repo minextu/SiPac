@@ -149,13 +149,13 @@ class SiPac_Chat
       //check if the post is new
       if ($post['id'] > $last_id OR in_array($post['channel'], $this->new_channels))
       {
-		$post_array = array("message"=>$post['message'], "type"=>$post['type'], "channel"=>$post['channel'],"user"=>$post['user'],"time"=>$post['time']);
+		$post_array = array("message"=>$post['message'], "type"=>$post['type'], "channel"=>$post['channel'],"user"=>$post['user'],"time"=>$post['time'], "color" => $post['color']);
 		$post_array = $this->check_proxy($post_array, "client");
 		
       	$post_user_name = $post_array['user'];
 		if ($post_array['type'] == 0) //normal post
 		{
-			$post_user = $post_array['user'].": ";
+			$post_user = $post_array['user'];
 	  
 			if ($post_array['user'] == $this->nickname)
 				$post_type = "own";
@@ -182,6 +182,7 @@ class SiPac_Chat
 	$post_html = str_replace("!!USER!!", $post_user, $post_html);
 	$post_html = str_replace("!!MESSAGE!!", $post_array['message'], $post_html);
 	$post_html = str_replace("!!TYPE!!", $post_type, $post_html);
+	$post_html = str_replace("!!USER_COLOR!!", $post_array['color'], $post_html);
 	
 	if ($this->settings['time_24_hours'])
           $date = date("H:i", $post_array['time']);
@@ -229,10 +230,10 @@ class SiPac_Chat
 			else
 			{
 			
-				$post_array = array("message"=>$message, "type"=>$type, "channel"=>$channel,"user"=>$user,"time"=>$time);
+				$post_array = array("message"=>$message, "type"=>$type, "channel"=>$channel,"user"=>$user, "color" => $this->settings['user_color'], "time"=>$time);
 				$post_array = $this->check_proxy($post_array, "server");
 				
-				$db_response = $this->db->save_post($post_array['message'], $this->id, $post_array['channel'], $post_array['type'], $post_array['user'], $post_array['time']);
+				$db_response = $this->db->save_post($post_array['message'], $this->id, $post_array['channel'], $post_array['type'], $post_array['user'], $post_array['color'], $post_array['time']);
 				if ($db_response !== true)
 					return array('info_type' => "error", 'info_text' => $db_response);
 				else

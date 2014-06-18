@@ -115,7 +115,7 @@ class SiPac_MySQL
     return $posts;
   }
   
-  public function save_post($message, $chat_id, $channel, $type, $user, $time)
+  public function save_post($message, $chat_id, $channel, $type, $user, $color, $time)
   {
     $this->connect();
       
@@ -155,11 +155,8 @@ class SiPac_MySQL
       return mysql_fetch_assoc($user_info);
   }
   
-  public function update_user($nickname, $channel, $chat_id, $time, $is_writing, $is_afk, $user_info)
+  public function update_user($nickname, $channel, $chat_id, $time, $is_writing, $is_afk, $user_info, $user_style)
   {
-    //variables to add later
-    $user_style = "";
-   
 	$is_writing =  $is_writing == "true" ? 1 : 0;
     //update the user entry with all new values
     $update_user_mysql = mysql_query("UPDATE sipac_users SET online = '" . $time . "', afk = '" . $is_afk ."', writing = '$is_writing', style = '" . $user_style . "', info = '". mysql_real_escape_string($user_info)."' WHERE name = '" . mysql_real_escape_string($nickname) . "' AND channel = '" . mysql_real_escape_string($channel) . "' AND chat_id = '" . mysql_real_escape_string($chat_id) . "'");
@@ -167,10 +164,9 @@ class SiPac_MySQL
     return $update_user_mysql;
   }
 
-  public function save_user($nickname, $channel, $user_info, $user_ip, $chat_id)
+  public function save_user($nickname, $channel, $user_info, $user_style, $user_ip, $chat_id)
   {
     //variables to add later
-    $user_style = "";
     $is_afk = "";
     
     //save the user with all given values

@@ -30,6 +30,9 @@ class SiPac_User
     $this->afk = $array['afk'];
     $this->info = $array['info'];
     $this->ip = $array['ip'];
+    $this->style = $array['style'];
+    
+    $this->color = explode("|||", $this->style)[0];
     
     $this->chat = $chat;
 	$this->chat_num = $chat->chat_num;
@@ -58,6 +61,8 @@ class SiPac_User
     $user_html = str_replace("!!NUM!!", $this->chat_num, $user_html);
     $user_html = str_replace("!!USER_ID!!", "user_".$this->id, $user_html);
     $user_html = str_replace("!!USER_INFO!!", $this->generate_user_info(), $user_html);
+    $user_html = str_replace("!!USER_COLOR!!", $this->color, $user_html);
+    
     return $user_html;
   }
   
@@ -101,7 +106,7 @@ class SiPac_User
       return array();
   }
   
-	public function get_user_info_string()
+	private function get_user_info_string()
 	{
 		if (is_array($this->info))
 		{
@@ -118,13 +123,15 @@ class SiPac_User
 	public function update_user()
 	{
 		$user_info = $this->get_user_info_string();
-		$this->chat->db->update_user($this->nickname, $this->channel, $this->chat->id, time(), $this->is_writing, $this->afk, $user_info);
+		$user_style = $this->style;
+		$this->chat->db->update_user($this->nickname, $this->channel, $this->chat->id, time(), $this->is_writing, $this->afk, $user_info, $user_style);
 	}
 	public function save_user($add_notify)
 	{
 		$user_info = $this->get_user_info_string();
+		$user_style = $this->style;
 		
-		$this->chat->db->save_user($this->nickname, $this->channel, $user_info, $this->ip, $this->chat->id);
+		$this->chat->db->save_user($this->nickname, $this->channel, $user_info, $user_style, $this->ip, $this->chat->id);
 		
 		if ($add_notify)
 		{

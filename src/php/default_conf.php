@@ -87,6 +87,7 @@ function return_default_settings()
 	
 	"debug" => false,
 	"include_file" => false,
+	"user_color" => false,
 	"user_afk_class" => "!!AUTO!!",
 	"user_online_class" => "!!AUTO!!"
 	);

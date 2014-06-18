@@ -40,7 +40,8 @@ class SiPac_Userlist
 			{
 				//save the user
 				$ip = $_SERVER['REMOTE_ADDR'];
-				$user_array = array("id" => "user", "name" => $this->chat->nickname, "writing" => false, "afk" => $this->chat->settings['start_as_afk'], "info" => $this->chat->settings['user_infos'], "ip" => $ip, "channel" => $channel);
+				$user_array = array("id" => "user", "name" => $this->chat->nickname, "writing" => false, "afk" => $this->chat->settings['start_as_afk'], "info" => $this->chat->settings['user_infos'], "ip" => $ip, "channel" => $channel,
+												"style" => $this->chat->settings['user_color']."|||");
 				$user = new SiPac_User($user_array, $this->chat);
 		
 				$user->save_user(true);
@@ -48,7 +49,8 @@ class SiPac_Userlist
 			else //if the user is already in the db, just update the information
 			{
 				$ip = $_SERVER['REMOTE_ADDR'];
-				$user_array = array("id" => "user", "name" => $this->chat->nickname, "writing" => $this->chat->is_writing, "afk" => $this->chat->afk, "info" => $this->chat->settings['user_infos'], "ip" => $ip, "channel" => $channel);
+				$user_array = array("id" => "user", "name" => $this->chat->nickname, "writing" => $this->chat->is_writing, "afk" => $this->chat->afk, "info" => $this->chat->settings['user_infos'], "ip" => $ip, "channel" => $channel,
+												"style" => $this->chat->settings['user_color']."|||");
 				$user = new SiPac_User($user_array, $this->chat);
 	
 				$user->update_user();

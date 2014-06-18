@@ -108,17 +108,23 @@ class SiPac_MySQLi
     {
       while ($post = mysqli_fetch_assoc($chat_mysql))
       {
-	
+		$post_exp = explode("|||", $post['user']);
+		$post['user'] = $post_exp[0];
+		if (!empty($post_exp[1]))
+			$post['color'] = $post_exp[1];
+		else
+			$post['color'] = false;
+		
 	  $posts[] = $post;
       }
     }
     return $posts;
   }
   
-  public function save_post($message, $chat_id, $channel, $type, $user, $time)
+  public function save_post($message, $chat_id, $channel, $type, $user, $color, $time)
   {
     $this->connect();
-      
+    $user = $user."|||".$color;
     $save_message_mysql = mysqli_query($this->link, "INSERT INTO sipac_entries (user, message, type, time, channel, chat_id) VALUES('" . mysqli_real_escape_string($this->link, $user) . "', '" . mysqli_real_escape_string($this->link, $message) . "','$type', '$time', '" . mysqli_real_escape_string($this->link, $channel) . "', '$chat_id')");
     if ($save_message_mysql == false)
       return mysqli_error($this->link);
@@ -155,11 +161,8 @@ class SiPac_MySQLi
       return mysqli_fetch_assoc($user_info);
   }
   
-  public function update_user($nickname, $channel, $chat_id, $time, $is_writing, $is_afk, $user_info)
+  public function update_user($nickname, $channel, $chat_id, $time, $is_writing, $is_afk, $user_info, $user_style)
   {
-    //variables to add later
-    $user_style = "";
-   
 	$is_writing =  $is_writing == "true" ? 1 : 0;
     //update the user entry with all new values
     $update_user_mysql = mysqli_query($this->link, "UPDATE sipac_users SET online = '" . $time . "', afk = '" . $is_afk ."', writing = '$is_writing', style = '" . $user_style . "', info = '". mysqli_real_escape_string($this->link, $user_info)."' WHERE name = '" . mysqli_real_escape_string($this->link, $nickname) . "' AND channel = '" . mysqli_real_escape_string($this->link, $channel) . "' AND chat_id = '" . mysqli_real_escape_string($this->link, $chat_id) . "'");
@@ -167,10 +170,9 @@ class SiPac_MySQLi
     return $update_user_mysql;
   }
 
-  public function save_user($nickname, $channel, $user_info, $user_ip, $chat_id)
+  public function save_user($nickname, $channel, $user_info, $user_style, $user_ip, $chat_id)
   {
     //variables to add later
-    $user_style = "";
     $is_afk = "";
     
     //save the user with all given values
