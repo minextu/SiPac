@@ -1,4 +1,4 @@
-<?php
+ <?php
 /*
     SiPac is highly customizable PHP and AJAX chat
     Copyright (C) 2013 Jan Houben
@@ -17,9 +17,16 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-trait SiPac_command
+class SiPac_Command
 {
-	private function check_command($message)
+	private $chat;
+	
+	public function __construct($chat)
+	{
+		$this->chat= $chat;
+	}
+	
+	public function check($message)
 	{
 		if (strpos($message, "/") === 0)
 		{ //message is a command
@@ -32,14 +39,14 @@ trait SiPac_command
 				$command_parameters = "";
 	  
 			$command_class = "SiPacCommand_".$command_name;
-			$command_path = dirname(__FILE__) ."/../../command/".$command_class.".php";
+			$command_path = dirname(__FILE__) ."/../command/".$command_class.".php";
 			if (file_exists($command_path))
 			{
 				include_once($command_path);
 				if (class_exists($command_class))
 				{
 					$command = new $command_class;
-					return $this->execute_command($command, $command_parameters);
+					return $this->execute($command, $command_parameters);
 				}
 				else
 					return array("info_type"=>"error", "info_text" => 'Classname is not "'.$command_class.'"');
@@ -51,7 +58,7 @@ trait SiPac_command
 				if ($command_return !== false)
 					return $command_return;
 				else
-					return array("info_type"=>"warn", "info_text" => $this->translate("<||command-not-found-text|".$command_name."||>"));
+					return array("info_type"=>"warn", "info_text" => $this->chat->language->translate("<||command-not-found-text|".$command_name."||>"));
 			}
 		}
 		else
@@ -59,10 +66,10 @@ trait SiPac_command
 	} 
 	private function check_custom_command($command_name, $command_parameters)
 	{
-		if (in_array($command_name, $this->settings['custom_commands']))
+		if (in_array($command_name, $this->chat->settings->get('custom_commands')))
 		{
 			$command_class = "SiPacCommand_".$command_name;
-			$command_path = dirname(__FILE__) ."/../../../../conf/command/".$command_class.".php";
+			$command_path = dirname(__FILE__) ."/../../../conf/command/".$command_class.".php";
 			if (file_exists($command_path))
 			{
 				include_once($command_path);
@@ -76,9 +83,9 @@ trait SiPac_command
 			return false;
 	}
 	
-	private function execute_command($command, $command_parameters)
+	private function execute($command, $command_parameters)
 	{
-		$command->set_variables($this, $command_parameters);
+		$command->set_variables($this->chat, $command_parameters);
 		if ($command->check_permission() == true)
 		{
 			$command_return = $command->execute();
@@ -86,13 +93,13 @@ trait SiPac_command
 			if (is_array($command_return))
 			{
 				if (isset($command_return['info_text']))
-					$command_return['info_text'] = $this->translate($command_return['info_text']);
+					$command_return['info_text'] = $this->chat->language->translate($command_return['info_text']);
 				return $command_return;
 			}
 			else
 				return array();
 			}
 			else
-				return array("info_type"=>"warn", "info_text" =>$this->translate( '<||no-permissions-text||>'));
+				return array("info_type"=>"warn", "info_text" =>$this->chat->language->translate( '<||no-permissions-text||>'));
 	}
 }

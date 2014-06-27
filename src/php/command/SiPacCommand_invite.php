@@ -12,7 +12,7 @@ class SiPacCommand_invite implements SiPacCommand
 	}
 	public function check_permission()
 	{
-		return $this->chat->settings['can_invite'];
+		return $this->chat->settings->get('can_invite');
 	}
 	public function execute()
 	{
@@ -21,13 +21,13 @@ class SiPacCommand_invite implements SiPacCommand
 		if (!empty($parameters[0]))
 		{
 			$user = $parameters[0];
-			$channel = $this->chat->active_channel;
+			$channel = $this->chat->channel->active;
 			
 			if (isset($parameters[1]) AND $parameters[1] == "true")
 			{
-				if ($this->chat->settings['can_force_invite'] == true)
+				if ($this->chat->settings->get('can_force_invite') == true)
 				{
-					$join_return = $this->chat->db->add_task("join|".$channel."|".$this->chat->decode_channel($channel), $user, $this->chat->encode_channel($this->chat->settings['channels'][0]), $this->chat->id);
+					$join_return = $this->chat->db->add_task("join|".$channel."|".$this->chat->channel->decode($channel), $user, $this->chat->channel->encode($this->chat->settings->get('channels')[0]), $this->chat->id);
 					if ($join_return == false)
 							return array("info_type"=>"error", "info_text"=>"<||user-not-found-text|".$user."||>");
 				}
@@ -36,7 +36,7 @@ class SiPacCommand_invite implements SiPacCommand
 			}
 			else
 			{
-				$invite_return = $this->chat->db->add_task("invite|".$channel."|".$this->chat->decode_channel($channel)."|".$this->chat->nickname, $user, $this->chat->encode_channel($this->chat->settings['channels'][0]), $this->chat->id);
+				$invite_return = $this->chat->db->add_task("invite|".$channel."|".$this->chat->channel->decode($channel)."|".$this->chat->nickname, $user, $this->chat->channel->encode($this->chat->settings->get('channels')[0]), $this->chat->id);
 				if ($invite_return == false)
 					return array("info_type"=>"error", "info_text"=>"<||user-not-found-text|".$user."||>");
 			}

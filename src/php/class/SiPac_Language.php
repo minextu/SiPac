@@ -1,3 +1,4 @@
+ 
 <?php
 /*
     SiPac is highly customizable PHP and AJAX chat
@@ -17,16 +18,22 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-trait SiPac_language
+class SiPac_Language
 {
-	private $text;
+	public $text;
+	private $settings;
 	
-	private function include_language()
+	public function __construct($settings)
 	{
-		$language_path = dirname(__FILE__)."/../../../lang/";
+		$this->settings = $settings;
+	}
+	
+	public function load()
+	{
+		$language_path = dirname(__FILE__)."/../../lang/";
     
 		global $chat_text;
-		(@include_once ($language_path.$this->settings['language'].".php")) OR die("Invalid Language");
+		(@include_once ($language_path.$this->settings->get('language').".php")) OR die("Invalid Language");
     
 		foreach ($chat_text as $key => $text)
 		{

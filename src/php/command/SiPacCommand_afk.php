@@ -11,22 +11,25 @@ class SiPacCommand_afk implements SiPacCommand
 	}
 	public function check_permission()
 	{
-		if ($this->chat->settings['deactivate_afk'] == false)
+		if ($this->chat->settings->get('deactivate_afk') == false)
 			return true;
 		else
 			return false;
 	}
 	public function execute()
 	{
-		if ($this->chat->afk == false)
+		if ($this->chat->afk->status == false)
 		{
-			$this->chat->afk = true;
 			if (!empty($this->parameters))
-				$this->chat->afk_reason = $this->parameters;
+				$reason = $this->parameters;
+			else
+				$reason = false;
+				
+			$this->chat->afk->set(true, $reason);
 		}
 		else
 		{
-			$this->chat->afk = false;
+			$this->chat->afk->set(false);
 			if  (!empty($this->parameters))
 				return array("info_type"=>"warn", "info_text"=>"<||no-reason-for-not-afk-text||>");
 		}

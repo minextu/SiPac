@@ -11,7 +11,7 @@ class SiPacCommand_name implements SiPacCommand
   }
   public function check_permission()
   {
-    if ($this->chat->settings['can_rename'] == true)
+    if ($this->chat->settings->get('can_rename') == true)
       return true;
     else
       return false;
@@ -24,7 +24,7 @@ class SiPacCommand_name implements SiPacCommand
 		$parameter_parts = explode(" ", $this->parameters);
 		if (empty($parameter_parts[1]))
 			$user = $this->chat->nickname;
-		else if ($this->chat->settings['can_rename_others'] == true)
+		else if ($this->chat->settings->get('can_rename_others') == true)
 			$user = $parameter_parts[1];
 		else
 		{
@@ -32,7 +32,7 @@ class SiPacCommand_name implements SiPacCommand
 			return false;
 		}
 		
-		$rename_return = $this->chat->db->add_task("new_name|".$parameter_parts[0], $user, $this->chat->active_channel, $this->chat->id);
+		$rename_return = $this->chat->db->add_task("new_name|".$parameter_parts[0], $user, $this->chat->channel->active, $this->chat->id);
 		
 		if ($rename_return == false)
 			return array("info_type"=>"error", "info_text"=>"<||user-not-found-text|".$user."||>");

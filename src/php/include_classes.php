@@ -18,18 +18,18 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-require_once("class/SiPac/settings.php");
-require_once("class/SiPac/layout.php");
-require_once("class/SiPac/channel.php");
-require_once("class/SiPac/language.php");
-require_once("class/SiPac/command.php");
-require_once("class/SiPac/proxy.php");
-require_once("class/SiPac/afk.php");
 require_once("class/SiPac.php");
 
 require_once("class/SiPac_MySQL.php");
 require_once("class/SiPac_User.php");
 require_once("class/SiPac_Userlist.php");
+require_once("class/SiPac_Channel.php");
+require_once("class/SiPac_Command.php");
+require_once("class/SiPac_Proxy.php");
+require_once("class/SiPac_Language.php");
+require_once("class/SiPac_Afk.php");
+require_once("class/SiPac_Layout.php");
+require_once("class/SiPac_Settings.php");
 
 require_once("class/Interface/SiPac_Command.php");
 require_once("class/Interface/SiPac_Proxy.php");

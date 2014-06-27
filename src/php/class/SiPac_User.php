@@ -20,62 +20,61 @@
 
 class SiPac_User
 {
-  
-  public function __construct($array, $chat)
-  {
-    $this->id = $array['id'];
-    $this->nickname = $array['name'];
-    $this->channel = $array['channel'];
-    $this->is_writing = $array['writing'];
-    $this->afk = $array['afk'];
-    $this->info = $array['info'];
-    $this->ip = $array['ip'];
-    $this->style = $array['style'];
-    
-    $this->color = explode("|||", $this->style)[0];
-    
-    $this->chat = $chat;
-	$this->chat_num = $chat->chat_num;
-	$this->layout = $this->chat->layout;
-    $this->settings = $this->chat->settings;
-    $this->db = $this->chat->db;
-  }
-  
-  public function generate_html()
-  {
-    $user_html = $this->layout['user_html'];
-    $user_html = str_replace("!!USER!!", $this->nickname, $user_html);
-    
-    if ($this->afk == 0)
-      $user_status = "<||online-status-text||>";
-    else
-      $user_status = "<||afk-status-text||>";
-    
-    $user_html = str_replace("!!USER_STATUS!!", $user_status, $user_html);
-    if ($this->afk == 0)
-      $user_afk = "online";
-    else
-      $user_afk = "afk";
-      
-    $user_html = str_replace("!!USER_AFK!!", $user_afk, $user_html);
-    $user_html = str_replace("!!NUM!!", $this->chat_num, $user_html);
-    $user_html = str_replace("!!USER_ID!!", "user_".$this->id, $user_html);
-    $user_html = str_replace("!!USER_INFO!!", $this->generate_user_info(), $user_html);
-    $user_html = str_replace("!!USER_COLOR!!", $this->color, $user_html);
-    
-    return $user_html;
-  }
-  
-  public function generate_user_info()
-  {
+	public function __construct($array, $chat)
+	{
+		$this->id = $array['id'];
+		$this->nickname = $array['name'];
+		$this->channel = $array['channel'];
+		$this->is_writing = $array['writing'];
+		$this->afk = $array['afk'];
+		$this->info = $array['info'];
+		$this->ip = $array['ip'];
+		$this->style = $array['style'];
+
+		$this->color = explode("|||", $this->style)[0];
+
+		$this->chat = $chat;
+		$this->chat_num = $chat->chat_num;
+		$this->layout = $this->chat->layout->arr;
+		$this->settings = $this->chat->settings;
+		$this->db = $this->chat->db;
+	}
+
+	public function generate_html()
+	{
+		$user_html = $this->layout['user_html'];
+		$user_html = str_replace("!!USER!!", $this->nickname, $user_html);
+
+		if ($this->afk == 0)
+			$user_status = "<||online-status-text||>";
+		else
+			$user_status = "<||afk-status-text||>";
+
+		$user_html = str_replace("!!USER_STATUS!!", $user_status, $user_html);
+		if ($this->afk == 0)
+			$user_afk = "online";
+		else
+			$user_afk = "afk";
+			
+		$user_html = str_replace("!!USER_AFK!!", $user_afk, $user_html);
+		$user_html = str_replace("!!NUM!!", $this->chat_num, $user_html);
+		$user_html = str_replace("!!USER_ID!!", "user_".$this->id, $user_html);
+		$user_html = str_replace("!!USER_INFO!!", $this->generate_user_info(), $user_html);
+		$user_html = str_replace("!!USER_COLOR!!", $this->color, $user_html);
+
+		return $user_html;
+	}
+
+	public function generate_user_info()
+	{
 		$user_info_tmp = array();
-        if ($this->settings['can_kick'])
+		if ($this->settings->get('can_kick'))
 			$user_info_tmp['Kick'] = "<a href='javascript:void(null);' onclick='chat_objects[".$this->chat_num."].kick_user(\"".addslashes($this->nickname) . "\");'><||kick-user|" . $this->nickname . "||></a>";
-		if ($this->settings['show_private_message_link'])
+		if ($this->settings->get('show_private_message_link'))
 			$user_info_tmp['Message'] = "<a href='javascript:void(null);' onclick='chat_objects[".$this->chat_num."].msg_user(\"".addslashes($this->nickname) . "\");'>Send a private message</a>";
-        if ($this->settings['can_see_ip'])
+		if ($this->settings->get('can_see_ip'))
 			$user_info_tmp['IP'] = $this->ip;
-       
+		
 		if (!empty($this->info))
 		{
 			$infos = explode("|||", $this->info);
@@ -88,24 +87,24 @@ class SiPac_User
 				}
 			}
 		}
-		
+			
 		$user_info = "";
-        foreach ($user_info_tmp as $info_head => $info)
-        {
-          //user dropdown infos
-          $user_info = $user_info .str_replace("!!INFO_HEAD!!", $info_head, str_replace("!!INFO!!", $info, $this->layout['user_info_entry']));
-        }
+		foreach ($user_info_tmp as $info_head => $info)
+		{
+		//user dropdown infos
+		$user_info = $user_info .str_replace("!!INFO_HEAD!!", $info_head, str_replace("!!INFO!!", $info, $this->layout['user_info_entry']));
+		}
 		return $user_info;
-  }
-  
-  public function generate_additional_info()
-  {
-    if ($this->is_writing == true)
-      return array("user_writing" => array($this->id));
-    else
-      return array();
-  }
-  
+	}
+
+	public function generate_additional_info()
+	{
+		if ($this->is_writing == true)
+			return array("user_writing" => array($this->id));
+		else
+			return array();
+	}
+
 	private function get_user_info_string()
 	{
 		if (is_array($this->info))
@@ -139,7 +138,7 @@ class SiPac_User
 			$this->chat->send_message("<||user-join-notification|".$this->nickname. "||>", $this->channel, 1, 0);
 		}
 	}
-  
+
 }
 
 ?>

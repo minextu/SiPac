@@ -18,7 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-$SiPac_version = "0.0.4-git (alpha2)";
+$SiPac_version = "0.0.4-git (alpha3)";
 
 //initiate the session, if not already started
 if (strlen(session_id()) < 1)
@@ -101,7 +101,7 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 						unset($_SESSION['SiPac'][$SiPac->id]['userlist'][$SiPac->client_num]);
 						
 					//active channel has to be a valid channel
-					if (array_search($chat_variables['active_channel'], $SiPac->channel_ids) === false)
+					if (array_search($chat_variables['active_channel'], $SiPac->channel->ids) === false)
 						DIE("You haven't joined this channel!");
 						
 					//obtain a nickname or load the old
@@ -110,8 +110,8 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 					//save the writing status
 					$SiPac->is_writing = $chat_variables['writing'];
 	  
-					//check afk status
-					$SiPac->check_afk();
+					//load afk status
+					$SiPac->afk->load();
 	  
 					//create a temp json answer var to collect all tmp answer to a big json array
 					$tmp_json_answer = array();

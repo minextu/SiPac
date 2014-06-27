@@ -53,7 +53,7 @@ class SiPacCommand_help implements SiPacCommand
 	private function get_custom_commands()
 	{
 		$command_files = array();
-		foreach ($this->chat->settings['custom_commands'] as $command)
+		foreach ($this->chat->settings->get('custom_commands') as $command)
 		{
 			$class_name = "SiPacCommand_".$command;
 			$command_files[$class_name] = dirname(__FILE__)."/../../../conf/command/".$class_name.".php";

@@ -12,7 +12,7 @@ class SiPacCommand_join implements SiPacCommand
 	}
 	public function check_permission()
 	{
-		return $this->chat->settings['can_join_channels'];
+		return $this->chat->settings->get('can_join_channels');
 	}
 	public function execute()
 	{
@@ -20,7 +20,7 @@ class SiPacCommand_join implements SiPacCommand
 		$user = $this->chat->nickname;
 		
 		if (!empty($channel))
-			$join_return = $this->chat->db->add_task("join|".$this->chat->encode_channel($channel)."|".$channel, $user, $this->chat->active_channel, $this->chat->id);
+			$join_return = $this->chat->db->add_task("join|".$this->chat->channel->encode($channel)."|".$channel, $user, $this->chat->channel->active, $this->chat->id);
 		else
 			return array('info_type' => "error",'info_text' => "<||no-channel-entered-text||>");
 	}

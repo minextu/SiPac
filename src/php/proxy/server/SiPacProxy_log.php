@@ -13,7 +13,7 @@ class SiPacProxy_log implements SiPacProxy
 		$type = $this->post['type'];
 		$chat_user = $this->post['user'];
 		$message = $this->post['message'];
-		$channel = $this->chat->get_channel_name($this->post['channel']);
+		$channel = $this->chat->channel->get_name($this->post['channel']);
 		
 		$log_date     = date("Y-m-d H:i:s", $this->post['time']);
 		$log_time     = date("H:i:s", $this->post['time']);
@@ -54,7 +54,7 @@ class SiPacProxy_log implements SiPacProxy
 				
 				$chat_log      = "\n[$log_date] [$channel] $chat_user: ". html_entity_decode($message) . "		| $ip";
 				
-				fwrite($chat_log_file, $this->chat->translate($chat_log, $this->chat->settings['log_language']));
+				fwrite($chat_log_file, $this->chat->language->translate($chat_log, $this->chat->settings->get('log_language')));
 				fclose($chat_log_file);
 				}
 				else

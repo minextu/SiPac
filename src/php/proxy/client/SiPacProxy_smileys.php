@@ -10,10 +10,10 @@ class SiPacProxy_smileys implements SiPacProxy
 	}
 	public function execute()
 	{  
-		foreach ($this->chat->settings['smileys'] as $smiley_code => $smiley_url)
+		foreach ($this->chat->settings->get('smileys') as $smiley_code => $smiley_url)
 		{
 			if (strpos($smiley_url, "http://") === false)
-				$smiley_url = $this->chat->html_path . "themes/" . $this->chat->settings['theme'] . "/smileys/" . $smiley_url;
+				$smiley_url = $this->chat->html_path . "themes/" . $this->chat->settings->get('theme') . "/smileys/" . $smiley_url;
 		
 			$smiley_code_html = addslashes(htmlentities($smiley_code, ENT_QUOTES));
 			$smiley_code      = str_replace("|", "&#x007C;", " " . htmlentities($smiley_code));

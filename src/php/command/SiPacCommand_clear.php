@@ -16,7 +16,7 @@ class SiPacCommand_clear implements SiPacCommand
 	}
 	public function check_permission()
 	{
-		return $this->chat->settings['can_clear_cache'];
+		return $this->chat->settings->get('can_clear_cache');
 	}
 	public function execute()
 	{

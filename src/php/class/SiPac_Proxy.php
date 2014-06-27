@@ -17,11 +17,18 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-trait SiPac_proxy
+class SiPac_Proxy
 {
-	public function check_proxy($post_array, $type)
+	private $chat;
+	
+	public function __construct($chat)
 	{
-		$proxy_folder = dirname(__FILE__)."/../../proxy/".$type;
+		$this->chat= $chat;
+	}
+	
+	public function check($post_array, $type)
+	{
+		$proxy_folder = dirname(__FILE__)."/../proxy/".$type;
 		if ($handle = opendir($proxy_folder))
 		{
 			while (false !== ($file = readdir($handle)))
@@ -34,7 +41,7 @@ trait SiPac_proxy
 					if (class_exists($class_name))
 					{
 						$proxy = new $class_name;
-						$proxy->set_variables($this, $post_array);
+						$proxy->set_variables($this->chat, $post_array);
 					
 						$post_array = $proxy->execute();
 					}
@@ -53,11 +60,11 @@ trait SiPac_proxy
 	private function check_custom_proxy($post_array, $type)
 	{
 		if ($type == "client")
-			$custom_proxy_array = $this->settings['custom_client_proxies'];
+			$custom_proxy_array = $this->chat->settings->get('custom_client_proxies');
 		else
-			$custom_proxy_array = $this->settings['custom_server_proxies'];
+			$custom_proxy_array = $this->chat->settings->get('custom_server_proxies');
 		
-		$proxy_folder = dirname(__FILE__)."/../../../../conf/proxy";
+		$proxy_folder = dirname(__FILE__)."/../../../conf/proxy";
 		
 		foreach ($custom_proxy_array as $proxy_name)
 		{
@@ -66,7 +73,7 @@ trait SiPac_proxy
 			if (class_exists($class_name))
 			{
 				$proxy = new $class_name;
-				$proxy->set_variables($this, $post_array);
+				$proxy->set_variables($this->chat, $post_array);
 					
 				$post_array = $proxy->execute();
 			}
@@ -78,10 +85,10 @@ trait SiPac_proxy
 	
 	public function check_custom_functions($values, $function)
 	{
-		$function_folder = dirname(__FILE__)."/../../../../conf/functions";
-		if ($this->settings[$function."_function"] != false)
+		$function_folder = dirname(__FILE__)."/../../../conf/functions";
+		if ($this->chat->settings->get($function."_function") != false)
 		{
-			$function_name = $this->settings[$function."_function"];
+			$function_name = $this->chat->settings->get($function."_function");
 			
 			include_once($function_folder."/SiPacFunction_".$function_name.".php");
 			$class_name = "SiPacFunction_".$function_name;
@@ -89,7 +96,7 @@ trait SiPac_proxy
 			if (class_exists($class_name))
 			{
 				$function = new $class_name;
-				$function->set_variables($this, $values);
+				$function->set_variables($this->chat, $values);
 					
 				return $function->execute();
 			}
@@ -99,4 +106,4 @@ trait SiPac_proxy
 		else
 			return true;
 	}
-}
+} 

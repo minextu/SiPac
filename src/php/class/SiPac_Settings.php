@@ -17,21 +17,34 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-trait SiPac_settings
-{ 
-	public $settings = array();
-	public $html_path;
-
-	private function load_settings($settings=false, $id=false)
+ 
+ class SiPac_Settings
+{
+	private $settings;
+	private $id;
+	
+	public function __construct($id)
 	{
-		//get the chat id, either from the settings or the function variable $id
-		if ($id !== false)
-			$this->id = $id;
-		else if ($settings !== false AND isset($settings['chat_id']))
-			$this->id = $settings['chat_id'];
+		$this->id = $id;
+	}
+	
+	public function set($setting, $value)
+	{
+		$this->settings[$setting] = $value;
+		$_SESSION['SiPac'][$this->id]['settings'][$setting] = $value;
+		return true;
+	}
+	
+	public function get($setting)
+	{
+		if (isset($this->settings[$setting]))
+			return $this->settings[$setting];
 		else
-		die("No chat id specified!");
-    
+			return false;
+	}
+	
+	public function load($settings=false)
+	{
 		//if the settings are already given, load them
 		if ($settings !== false)
 			$this->settings = $settings;
@@ -54,12 +67,7 @@ trait SiPac_settings
 		}
 		//save the settings in the session
 		$_SESSION['SiPac'][$this->id]['settings'] = $this->settings;
-
-		//get the correct html path or load a custom
-		if ($this->settings['html_path'] == "!!AUTO!!")
-			$this->html_path = str_replace("//", "/", "/" . str_replace($_SERVER['DOCUMENT_ROOT'], "", realpath(dirname(__FILE__)."/../../../..") . "/"));
-		else
-			$this->html_path = $this->settings['html_path'];
-    
 	}
+	
 }
+
