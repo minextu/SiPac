@@ -30,15 +30,16 @@ class SiPac_MySQL
   
   private $nickname;
   
-  private $columns = array("sipac_entries" => array("id", "user", "message", "type", "time", "channel", "chat_id"),
+  private $columns = array("sipac_entries" => array("id", "user", "message", "type", "style", "time", "channel", "chat_id"),
 														   "sipac_users" =>  array("id", "name", "task", "info", "style", "afk", "writing", "ip", "online", "channel", "chat_id"));
   
-  public function __construct($host, $user, $pw, $db)
+  public function __construct($host, $user, $pw, $db, $plugin)
   {
     $this->host = $host;
     $this->db = $db;
     $this->user = $user;
     $this->pw = $pw;
+    $this->plugin = $plugin;
   }
   public function check($no_table_check=false)
   {
@@ -57,11 +58,11 @@ class SiPac_MySQL
   {
 		foreach ($this->columns as $table=>$columns)
 		{
-			$check_columns_mysql = mysql_query("SHOW COLUMNS FROM $table");
+			$check_columns_mysql = $this->query("SHOW COLUMNS FROM $table");
 			$check_columns = array();
-			if ($check_columns_mysql != false AND mysql_num_rows($check_columns_mysql) > 0) 
+			if ($check_columns_mysql != false AND $this->num_rows($check_columns_mysql) > 0) 
 			{
-				while ($row = mysql_fetch_assoc($check_columns_mysql))
+				while ($row = $this->fetch_assoc($check_columns_mysql))
 				{
 					$check_columns[$row['Field']] = $row;
 				}
@@ -81,32 +82,80 @@ class SiPac_MySQL
 		else
 			return true;
   }
+  
+  public function query($sql)
+  {
+	$this->connect();
+	
+	if ($this->plugin == "mysql")
+		return mysql_query($sql);
+	else
+		return mysqli_query($this->link, $sql);
+  }
+  private function fetch_assoc($mysql)
+  {
+	if ($this->plugin == "mysql")
+		return mysql_fetch_assoc($mysql);
+	else
+		return mysqli_fetch_assoc($mysql);
+  }
+  private function fetch_object($mysql)
+  {
+	if ($this->plugin == "mysql")
+		return mysql_fetch_object($mysql);
+	else
+		return mysqli_fetch_object($mysql);
+  }
+  private function num_rows($mysql)
+  {
+	if ($this->plugin == "mysql")
+		return mysql_num_rows($mysql);
+	else
+		return mysqli_num_rows($mysql);
+  }
+  
+  private function escape_string($string)
+  {
+      $this->connect();
+      
+	if ($this->plugin == "mysql")
+		return mysql_real_escape_string($string);
+	else
+		return mysqli_real_escape_string($this->link, $string);
+  }
+  
+  private function error()
+  {
+	if ($this->plugin == "mysql")
+		return mysql_error();
+	else
+		return mysqli_error($this->link);
+  }
   public function check_database()
   {
-	$sql = 'SELECT COUNT(*) AS `exists` FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMATA.SCHEMA_NAME="'.mysql_real_escape_string($this->db).'"';
+	$sql = 'SELECT COUNT(*) AS `exists` FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMATA.SCHEMA_NAME="'.$this->escape_string($this->db).'"';
 
-	$query = mysql_query($sql);
+	$query = $this->query($sql);
 	if ($query === false) {
-		throw new Exception(mysql_error(), mysql_errno());
+		throw new Exception($this->error(), mysql_errno());
 	}
 
 	// extract the value
-		$row = mysql_fetch_object($query);
+		$row = $this->fetch_object($query);
 	$dbExists = (bool) $row->exists;
 	 return $dbExists;
   }
   public function get_posts($chat_id, $channels)
   {
-    $this->connect();
-    $chat_mysql = mysql_query("SELECT * FROM sipac_entries WHERE chat_id LIKE '".mysql_real_escape_string($chat_id)."' ORDER BY id ASC");
+    $chat_mysql = $this->query("SELECT * FROM sipac_entries WHERE chat_id LIKE '".$this->escape_string($chat_id)."' ORDER BY id ASC");
     
     $posts = array();
     
     if ($chat_mysql == false)
-     echo mysql_error();
+     echo $this->error();
     else
     {
-      while ($post = mysql_fetch_assoc($chat_mysql))
+      while ($post = $this->fetch_assoc($chat_mysql))
       {
 	
 	  $posts[] = $post;
@@ -115,13 +164,11 @@ class SiPac_MySQL
     return $posts;
   }
   
-  public function save_post($message, $chat_id, $channel, $type, $user, $color, $time)
+  public function save_post($message, $chat_id, $channel, $type, $user, $style, $time)
   {
-    $this->connect();
-      
-    $save_message_mysql = mysql_query("INSERT INTO sipac_entries (user, message, type, time, channel, chat_id) VALUES('" . mysql_real_escape_string($user) . "', '" . mysql_real_escape_string($message) . "','$type', '$time', '" . mysql_real_escape_string($channel) . "', '$chat_id')");
+    $save_message_mysql = $this->query("INSERT INTO sipac_entries (user, message, type, style, time, channel, chat_id) VALUES('" . $this->escape_string($user) . "', '" . $this->escape_string($message) . "','$type', '".$this->escape_string($style)."', '$time', '" . $this->escape_string($channel) . "', '$chat_id')");
     if ($save_message_mysql == false)
-      return mysql_error();
+      return $this->error();
     else
 		return $save_message_mysql;
   }
@@ -129,15 +176,15 @@ class SiPac_MySQL
   public function get_all_users($channel,$chat_id)
   {
     //get all users in the chat
-    $users_mysql = mysql_query("SELECT * FROM sipac_users WHERE chat_id LIKE '".mysql_real_escape_string($chat_id)."' AND channel LIKE '".mysql_real_escape_string($channel)."'");
+    $users_mysql = $this->query("SELECT * FROM sipac_users WHERE chat_id LIKE '".$this->escape_string($chat_id)."' AND channel LIKE '".$this->escape_string($channel)."'");
     
     $users = array();
     
     if ($users_mysql == false)
-      echo mysql_error();
+      echo $this->error();
     else
     {
-      while ($user = mysql_fetch_assoc($users_mysql))
+      while ($user = $this->fetch_assoc($users_mysql))
       {
 	$users[] = $user;
       }
@@ -148,18 +195,18 @@ class SiPac_MySQL
   public function get_user($nickname, $channel, $chat_id)
   {
     //get all values of the user with the given nickname
-    $user_info = mysql_query("SELECT * FROM sipac_users WHERE name LIKE '".mysql_real_escape_string($nickname)."' AND channel LIKE '".mysql_real_escape_string($channel)."' AND chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
+    $user_info = $this->query("SELECT * FROM sipac_users WHERE name LIKE '".$this->escape_string($nickname)."' AND channel LIKE '".$this->escape_string($channel)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
     if ($user_info == false)
-      echo mysql_error();
+      echo $this->error();
     else
-      return mysql_fetch_assoc($user_info);
+      return $this->fetch_assoc($user_info);
   }
   
   public function update_user($nickname, $channel, $chat_id, $time, $is_writing, $is_afk, $user_info, $user_style)
   {
 	$is_writing =  $is_writing == "true" ? 1 : 0;
     //update the user entry with all new values
-    $update_user_mysql = mysql_query("UPDATE sipac_users SET online = '" . $time . "', afk = '" . $is_afk ."', writing = '$is_writing', style = '" . $user_style . "', info = '". mysql_real_escape_string($user_info)."' WHERE name = '" . mysql_real_escape_string($nickname) . "' AND channel = '" . mysql_real_escape_string($channel) . "' AND chat_id = '" . mysql_real_escape_string($chat_id) . "'");
+    $update_user_mysql = $this->query("UPDATE sipac_users SET online = '" . $time . "', afk = '" . $is_afk ."', writing = '$is_writing', style = '" . $user_style . "', info = '". $this->escape_string($user_info)."' WHERE name = '" . $this->escape_string($nickname) . "' AND channel = '" . $this->escape_string($channel) . "' AND chat_id = '" . $this->escape_string($chat_id) . "'");
     
     return $update_user_mysql;
   }
@@ -170,14 +217,14 @@ class SiPac_MySQL
     $is_afk = "";
     
     //save the user with all given values
-    $add_user_mysql = mysql_query("INSERT INTO sipac_users (name, info, style, afk, writing, ip, online, channel, chat_id) VALUES ('" . mysql_real_escape_string($nickname) . "', '" . mysql_real_escape_string($user_info) . "', '" . $user_style . "', '" . $is_afk . "', 'false', '" . $user_ip . "', '" . time() . "', '" . mysql_real_escape_string($channel) . "', '$chat_id')");
+    $add_user_mysql = $this->query("INSERT INTO sipac_users (name, info, style, afk, writing, ip, online, channel, chat_id) VALUES ('" . $this->escape_string($nickname) . "', '" . $this->escape_string($user_info) . "', '" . $user_style . "', '" . $is_afk . "', 'false', '" . $user_ip . "', '" . time() . "', '" . $this->escape_string($channel) . "', '$chat_id')");
   }
   
   public function delete_user($nickname, $channel, $chat_id)
   {
   
   
-    $delete_user = mysql_query("DELETE FROM sipac_users WHERE name LIKE '" . mysql_real_escape_string($nickname) . "' AND channel LIKE '".mysql_real_escape_string($channel)."' AND chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
+    $delete_user = $this->query("DELETE FROM sipac_users WHERE name LIKE '" . $this->escape_string($nickname) . "' AND channel LIKE '".$this->escape_string($channel)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
   }
   
   public function add_task($task, $user, $channel, $chat_id)
@@ -185,10 +232,10 @@ class SiPac_MySQL
     if ($user === false)
       $user = $this->nickname;
       
-	$count = mysql_query("SELECT * from sipac_users WHERE  name LIKE '".mysql_real_escape_string($user)."' AND channel LIKE '".mysql_real_escape_string($channel)."' AND chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
-	if (mysql_num_rows($count) > 0)
+	$count = $this->query("SELECT * from sipac_users WHERE  name LIKE '".$this->escape_string($user)."' AND channel LIKE '".$this->escape_string($channel)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
+	if ($this->num_rows($count) > 0)
 	{
-		$add_task = mysql_query("UPDATE sipac_users SET task = '".mysql_real_escape_string($task)."' WHERE name LIKE '".mysql_real_escape_string($user)."' AND channel LIKE '".mysql_real_escape_string($channel)."' AND chat_id LIKE '".mysql_real_escape_string($chat_id)."'");
+		$add_task = $this->query("UPDATE sipac_users SET task = '".$this->escape_string($task)."' WHERE name LIKE '".$this->escape_string($user)."' AND channel LIKE '".$this->escape_string($channel)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
 		return true;
     }
     else
@@ -199,15 +246,15 @@ class SiPac_MySQL
 	{
 		foreach ($channels as $channel)
 		{
-			$remove_old_posts = mysql_query
+			$remove_old_posts = $this->query
 			("DELETE from sipac_entries 
 				WHERE id IN (select id from (select id from sipac_entries 
-					WHERE chat_id LIKE '".mysql_real_escape_string($chat_id)."' AND channel LIKE '".mysql_real_escape_string($channel)."' ORDER BY id DESC LIMIT $max_messages, 1000) 
+					WHERE chat_id LIKE '".$this->escape_string($chat_id)."' AND channel LIKE '".$this->escape_string($channel)."' ORDER BY id DESC LIMIT $max_messages, 1000) 
 				x) ");
 			
 			if ($remove_old_posts == false)
 			{
-				echo mysql_error();
+				echo $this->error();
 				break;
 				return false;
 			}
@@ -219,32 +266,45 @@ class SiPac_MySQL
   {
     $this->nickname = $nickname;
   }
-  
-  public function query($sql)
-  {
-	$query = mysql_query($sql);
-	if ($query == true)
-		return true;
-	else
-		return mysql_error();
-  }
   private function connect()
   {
-    if ($this->connected == false)
-    {
-      /*Connect to mysql */
-      if (!mysql_connect($this->host, $this->user, $this->pw))
-	return mysql_error();
-      else if (!mysql_select_db($this->db))
-	return mysql_error();
-      else
-      {
-	$this->connected = true;
-	return true;
-      }
-    }
-	else
+   if ($this->plugin == "mysql")
+   {
+	if ($this->connected == false)
+	{
+		/*Connect to mysql */
+		if (!mysql_connect($this->host, $this->user, $this->pw))
+		return mysql_error();
+		else if (!mysql_select_db($this->db))
+		return mysql_error();
+		else
+		{
+		$this->connected = true;
 		return true;
+		}
+	}
+		else
+			return true;
+  }
+  else
+  {
+	if ($this->connected == false)
+	{
+		/*Connect to mysql */
+		$this->link = mysqli_connect($this->host, $this->user, $this->pw);
+		if ($this->link == false)
+			return false;
+		else if (!mysqli_select_db($this->link, $this->db))
+			return mysqli_error($this->link);
+		else
+		{
+		$this->connected = true;
+		return true;
+		}
+	}
+		else
+			return true;
+   }
   }
 }
 

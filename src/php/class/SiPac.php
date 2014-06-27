@@ -75,9 +75,9 @@ class SiPac_Chat
 		{
 			//start mysql connection
 			if ($this->settings['database_type'] == "mysqli")
-				$this->db = new SiPac_MySQLi($this->settings['mysql_hostname'], $this->settings['mysql_username'], $this->settings['mysql_password'], $this->settings['mysql_database']);
+				$this->db = new SiPac_MySQL($this->settings['mysql_hostname'], $this->settings['mysql_username'], $this->settings['mysql_password'], $this->settings['mysql_database'], "mysqli");
 			else if ($this->settings['database_type'] == "mysql")
-				$this->db = new SiPac_MySQL($this->settings['mysql_hostname'], $this->settings['mysql_username'], $this->settings['mysql_password'], $this->settings['mysql_database']);
+				$this->db = new SiPac_MySQL($this->settings['mysql_hostname'], $this->settings['mysql_username'], $this->settings['mysql_password'], $this->settings['mysql_database'], "mysql");
 			else
 				die("Unknown database type!");
 				
@@ -149,7 +149,7 @@ class SiPac_Chat
       //check if the post is new
       if ($post['id'] > $last_id OR in_array($post['channel'], $this->new_channels))
       {
-		$post_array = array("message"=>$post['message'], "type"=>$post['type'], "channel"=>$post['channel'],"user"=>$post['user'],"time"=>$post['time'], "color" => $post['color']);
+		$post_array = array("message"=>$post['message'], "type"=>$post['type'], "channel"=>$post['channel'],"user"=>$post['user'],"time"=>$post['time'], "style" => $post['style']);
 		$post_array = $this->check_proxy($post_array, "client");
 		
       	$post_user_name = $post_array['user'];
@@ -182,7 +182,11 @@ class SiPac_Chat
 	$post_html = str_replace("!!USER!!", $post_user, $post_html);
 	$post_html = str_replace("!!MESSAGE!!", $post_array['message'], $post_html);
 	$post_html = str_replace("!!TYPE!!", $post_type, $post_html);
-	$post_html = str_replace("!!USER_COLOR!!", $post_array['color'], $post_html);
+	
+	$message_style = explode("|||", $post_array['style']);
+	$color = $message_style[0];
+	
+	$post_html = str_replace("!!USER_COLOR!!", $color, $post_html);
 	
 	if ($this->settings['time_24_hours'])
           $date = date("H:i", $post_array['time']);
@@ -229,11 +233,12 @@ class SiPac_Chat
 			}
 			else
 			{
-			
-				$post_array = array("message"=>$message, "type"=>$type, "channel"=>$channel,"user"=>$user, "color" => $this->settings['user_color'], "time"=>$time);
+				$message_style = $this->settings['user_color']."|||";
+				
+				$post_array = array("message"=>$message, "type"=>$type, "channel"=>$channel,"user"=>$user, "style" => $message_style, "time"=>$time);
 				$post_array = $this->check_proxy($post_array, "server");
 				
-				$db_response = $this->db->save_post($post_array['message'], $this->id, $post_array['channel'], $post_array['type'], $post_array['user'], $post_array['color'], $post_array['time']);
+				$db_response = $this->db->save_post($post_array['message'], $this->id, $post_array['channel'], $post_array['type'], $post_array['user'], $post_array['style'], $post_array['time']);
 				if ($db_response !== true)
 					return array('info_type' => "error", 'info_text' => $db_response);
 				else

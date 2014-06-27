@@ -15,12 +15,12 @@ if (isset($_POST['mysql_send']))
 		if ($_POST['mysql_ext'] == "mysql")
 		{
 			require_once(dirname(__FILE__)."/php/class/SiPac_MySQL.php");
-			$db = new SiPac_MySQL($_POST['hostname'], $_POST['username'], $_POST['password'], $_POST['database']);
+			$db = new SiPac_MySQL($_POST['hostname'], $_POST['username'], $_POST['password'], $_POST['database'], "mysql");
 		}
 		else if ($_POST['mysql_ext'] == "mysqli")
 		{
-			require_once(dirname(__FILE__)."/php/class/SiPac_MySQLi.php");
-			$db = new SiPac_MySQLi($_POST['hostname'], $_POST['username'], $_POST['password'], $_POST['database']);
+			require_once(dirname(__FILE__)."/php/class/SiPac_MySQL.php");
+			$db = new SiPac_MySQL($_POST['hostname'], $_POST['username'], $_POST['password'], $_POST['database'], "mysqli");
 		}
 		else
 			die("Error: wrong MySQL extension!");
@@ -43,6 +43,7 @@ if (isset($_POST['mysql_send']))
 				echo $db->query("ALTER TABLE sipac_entries CHANGE extra type INT(3)");
 				echo $db->query("ALTER TABLE sipac_users CHANGE action task mediumtext");
 				echo $db->query("ALTER TABLE sipac_users CHANGE last_time online INT(10)");
+				echo $db->query("ALTER TABLE sipac_entries ADD style MEDIUMTEXT NOT NULL AFTER type");
 				echo "<div style='background:orange; color: white'>Update done Successfully! Please delete this file, after you are done!</div>";
 			}
 		}
