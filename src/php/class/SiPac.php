@@ -71,7 +71,7 @@ class SiPac_Chat
 			$this->html_path = str_replace("//", "/", "/" . str_replace($_SERVER['DOCUMENT_ROOT'], "", realpath(dirname(__FILE__)."/../../..") . "/"));
 		
 		//check, if all mysql settings are given
-		if (empty($this->settings->get('mysql_hostname')) OR empty($this->settings->get('mysql_username')) OR $this->settings->get('mysql_password') === false OR empty($this->settings->get('mysql_database')))
+		if ($this->settings->get('mysql_hostname') == false OR $this->settings->get('mysql_username') == false OR $this->settings->get('mysql_password') === false OR $this->settings->get('mysql_database') == false)
 			die("Missing MySQL Settings!");
 		else
 		{
