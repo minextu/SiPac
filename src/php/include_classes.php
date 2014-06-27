@@ -27,7 +27,6 @@ require_once("class/SiPac/proxy.php");
 require_once("class/SiPac/afk.php");
 require_once("class/SiPac.php");
 
-require_once("class/SiPac_MySQLi.php");
 require_once("class/SiPac_MySQL.php");
 require_once("class/SiPac_User.php");
 require_once("class/SiPac_Userlist.php");
