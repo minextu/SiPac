@@ -168,8 +168,15 @@
 ##CHAT_MAIN## .chat_channels_ul .chat_channel_unread .chat_channel_span
 {
 	background: #e4e8ad;
+	animation: channel_anim 0.3s alternate;
+	animation-iteration-count: 4;
 	-webkit-animation: channel_anim 0.3s alternate;
 	-webkit-animation-iteration-count: 4;
+}
+@keyframes channel_anim
+{
+	from { background: #ebf0f1; }
+	to { background: #e4e8ad; }
 }
 @-webkit-keyframes channel_anim
 {

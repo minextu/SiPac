@@ -51,7 +51,7 @@ $chat_layout = "
 		<span class='chat_header'>SiPac</span>
 		<ul class='chat_channels_ul'>
 		</ul>
-		<span class='chat_add_channel'><a href='javascript:void(0);' onclick='var channel_name = prompt(\"Please enter a channel name\"); if (channel_name != null) { chat_objects[!!NUM!!].insert_command(\"join \" + channel_name, true); }'>+</a></span>
+		<span class='chat_add_channel'><a href='javascript:void(0);' onclick='var channel_name = prompt(\"<||enter-channel-name-text||>\"); if (channel_name != null) { chat_objects[!!NUM!!].insert_command(\"join \" + channel_name, true); }'>+</a></span>
 	</nav>
 	<div class='chat_container'>
 		<div class='chat_left'>
@@ -70,8 +70,8 @@ $chat_layout = "
 			</div>
 			<div class='chat_element'>
 				<div class='chat_element_head'><||settings-head||></div>
-				<input type ='checkbox' checked='checked' onclick='if (chat_objects[!!NUM!!].enable_sound == true) { chat_objects[!!NUM!!].enable_sound = false; } else { chat_objects[!!NUM!!].enable_sound = true; } '>Enable Sound
-				<br><input type ='checkbox' onclick='if (chat_objects[!!NUM!!].enable_notifications == true) { chat_objects[!!NUM!!].enable_notifications= false; } else { chat_objects[!!NUM!!].enable_notifications = true; chat_objects[!!NUM!!].show_notification(\"Success\", \"Notifications are now enabled\");} '>Enable Desktop Notifications (experimental)
+				<input type ='checkbox' checked='checked' onclick='if (chat_objects[!!NUM!!].enable_sound == true) { chat_objects[!!NUM!!].enable_sound = false; } else { chat_objects[!!NUM!!].enable_sound = true; } '><||enable-sound-text||>
+				<br><input checked='checked' class='chat_notification_checkbox' type ='checkbox' onclick='if (chat_objects[!!NUM!!].enable_notifications == true) { chat_objects[!!NUM!!].enable_notifications= false; } else { chat_objects[!!NUM!!].enable_notifications = true; chat_objects[!!NUM!!].check_notification_permisson();} '><||enable-desktop-notifications-text||>
 			</div>
 			<div class='chat_element' style='text-align: center;'>
 				<div class='chat_element_head'><||smileys-head||></div>
@@ -112,6 +112,15 @@ function layout_user_writing_status (status, username, user_id)
   {
     document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML =  this.old_user_status[username];
   }
+}
+';
+$chat_layout_functions['layout_notification_status'] ='
+function (status)
+{
+	if (status == false)
+		this.chat.getElementsByClassName("chat_notification_checkbox")[0].checked = false;
+	else
+		this.chat.getElementsByClassName("chat_notification_checkbox")[0].checked = true;
 }
 ';
 ?>

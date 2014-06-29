@@ -212,7 +212,9 @@ function Chat(theme, id, client_num, channels, channel_titles, texts, layout)
   this.new_channels = new Array();
   this.active_channel = "";
   this.enable_sound = true;
+  
   this.enable_notifications = false;
+
   this.add_channel(undefined, undefined, true);
   this.change_channel(this.channels[0]);
 
@@ -239,8 +241,6 @@ function Chat(theme, id, client_num, channels, channel_titles, texts, layout)
     this.new_post_audio.type = 'audio/mpeg';
     this.new_post_audio.src = chat_html_path + "themes/" + this.theme + "/sound/new_post.mp3";
   }
-
-  this.init();
 }
 Chat.prototype.init = function()
 {
@@ -256,6 +256,9 @@ Chat.prototype.init = function()
   this.chat.addEventListener("mousemove", new_messages_status, false);
   
   scroll(this.chat, "chat_conversation", 0, true);
+  
+  if (typeof this.layout_notification_status != "undefined")
+	  this.layout_notification_status(this.enable_notifications);
 };
 Chat.prototype.send_message = function (chat_message)
 {
@@ -528,8 +531,9 @@ Chat.prototype.change_channel = function (channel)
 	document.getElementById(this.id + "_channel_" + this.active_channel).className = "chat_channel";
 	this.chat.getElementsByClassName("chat_conversation_channel_" + this.active_channel)[0].style.display = "none";
 	this.chat.getElementsByClassName("chat_userlist_channel_" + this.active_channel)[0].style.display = "none";
-	document.getElementById(this.id + "_channel_" + channel).className = "chat_channel_selected";
 	}catch(e){}
+	
+	document.getElementById(this.id + "_channel_" + channel).className = "chat_channel_selected";
 	
 	this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].style.display = "block";
 	this.chat.getElementsByClassName("chat_userlist_channel_" + channel)[0].style.display = "block";
@@ -560,7 +564,14 @@ Chat.prototype.handle_server_tasks = function (tasks)
   {
     var task_parts = tasks[i].split("|");
 
-    if (task_parts[0] == "message" || task_parts[0] == "kick")
+    if (task_parts[0] == "kick")
+    {
+	    if (task_parts[1] == "")
+		alert(this.texts['you-were-kicked-text'].replace("%1", task_parts[2]));
+	    else
+		    alert(this.texts['you-were-kicked-by-user-text'].replace("%1", task_parts[1]).replace("%2", task_parts[2]));
+    }
+    else if (task_parts[0] == "message")
       this.alert(task_parts[1]);
     else if (task_parts[0] == "join")
     {
@@ -646,35 +657,67 @@ Chat.prototype.information = function (info, type, nohide, onlyhide, noclose)
       }, 5000);
   }
 };
-Chat.prototype.show_notification = function(user, message)
+Chat.prototype.check_notification_permisson = function(user, message)
 {
-	var Notification = window.Notifications || window.mozNotifications || window.webkitNotifications;
-
-	Notification.requestPermission(function (permission) {
-		 console.log(permission);
+	this.enable_notifications = false;
+	if (typeof this.layout_notification_status != "undefined")
+		this.layout_notification_status(false);
+	
+	var Notification = window.Notification || window.mozNotification || window.webkitNotification;
+	var chat = this;
+	
+	Notification.requestPermission(function (permission) 
+	{
+		if (permission == "granted")
+		{
+			chat.enable_notifications = true;
+			if (typeof chat.layout_notification_status != "undefined")
+				chat.layout_notification_status(true);
+			if (user != undefined && message != undefined)
+				chat.show_notification(user, message, true);
+		}
+		else
+		{
+			chat.enable_notifications = false;
+			if (typeof chat.layout_notification_status != "undefined")
+				chat.layout_notification_status(false);
+		}
 	});
-
-
-	var instance = Notification.createNotification("", user, message);
-
-	setTimeout(function(){
-			instance.cancel();
-			}, '5000');
-
-		instance.onclick = function () {
-			// Something to do
-		};
-		instance.onerror = function () {
-			// Something to do
-		};
-		instance.onshow = function () {
-			// Something to do
-		};
-		instance.onclose = function () {
-			// Something to do
-		};
-	instance.show();
-}
+};
+Chat.prototype.show_notification = function(user, message,permission)
+{
+	if (permission != true)
+	{
+			this.check_notification_permisson(user,message);
+			return false;
+	}
+	var Notification = window.Notification || window.mozNotification || window.webkitNotification;
+	
+	var instance = new Notification(user, 
+						 {
+							body: message
+						}
+	);
+		
+	setTimeout(function(){instance.cancel();}, '5000');
+		
+	instance.onclick = function () 
+	{
+		// Something to do
+	};
+	instance.onerror = function () 
+	{
+		// Something to do
+	};
+	instance.onshow = function () 
+	{
+		// Something to do
+	};
+	instance.onclose = function () 
+	{
+		// Something to do
+	};
+};
 Chat.prototype.add_smiley = function (code)
 {
   this.chat.getElementsByClassName("chat_message")[0].value += code;
@@ -720,6 +763,7 @@ Chat.prototype.insert_command = function(command, auto_send)
 
 Chat.prototype.alert = function(text, action)
 {
+	/*
   if (action == "close")
   {
     this.alert_status = 2;
@@ -744,17 +788,22 @@ Chat.prototype.alert = function(text, action)
     
     this.alert_status = 1;
   }	
+  */
+	alert(text);
 };
 Chat.prototype.prompt = function(text, id, action, button_text)
 {
+	/*
   var alert_text = text;
   alert_text += "<p><input type='text' onkeydown='if (event.keyCode == 13) { " + action + " chat_objects[" + this.num + "].alert(undefined, \"close\");}' id='" + id + "'></p><button onclick='" + action + " chat_objects[" + this.num + "].alert(undefined, \"close\");'>" + button_text + "</button></p>";
   this.alert(alert_text)
+  */
+	alert(' in development');
 };
 
 Chat.prototype.kick_user = function(user)
 {			//Reason for the Kick:																																		kick user
-   var reason = prompt("Reason for the kick:");
+   var reason = prompt(this.texts['reason-for-kick-text']);
    if (reason != null)
 	this.insert_command("kick " + user + " " + reason, true);
 }

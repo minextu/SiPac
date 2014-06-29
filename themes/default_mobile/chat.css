@@ -240,39 +240,38 @@
 /*Chat user*/
 ##CHAT_MAIN## .chat_user
 {
-	background: #f3f7f8;
-	border-bottom: 1px solid #e7ebec;
-	min-height: 50px;
-	overflow: auto;
-	padding: 5px;
+	width: 100%;
+	background: #f0f0f0;
+	font-size: 15px;
+	border-top: 1px solid #d7dbdc;
+	border-bottom: 1px solid #d7dbdc;
+	margin-bottom: 5px;
+	min-height: 40px;
+	padding: 0 0px;
+	transition: all 0.1s;
 }
-
+##CHAT_MAIN## .chat_user:hover
+{
+	padding: 10px 0px;
+}
 ##CHAT_MAIN## .chat_user .chat_user_name
 {
-	font-size: 20px;
-	color: #fff;
-	text-shadow: 0px 0px 2px #000;
+	background: #e8edee;
+	text-shadow: 0px 0px 5px #fff;
+	margin-bottom: 5px;
+	font-weight: bold;
+	color: #225bb1;
+	font-size: 16px;
 }
-
 ##CHAT_MAIN## .chat_user .chat_user_status
 {
 	float: right;
-	text-shadow: none;
-	font-size: 15px;
-	color: #5372a1;
-	font-weight: bold;
 }
 
-##CHAT_MAIN## .chat_user .chat_user_bottom ul
+##CHAT_MAIN## .chat_user_info div
 {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-##CHAT_MAIN## .chat_user .chat_user_bottom ul li
-{
-	float: left;
+	width: 100%;
+	padding-bottom: 5px;
 }
 
 /*chat notice */

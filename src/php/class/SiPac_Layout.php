@@ -153,7 +153,7 @@ class SiPac_Layout
 				$js_chat = $js_chat."chat_objects[chat_objects.length-1].$name();";
 		}
     }
-    $js_chat = $js_chat."</script>";
+    $js_chat = $js_chat."chat_objects[chat_objects.length-1].init();</script>";
     
     return $js_chat;
   }

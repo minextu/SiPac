@@ -18,57 +18,72 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 $chat_text = array(
+
+/* Userlist*/
+"online-status-text" => "online",
+"afk-status-text" => "afk",
+"writing-status" => "Writing...",
+"kick-head" => "Kick",
+"kick-user"=>"Kick %1",
+"private-message-head" => "Message",
+"send-private-message-text" => "Send a private message",
+
+/* Notifications */
 "rename-notification" => "[user]%1[/user] is now [user]%2[/user]",
 "user-left-notification" =>"[user]%1[/user] has left",
 "user-join-notification" => "[user]%1[/user] has joined",
+"user-kicked-user-notification" => "[user]%1[/user] was kicked by [user]%2[/user] (%3)",
+"user-kicked-notification" => "[user]%1[/user] was kicked (%2)",
+"user-now-afk-no-reason-notification" => "[user]%1[/user] is now away",
+"user-now-afk-notification" => "[user]%1[/user] is now away (%2)",
+"user-now-not-afk-notification" => "[user]%1[/user] is back again",
+
+/* Commands */
 "command-list-head" => "You can use the following Commands:",
 "command-syntax-head" => "Command Syntax:",
-"command-not-found-text" => "Command %1 not found! (Use /help for a command list)",
+"command-not-found-text" => "Command %1 not found! (Type /help for a command list)",
 "no-permissions-text" => "No permissions!",
 "no-permissions-rename-other-user" => "No permissions to rename an other user!",
 "user-not-found-text" => "User %1 not found",
 "newname-not-entered-text" => "You didn't enter a new name!",
-"message-empty-text" => "Nothing entered",
-"send-button-text" => "send",
-"room-loading-text" => "Loading the Room. Please wait...",
-//"User %1 will be kicked",
-//"no reason",
-//"You were kicked! Reason: %1",
-//"%1 was kicked by %3. Reason: %2",
-//"%1 was kicked. Reason: %2",
-"kick-user"=>"Kick %1",
-"online-status-text" => "online",
-"afk-status-text" => "afk",
-"message-input-placeholder" => "Please enter a message...",
+"no-reason-for-not-afk-text" => "You can't give a reason for not being afk!",
+"no-channel-entered" =>"You must enter a channel!",
+"arguments-missing-text" => "Missing argument! Type /help for the syntax.",
+"no-user-entered-text" => "You have to enter a user!",
+
+"me-random-text-1" => "has something better to do",
+"me-random-text-2" => "has fallen in love with %1",
+"me-random-text-3" => "wishes he had not forgotten the text",
+"me-random-text-4" => "thinks he/she is beautiful",
+"me-random-text-5" => "is watching for %1",
+
+/* Kick */
+"reason-for-kick-text" => "Reason for the kick:",
+"kick-no-reason-text" => "no reason",
+"you-were-kicked-text" => "You were kicked! (%1)",
+"you-were-kicked-by-user-text" => "You were kicked by %1! (%2)",
+
+/* Notice Popup */
 "info-head" => "Info:",
 "error-head" => "Error:",
 "warning-head" => "Warning:",
 "success-head" => "Success:",	
 
-"no-reason-for-not-afk-text" => "You can't give a reason for not being afk!",
-"user-now-afk-no-reason-text" => "[user]%1[/user] is now away",
-"user-now-afk-text" => "[user]%1[/user] is now away (%2)",
-"user-now-not-afk-text" => "[user]%1[/user] is back again",
-
-"no-channel-entered" =>"You must enter a channel!",
-"arguments-missing-text" => "Missing argument! Type /help for the syntax.",
-//"no user specified",
-"writing-status" => "Writing...",
-
+/* Log */
 "log-message" => "Message",
 "log-info"=>"Info",
 
-
 /* theme translations */
+"message-input-placeholder" => "Please enter a message...",
+"send-button-text" => "send",
+"room-loading-text" => "Loading the Room. Please wait...",
 "userlist-head" => "Userlist (%1)",
 "settings-head" => "Settings",
 "smileys-head" => "Smileys",
+"enter-channel-name-text" => "Please enter a channel name",
+"enable-sound-text" => "Enable Sound",
+"enable-desktop-notifications-text" => "Enable Desktop Notifications",
 
-/*me random text*/
-"me-random-text-1" => "has something better to do",
-"me-random-text-2" => "has fallen in love with %1",
-"me-random-text-3" => "wishes he had not forgotten the text",
-"me-random-text-4" => "thinks he/she is beautiful",
-"me-random-text-5" => "is watching for %1"
+"message-empty-text" => "Nothing entered"
 );
 ?>

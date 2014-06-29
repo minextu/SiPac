@@ -121,7 +121,11 @@ class SiPac_Chat
 			
 			//clean the db (remove old messages)
 			$this->db->clean_up($this->channel->ids, $this->settings->get('max_messages'), $this->id);
+			
+			//reset the Chat (reset a possible kick)
+			$this->reset();
 		}
+		
 		$this->channel->check();
 		
 		if ($chat_num ===false)
@@ -139,13 +143,20 @@ class SiPac_Chat
 		
 		$this->layout = new SiPac_Layout($this);
 		$this->layout->load();
+		
+		$this->check_kick();
 	}
 
 	public function draw()
 	{
 		return $this->layout->draw();
 	}
-
+	
+	private function reset()
+	{
+		unset($_SESSION['SiPac'][$this->id]['kick']);
+	}
+	
 	public function get_posts($last_id)
 	{
 		//load all posts
@@ -298,29 +309,46 @@ public function handle_userlist()
 					$array['tasks'][] = $user_info['task'];
 				else if ($task_parts[0] == "invite")
 					$array['tasks'][] = $user_info['task'];
-				/*
-				else if ($action_parts[0] == "kick")
+				else if ($task_parts[0] == "kick")
 				{
-				$array['actions'][] = "kick|<||t23|" . $action_parts[1] . "||>";
-				if (!empty($action_parts[2]))
-					save_message("<||t24|" . $get_user->name . "|" . $action_parts[1] . "|" . $action_parts[2] . "||>", $get_user->channel, 1); //%1 was kicked by %3. Reason: %2
-				else
-					save_message("<||t25|" . $get_user->name . "|" . $action_parts[1] . "||>", $get_user->channel, 1); //%1 was kicked. Reason: %2
-				$delete_user                   = mysql_query("DELETE FROM chat_users WHERE id LIKE '" . $get_user->id . "'");
-				$_SESSION[$chat_id]['is_kick'] = true;
-				$chat_no_save_user             = true;
+					$array['tasks'][] = $user_info['task'];
+					if (!empty($task_parts[1]))
+					{
+						$notification_text = "<||user-kicked-user-notification|".$user_info['name']."|".$task_parts[1]."|".$task_parts[2]."||>";
+						$_SESSION['SiPac'][$this->id]['kick'] = "<||you-were-kicked-by-user-text|".$task_parts[1]."|".$task_parts[2]."||>";
+					}
+					else
+					{
+						$notification_text = "<||user-kicked-notification|".$user_info['name']."|".$task_parts[2]."||>";
+						$_SESSION['SiPac'][$this->id]['kick'] = "<||you-were-kicked-text|".$task_parts[2]."||>";
+					}
+					
+					foreach ($this->channel->ids as $channel)
+					{
+						$this->send_message("<||user-kicked-notification|".$user_info['name']."|".$task_parts[2]."||>", $channel, 1);
+						$this->db->delete_user($user_info['name'], $channel, $this->id);
+					}
 				}
+				/*
 				else if ($action_parts[0] == "message")
 				$array['actions'][] = "message|" . $action_parts[1];
 				else
 					$chat_debug['warn'][] = "Action " . $action_parts[0] . " not defined!";*/
-		
 		
 				$this->db->add_task("", $this->nickname, $channel, $this->id);
 			}
 		}
 		return $array;
 	}
+	
+	private function check_kick()
+	{
+		if (!empty($_SESSION['SiPac'][$this->id]['kick']))
+			die($this->language->translate($_SESSION['SiPac'][$this->id]['kick']));
+		else
+			return false;
+	}
+	
 	public function check_changes()
 	{
 	//get tasks (kick, ban, etc.)

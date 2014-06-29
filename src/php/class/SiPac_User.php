@@ -69,9 +69,9 @@ class SiPac_User
 	{
 		$user_info_tmp = array();
 		if ($this->settings->get('can_kick'))
-			$user_info_tmp['Kick'] = "<a href='javascript:void(null);' onclick='chat_objects[".$this->chat_num."].kick_user(\"".addslashes($this->nickname) . "\");'><||kick-user|" . $this->nickname . "||></a>";
+			$user_info_tmp['<||kick-head||>'] = "<a href='javascript:void(null);' onclick='chat_objects[".$this->chat_num."].kick_user(\"".addslashes($this->nickname) . "\");'><||kick-user|" . $this->nickname . "||></a>";
 		if ($this->settings->get('show_private_message_link'))
-			$user_info_tmp['Message'] = "<a href='javascript:void(null);' onclick='chat_objects[".$this->chat_num."].msg_user(\"".addslashes($this->nickname) . "\");'>Send a private message</a>";
+			$user_info_tmp['<||private-message-head||>'] = "<a href='javascript:void(null);' onclick='chat_objects[".$this->chat_num."].msg_user(\"".addslashes($this->nickname) . "\");'><||send-private-message-text||></a>";
 		if ($this->settings->get('can_see_ip'))
 			$user_info_tmp['IP'] = $this->ip;
 		
