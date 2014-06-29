@@ -213,7 +213,7 @@ function Chat(theme, id, client_num, channels, channel_titles, texts, layout)
   this.active_channel = "";
   this.enable_sound = true;
   
-  this.enable_notifications = false;
+  this.notifications_enabled = false;
 
   this.add_channel(undefined, undefined, true);
   this.change_channel(this.channels[0]);
@@ -258,7 +258,7 @@ Chat.prototype.init = function()
   scroll(this.chat, "chat_conversation", 0, true);
   
   if (typeof this.layout_notification_status != "undefined")
-	  this.layout_notification_status(this.enable_notifications);
+	  this.layout_notification_status(this.notifications_enabled);
 };
 Chat.prototype.send_message = function (chat_message)
 {
@@ -435,7 +435,7 @@ Chat.prototype.add_entries = function (channel, entries, users, messages)
     for (var i = 0; i < entries.length; i++)
     {
       chat_window.innerHTML += entries[i];
-	  if (users[i] != this.username && this.enable_notifications == true)
+	  if (users[i] != this.username && this.notifications_enabled == true)
 		this.show_notification(users[i], messages[i]);
     }
     if (this.first_start)
@@ -657,41 +657,38 @@ Chat.prototype.information = function (info, type, nohide, onlyhide, noclose)
       }, 5000);
   }
 };
-Chat.prototype.check_notification_permisson = function(user, message)
+Chat.prototype.disable_notifications = function()
 {
-	this.enable_notifications = false;
+	this.notifications_enabled = false;
+	if (typeof this.layout_notification_status != "undefined")
+		this.layout_notification_status(false);
+};
+Chat.prototype.enable_notifications = function()
+{
+	this.notifications_enabled = false;
 	if (typeof this.layout_notification_status != "undefined")
 		this.layout_notification_status(false);
 	
 	var Notification = window.Notification || window.mozNotification || window.webkitNotification;
 	var chat = this;
-	console.debug("Permisson check!");
 	Notification.requestPermission(function (permission) 
 	{
-		console.debug("Per:" + permission);
 		if (permission == "granted")
 		{
-			chat.enable_notifications = true;
+			chat.notifications_enabled = true;
 			if (typeof chat.layout_notification_status != "undefined")
 				chat.layout_notification_status(true);
 		}
 		else
 		{
-			chat.enable_notifications = false;
+			chat.notifications_enabled = false;
 			if (typeof chat.layout_notification_status != "undefined")
 				chat.layout_notification_status(false);
 		}
 	});
-	if (user != undefined && message != undefined)
-		chat.show_notification(user, message, true);
 };
-Chat.prototype.show_notification = function(user, message,permission)
+Chat.prototype.show_notification = function(user, message)
 {
-	if (permission != true)
-	{
-			this.check_notification_permisson(user,message);
-			return false;
-	}
 	var Notification = window.Notification || window.mozNotification || window.webkitNotification;
 	
 	var instance = new Notification(user, 

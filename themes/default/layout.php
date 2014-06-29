@@ -71,7 +71,7 @@ $chat_layout = "
 			<div class='chat_element'>
 				<div class='chat_element_head'><||settings-head||></div>
 				<input type ='checkbox' checked='checked' onclick='if (chat_objects[!!NUM!!].enable_sound == true) { chat_objects[!!NUM!!].enable_sound = false; } else { chat_objects[!!NUM!!].enable_sound = true; } '><||enable-sound-text||>
-				<br><input checked='checked' class='chat_notification_checkbox' type ='checkbox' onclick='if (chat_objects[!!NUM!!].enable_notifications == true) { chat_objects[!!NUM!!].enable_notifications= false; } else { chat_objects[!!NUM!!].enable_notifications = true; chat_objects[!!NUM!!].check_notification_permisson();} '><||enable-desktop-notifications-text||>
+				<br><input checked='checked' class='chat_notification_checkbox' type ='checkbox' onclick='if (chat_objects[!!NUM!!].notifications_enabled == true) { chat_objects[!!NUM!!].disable_notifications(); } else { chat_objects[!!NUM!!].enable_notifications();} '><||enable-desktop-notifications-text||>
 			</div>
 			<div class='chat_element' style='text-align: center;'>
 				<div class='chat_element_head'><||smileys-head||></div>
