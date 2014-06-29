@@ -20,6 +20,8 @@ class SiPacProxy_smileys implements SiPacProxy
 		
 			$this->post['message'] = str_replace($smiley_code, "<img style='max-height: 20px;margin-right: 3px;' src='" . $smiley_url . "' title='" . $smiley_code_html . "' alt='" . $smiley_code_html . "'>", " " . $this->post['message']);
 		}
+		$this->post['message'] = trim($this->post['message']);
+		
 		return $this->post;
 	}
 }

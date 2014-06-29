@@ -665,16 +665,15 @@ Chat.prototype.check_notification_permisson = function(user, message)
 	
 	var Notification = window.Notification || window.mozNotification || window.webkitNotification;
 	var chat = this;
-	
+	console.debug("Permisson check!");
 	Notification.requestPermission(function (permission) 
 	{
+		console.debug("Per:" + permission);
 		if (permission == "granted")
 		{
 			chat.enable_notifications = true;
 			if (typeof chat.layout_notification_status != "undefined")
 				chat.layout_notification_status(true);
-			if (user != undefined && message != undefined)
-				chat.show_notification(user, message, true);
 		}
 		else
 		{
@@ -683,6 +682,8 @@ Chat.prototype.check_notification_permisson = function(user, message)
 				chat.layout_notification_status(false);
 		}
 	});
+	if (user != undefined && message != undefined)
+		chat.show_notification(user, message, true);
 };
 Chat.prototype.show_notification = function(user, message,permission)
 {
@@ -699,7 +700,7 @@ Chat.prototype.show_notification = function(user, message,permission)
 						}
 	);
 		
-	setTimeout(function(){instance.cancel();}, '5000');
+	setTimeout(function(){instance.close();}, '5000');
 		
 	instance.onclick = function () 
 	{
