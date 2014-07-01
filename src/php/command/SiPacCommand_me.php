@@ -32,7 +32,7 @@ class SiPacCommand_me implements SiPacCommand
 			$message = $random_sentences[mt_rand(0, count($random_sentences) - 1)];
 		}
 		
-		$this->chat->send_message("*[user]".$this->chat->nickname."[/user] ".$message, $this->chat->channel->active, 1);
+		$this->chat->message->send("*[user]".$this->chat->nickname."[/user] ".$message, $this->chat->channel->active, 1);
 	}
 }
 

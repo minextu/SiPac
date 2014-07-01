@@ -58,6 +58,9 @@ function return_default_settings()
 	),
 	"show_private_message_link" => true,
 	
+	"disabled_client_proxies" => array(),
+	"disabled_server_proxies" => array(),
+	
 	"custom_commands" => array(),
 	"custom_client_proxies" => array(),
 	"custom_server_proxies" => array(),
@@ -76,7 +79,12 @@ function return_default_settings()
 	"can_rename_others" => true,
 	"can_invite" => true,
 	"can_force_invite" => true,
+	
+	"spam_max_count" => 6,
+	"spam_count_interval" => 2,
+	
 	"can_see_ip" => false,
+	
 	"user_infos" => array(
 	),
 	"use_cache" => true,

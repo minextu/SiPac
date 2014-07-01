@@ -135,7 +135,7 @@ class SiPac_User
 		if ($add_notify)
 		{
 			//send a message, that this user jas joined the channel
-			$this->chat->send_message("<||user-join-notification|".$this->nickname. "||>", $this->channel, 1, 0);
+			$this->chat->message->send("<||user-join-notification|".$this->nickname. "||>", $this->channel, 1, 0);
 		}
 	}
 

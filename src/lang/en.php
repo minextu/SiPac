@@ -27,6 +27,7 @@ $chat_text = array(
 "kick-user"=>"Kick %1",
 "private-message-head" => "Message",
 "send-private-message-text" => "Send a private message",
+"private-message-prompt-text" => "Private message",
 
 /* Notifications */
 "rename-notification" => "[user]%1[/user] is now [user]%2[/user]",
@@ -68,6 +69,10 @@ $chat_text = array(
 "error-head" => "Error:",
 "warning-head" => "Warning:",
 "success-head" => "Success:",	
+
+/* Desktop Notifications */
+"desktop-notifications-enabled-head" => "Success",
+"desktop-notifications-enabled-text" => "Desktop Notifications are now enabled",
 
 /* Log */
 "log-message" => "Message",

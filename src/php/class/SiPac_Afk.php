@@ -55,7 +55,7 @@ class SiPac_Afk
 				if ($this->chat->settings->get('deactivate_afk') == false)
 				{
 					if ($this->status == false)
-						$this->chat->send_message("<||user-now-not-afk-notification|".$this->chat->nickname."||>", $channel, 1);
+						$this->chat->message->send("<||user-now-not-afk-notification|".$this->chat->nickname."||>", $channel, 1);
 					else
 					{
 						if (empty($reason))
@@ -63,7 +63,7 @@ class SiPac_Afk
 						else
 							$afk_text = "<||user-now-afk-notification|".$this->chat->nickname."|".$reason."||>";
 							
-						$this->chat->send_message($afk_text, $channel, 1);
+						$this->chat->message->send($afk_text, $channel, 1);
 					}
 				}
 			}

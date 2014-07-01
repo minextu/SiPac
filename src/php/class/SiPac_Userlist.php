@@ -77,7 +77,7 @@ class SiPac_Userlist
 						//delete the user
 						$this->chat->db->delete_user($user['name'], $user['channel'], $this->chat->id);
 						//save a message, that the user has left
-						$this->chat->send_message("<||user-left-notification|".$user['name']. "||>", $user['channel'], 1, 0, $user['online']);
+						$this->chat->message->send("<||user-left-notification|".$user['name']. "||>", $user['channel'], 1, 0, $user['online']);
 					}
 				}
 			}

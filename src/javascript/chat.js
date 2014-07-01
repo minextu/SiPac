@@ -678,6 +678,7 @@ Chat.prototype.enable_notifications = function()
 			chat.notifications_enabled = true;
 			if (typeof chat.layout_notification_status != "undefined")
 				chat.layout_notification_status(true);
+			chat.show_notification(chat.texts['desktop-notifications-enabled-head'],chat.texts['desktop-notifications-enabled-text']);
 		}
 		else
 		{
@@ -807,22 +808,10 @@ Chat.prototype.kick_user = function(user)
 }
 
 Chat.prototype.msg_user = function(user)
-{			//Reason for the Kick:																																		kick user
-   var message = prompt("Message:");
+{
+	var message = prompt(this.texts['private-message-prompt-text']);
    if (message != null)
 	this.insert_command("msg " + user + " " + message, true);
-}
-
-Chat.prototype.sound_status = function(status)
-{
-  if (this.enable_sound == false && status == undefined || status == true)
-  {
-    this.enable_sound = true;
-  }
-  else
-  {
-    this.enable_sound = false;
-  }
 };
 
 Chat.prototype.check_return = function (e)

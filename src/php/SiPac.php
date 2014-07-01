@@ -18,7 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-$SiPac_version = "0.0.4-git (alpha4)";
+$SiPac_version = "0.0.4-git (alpha5)";
 
 //initiate the session, if not already started
 if (strlen(session_id()) < 1)
@@ -130,14 +130,14 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 							//decode the message
 							$message = urldecode($message);
 							// save the message and keep the answer of the save_message function (it could contain notifications)
-							$send_answer = array_merge($send_answer, $SiPac->send_message($message, $chat_variables['active_channel']));
+							$send_answer = array_merge($send_answer, $SiPac->message->send($message, $chat_variables['active_channel']));
 						}
 						//merge the json array with the send_answer array
 						$tmp_json_answer = array_merge($send_answer, $tmp_json_answer);
 					}
 	  
 					//get all new posts since the last request and save them in the var tmp json_answer
-					$tmp_json_answer['get'] = array_merge($tmp_json_answer['get'], $SiPac->get_posts($chat_variables['last_id']));
+					$tmp_json_answer['get'] = array_merge($tmp_json_answer['get'], $SiPac->message->get($chat_variables['last_id']));
 	  
 					$check_changes['get'] = $SiPac->check_changes();
 	  

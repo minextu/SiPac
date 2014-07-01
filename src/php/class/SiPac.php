@@ -137,10 +137,12 @@ class SiPac_Chat
 		
 		$this->language = new SiPac_Language($this->settings);
 		$this->language->load();
-
+		
+		$this->message= new SiPac_Message($this);
+		
 		$this->command = new SiPac_Command($this);
 		$this->proxy = new SiPac_Proxy($this);
-		
+
 		$this->layout = new SiPac_Layout($this);
 		$this->layout->load();
 		
@@ -157,140 +159,23 @@ class SiPac_Chat
 		unset($_SESSION['SiPac'][$this->id]['kick']);
 	}
 	
-	public function get_posts($last_id)
+	public function handle_userlist()
 	{
-		//load all posts
-		$db_response = $this->db->get_posts($this->id, $this->channel->ids);
+		$this->userlist = new SiPac_Userlist($this);
 
-		$new_posts = array();
-		$new_post_users = array();
-		$new_post_messages = array();
+		//delete all old user
+		$this->userlist->delete_old_users();
 
-		$updated_last_id = $last_id;
+		//save the user in the db
+		$this->userlist->save_user();
 
-		foreach ($db_response as $post)
-		{
-			//check if the post is new
-			if ($post['id'] > $last_id OR in_array($post['channel'], $this->channel->new))
-			{
-				$post_array = array("message"=>$post['message'], "type"=>$post['type'], "channel"=>$post['channel'],"user"=>$post['user'],"time"=>$post['time'], "style" => $post['style']);
-				$post_array = $this->proxy->check($post_array, "client");
-				
-				$post_user_name = $post_array['user'];
-				if ($post_array['type'] == 0) //normal post
-				{
-					$post_user = $post_array['user'];
-			
-					if ($post_array['user'] == $this->nickname)
-						$post_type = "own";
-					else
-						$post_type = "others";
-				}
-				else if ($post_array['type'] == 1) //notify
-				{
-					$post_user = "";
-					$post_type = "notify";
-					$post_array['message'] = $this->language->translate($post_array['message']);
-					
-					if (isset($this->layout->arr['notify_user']))
-						$post_array['message'] =   preg_replace('#\[user\](.*)\[/user\]#isU', str_replace("!!USER!!", "$1", $this->layout->arr['notify_user']), $post_array['message']);
-					else
-						$post_array['message'] =   preg_replace('#\[user\](.*)\[/user\]#isU', "$1", $post_array['message']);
-				}
-			
-				if ($post_type == "notify")
-					$post_html = $this->layout->arr['notify_html'];
-				else
-					$post_html = $this->layout->arr['post_html'];
-					
-				$post_html = str_replace("!!USER!!", $post_user, $post_html);
-				$post_html = str_replace("!!MESSAGE!!", $post_array['message'], $post_html);
-				$post_html = str_replace("!!TYPE!!", $post_type, $post_html);
-				
-				$message_style = explode("|||", $post_array['style']);
-				$color = $message_style[0];
-				
-				$post_html = str_replace("!!USER_COLOR!!", $color, $post_html);
-				
-				if ($this->settings->get('time_24_hours'))
-					$date = date("H:i", $post_array['time']);
-				else
-					$date = date("h:i A", $post_array['time']);
-				
-				if (date("d.m.Y", $post_array['time']) != date("d.m.Y", time()))
-					$date = date($this->settings->get('date_format'), $post_array['time']). " " . $date;
-				
-				$post_html = str_replace("!!TIME!!", $date, $post_html);
-				
-				
-				$new_posts[$post_array['channel']][] = $post_html;
-				$new_post_users[$post_array['channel']][] = $post_user_name;
-				$new_post_messages[$post_array['channel']][] = $post_array['message'];
-			}
-			//save the highest id
-			$updated_last_id = $post['id'];
-		}
-		
-		$last_id = $updated_last_id;
-		//return all new posts and the highest id
-		return array('posts' => $new_posts, 'post_users' => $new_post_users, 'post_messages' => $new_post_messages, 'last_id' => $last_id, 'username' => $this->nickname);
+		//get other users
+		$userlist_answer = $this->userlist->get_users();
+
+		$userlist_array = $userlist_answer;
+
+		return $userlist_array;
 	}
-	public function send_message($message, $channel, $type = 0, $user = 0, $time = 0)
-	{
-		//remove uneeded space
-		$message = trim($message);
-		
-		if ($type == 0)
-			$message =  htmlspecialchars($message);
-			
-		if (empty($user))
-			$user = $this->nickname;
-	
-		if (empty($time))
-			$time = time();
-		
-		if (!empty($message))
-		{
-			$command_return = $this->command->check($message) ;
-			if ($command_return !== false)
-			{
-				return $command_return;
-			}
-			else
-			{
-				$message_style = $this->settings->get('user_color')."|||";
-				
-				$post_array = array("message"=>$message, "type"=>$type, "channel"=>$channel,"user"=>$user, "style" => $message_style, "time"=>$time);
-				$post_array = $this->proxy->check($post_array, "server");
-				
-				$db_response = $this->db->save_post($post_array['message'], $this->id, $post_array['channel'], $post_array['type'], $post_array['user'], $post_array['style'], $post_array['time']);
-				if ($db_response !== true)
-					return array('info_type' => "error", 'info_text' => $db_response);
-				else
-					return array();
-			}
-		}
-		else
-			return array('info_type' => "error", 'info_text' => $this->language->translate("<||message-empty-text||>"));
-	}
-
-public function handle_userlist()
-{
-	$this->userlist = new SiPac_Userlist($this);
-
-	//delete all old user
-	$this->userlist->delete_old_users();
-
-	//save the user in the db
-	$this->userlist->save_user();
-
-	//get other users
-	$userlist_answer = $this->userlist->get_users();
-
-	$userlist_array = $userlist_answer;
-
-	return $userlist_array;
-}
 	public function get_tasks()
 	{
 		$array = array();
@@ -306,7 +191,10 @@ public function handle_userlist()
 				if ($task_parts[0] == "new_name")
 					$this->new_nickname = $task_parts[1];
 				else if ($task_parts[0] == "join")
+				{
 					$array['tasks'][] = $user_info['task'];
+					$_SESSION['SiPac'][$this->id]['channel_titles'][$task_parts[1]] = $task_parts[2];
+				}
 				else if ($task_parts[0] == "invite")
 					$array['tasks'][] = $user_info['task'];
 				else if ($task_parts[0] == "kick")
@@ -315,19 +203,14 @@ public function handle_userlist()
 					if (!empty($task_parts[1]))
 					{
 						$notification_text = "<||user-kicked-user-notification|".$user_info['name']."|".$task_parts[1]."|".$task_parts[2]."||>";
-						$_SESSION['SiPac'][$this->id]['kick'] = "<||you-were-kicked-by-user-text|".$task_parts[1]."|".$task_parts[2]."||>";
+						$client_text = "<||you-were-kicked-by-user-text|".$task_parts[1]."|".$task_parts[2]."||>";
 					}
 					else
 					{
 						$notification_text = "<||user-kicked-notification|".$user_info['name']."|".$task_parts[2]."||>";
-						$_SESSION['SiPac'][$this->id]['kick'] = "<||you-were-kicked-text|".$task_parts[2]."||>";
+						$client_text = "<||you-were-kicked-text|".$task_parts[2]."||>";
 					}
-					
-					foreach ($this->channel->ids as $channel)
-					{
-						$this->send_message("<||user-kicked-notification|".$user_info['name']."|".$task_parts[2]."||>", $channel, 1);
-						$this->db->delete_user($user_info['name'], $channel, $this->id);
-					}
+					$this->kick($client_text, $notification_text);
 				}
 				/*
 				else if ($action_parts[0] == "message")
@@ -339,6 +222,16 @@ public function handle_userlist()
 			}
 		}
 		return $array;
+	}
+	
+	public function kick($client_text, $notification_text)
+	{
+		$_SESSION['SiPac'][$this->id]['kick'] = $client_text;
+		foreach ($this->channel->ids as $channel)
+		{
+				$this->message->send($notification_text, $channel, 1);
+				$this->db->delete_user($this->nickname, $channel, $this->id);
+		}
 	}
 	
 	private function check_kick()
@@ -376,7 +269,7 @@ public function handle_userlist()
 		{
 			foreach($this->channel->ids as $channel)
 			{
-					$this->send_message("<||rename-notification|".$_SESSION['SiPac'][$this->id]['nickname']." |".$this->nickname."||>", $channel, 1, 0);
+					$this->message->send("<||rename-notification|".$_SESSION['SiPac'][$this->id]['nickname']." |".$this->nickname."||>", $channel, 1, 0);
 					$this->db->delete_user($_SESSION['SiPac'][$this->id]['nickname'], $channel, $this->id);
 					
 					//add new user
@@ -393,8 +286,5 @@ public function handle_userlist()
 		$this->db->update_nickname($this->nickname);
 	}
 }
-
-
-
 
 ?>

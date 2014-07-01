@@ -21,7 +21,7 @@ class SiPac_Channel
 { 
 	private $chat;
 	
-	public $arr;
+	public $list;
 	public $ids;
 	public $new = array();
 	public $active;
@@ -37,12 +37,12 @@ class SiPac_Channel
 		{
 			if ($is_id == true)
 			{
-				$this->arr[] = $this->create_array($channel, true);
+				$this->list[] = $this->create_array($channel, true);
 				$this->ids[] = $channel;
 			}
 			else
 			{
-				$this->arr[] = $this->create_array($channel);
+				$this->list[] = $this->create_array($channel);
 				$this->ids[] = $this->encode($channel);
 			}
 		}
@@ -53,15 +53,19 @@ class SiPac_Channel
 	}
 	public function decode($channel)
 	{
-		return base64_decode($channel);
+		if (!empty($_SESSION['SiPac'][$this->chat->id]['channel_titles'][$channel]))
+			$title =  $_SESSION['SiPac'][$this->chat->id]['channel_titles'][$channel];
+		else
+			$title = base64_decode($channel);
+		return $title;
 	}
 	public function get_name($channel_id)
 	{
-		return $this->arr[array_search($channel_id, $this->ids)]['title'];
+		return $this->list[array_search($channel_id, $this->ids)]['title'];
 	}
 	public function get_id($channel_title)
 	{
-		foreach ($this->arr as $channel)
+		foreach ($this->list as $channel)
 		{
 			if ($channel['title'] == $channel_title)
 				return $channel['id'];
@@ -70,7 +74,10 @@ class SiPac_Channel
 	public function create_array($channel, $is_id=false)
 	{
 		if ($is_id == true)
-			return  array("title" =>utf8_decode($this->decode($channel)), "id" => $channel);
+		{
+			$title = utf8_decode($this->decode($channel));
+			return  array("title" => $title, "id" => $channel);
+		}
 		else
 			return array("title" => $channel, "id" => $this->encode($channel));
 	}
@@ -78,7 +85,7 @@ class SiPac_Channel
 	{
 		if (isset($_SESSION['SiPac'][$this->chat->id]['old_channels']))
 		{
-			foreach ($this->arr as $channel)
+			foreach ($this->list as $channel)
 			{
 				if (!in_array($channel, $_SESSION['SiPac'][$this->chat->id]['old_channels']))
 				{
@@ -91,7 +98,7 @@ class SiPac_Channel
 			}
 		}
 	
-		$_SESSION['SiPac'][$this->chat->id]['old_channels'] = $this->arr;
+		$_SESSION['SiPac'][$this->chat->id]['old_channels'] = $this->list;
 	}
 	public function restore_old()
 	{
@@ -100,9 +107,9 @@ class SiPac_Channel
 		{
 			foreach ($_SESSION['SiPac'][$this->chat->id]['old_channels'] as $channel)
 			{
-				if (array_search($channel, $this->arr) === false AND $this->chat->settings->get('can_join_channels') == true)
+				if (array_search($channel, $this->list) === false AND $this->chat->settings->get('can_join_channels') == true)
 				{
-					$this->arr[] = $channel;
+					$this->list[] = $channel;
 				}	
 			}
 		}

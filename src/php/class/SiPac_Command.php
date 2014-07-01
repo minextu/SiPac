@@ -37,26 +37,25 @@ class SiPac_Command
 				$command_parameters =  $command_parts[1];
 			else
 				$command_parameters = "";
-	  
-			$command_class = "SiPacCommand_".$command_name;
-			$command_path = dirname(__FILE__) ."/../command/".$command_class.".php";
-			if (file_exists($command_path))
-			{
-				include_once($command_path);
-				if (class_exists($command_class))
-				{
-					$command = new $command_class;
-					return $this->execute($command, $command_parameters);
-				}
-				else
-					return array("info_type"=>"error", "info_text" => 'Classname is not "'.$command_class.'"');
-			}
+			
+			$command_return = $this->check_custom_command($command_name, $command_parameters);
+			if ($command_return !== false)
+				return $command_return;
 			else
 			{
-				$command_return = $this->check_custom_command($command_name, $command_parts);
-				
-				if ($command_return !== false)
-					return $command_return;
+				$command_class = "SiPacCommand_".$command_name;
+				$command_path = dirname(__FILE__) ."/../command/".$command_class.".php";
+				if (file_exists($command_path))
+				{
+					include_once($command_path);
+					if (class_exists($command_class))
+					{
+						$command = new $command_class;
+						return $this->execute($command, $command_parameters);
+					}
+					else
+						return array("info_type"=>"error", "info_text" => 'Classname is not "'.$command_class.'"');
+				}
 				else
 					return array("info_type"=>"warn", "info_text" => $this->chat->language->translate("<||command-not-found-text|".$command_name."||>"));
 			}
@@ -74,7 +73,7 @@ class SiPac_Command
 			{
 				include_once($command_path);
 				$command = new $command_class;
-				return $this->execute_command($command, $command_parameters);
+				return $this->execute($command, $command_parameters);
 			}
 			else
 				die($command_class." doesn't exist!");

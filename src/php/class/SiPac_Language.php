@@ -21,29 +21,37 @@
 class SiPac_Language
 {
 	public $text;
+	public $default_language;
 	private $settings;
 	
 	public function __construct($settings)
 	{
 		$this->settings = $settings;
+		$this->default_language = $this->settings->get('language');
 	}
 	
 	public function load()
 	{
+		$this->text = $this->get_language($this->default_language);
+	}
+	
+	private function get_language($language)
+	{
 		$language_path = dirname(__FILE__)."/../../lang/";
-    
+		
 		global $chat_text;
-		(@include_once ($language_path.$this->settings->get('language').".php")) OR die("Invalid Language");
-    
-		foreach ($chat_text as $key => $text)
-		{
-			$this->text[$key] = $text;
-		}
-    
+		(@include_once ($language_path.$language.".php")) OR die("Invalid Language");
+		
+		return $chat_text;
 	}
   
-	public function translate($text)
+	public function translate($text, $language=false)
 	{
+		if ($language == false OR $language == $this->default_language)
+			$language_text = $this->text;
+		else
+			$language_text = $this->get_language($language);
+			
 		preg_match_all('#<\|\|(.*)\|\|>#isU', $text, $matches, PREG_SET_ORDER);
     
     
@@ -57,9 +65,9 @@ class SiPac_Language
 			else
 				$translation_key = $match[1];
 	
-			if (isset($this->text[$translation_key]))
+			if (isset($language_text[$translation_key]))
 			{
-				$translation = $this->text[$translation_key];
+				$translation = $language_text[$translation_key];
 	
 				if (isset($parts))
 				{
@@ -83,6 +91,6 @@ class SiPac_Language
 			unset($parts);
 		}
    
-		return $text;
+   return $text.$language;
 	}
 }

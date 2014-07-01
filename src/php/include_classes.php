@@ -26,6 +26,7 @@ require_once("class/SiPac_Userlist.php");
 require_once("class/SiPac_Channel.php");
 require_once("class/SiPac_Command.php");
 require_once("class/SiPac_Proxy.php");
+require_once("class/SiPac_Message.php");
 require_once("class/SiPac_Language.php");
 require_once("class/SiPac_Afk.php");
 require_once("class/SiPac_Layout.php");

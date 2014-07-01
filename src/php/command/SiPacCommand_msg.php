@@ -45,7 +45,7 @@ class SiPacCommand_msg implements SiPacCommand
 			{	
 				$join_return = $this->chat->db->add_task("join|".$channel_id."|".$channel_name_self, $this->chat->nickname, $this->chat->channel->active, $this->chat->id);
 				if ($message !== false)
-					$this->chat->send_message($message, $channel_id);
+					$this->chat->message->send($message, $channel_id);
 			}
 		}
 		else
