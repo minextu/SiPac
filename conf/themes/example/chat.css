@@ -1,0 +1,95 @@
+##CHAT_MAIN##
+{
+		height: 100%;
+		font-size: 20px;
+		overflow: auto;
+}
+##CHAT_MAIN## .chat_channels_nav
+{
+	height: 5%;	
+	display: block;
+	font-size: 15px;
+}
+##CHAT_MAIN## .chat_channels_ul
+{
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px;
+}
+##CHAT_MAIN## .chat_channels_ul li, ##CHAT_MAIN## .chat_add_channel
+{
+	float: left;
+	background: orange;
+	padding: 5px;
+	margin-right: 10px;
+}
+##CHAT_MAIN## .chat_channels_ul .chat_channel_selected
+{
+	background: yellow;
+}
+##CHAT_MAIN## .chat_channels_ul li .chat_channel_close
+{
+	color: red;
+	margin-left: 10px;
+}
+##CHAT_MAIN## .chat_conversation
+{
+	float: left;
+	width: 70%;
+	height: 80%;
+	overflow: auto;
+	background: blue;
+}
+##CHAT_MAIN## .chat_conversation .chat_entry_notify, ##CHAT_MAIN## .chat_conversation .chat_entry_own, ##CHAT_MAIN## .chat_conversation .chat_entry_others
+{
+	background: gray;
+	margin-top: 2px;
+}
+##CHAT_MAIN## .chat_entry_date
+{
+	float: right;
+}
+##CHAT_MAIN## .chat_userlist
+{
+	float: right;
+	width: 30%;
+	height: 90%;
+	overflow: auto;
+	background: red;
+}
+##CHAT_MAIN## .chat_userlist .chat_user
+{
+	background: gray;
+	padding: 5px;
+	margin-bottom: 5px;
+}
+##CHAT_MAIN## .chat_user_input
+{
+	float: left;
+	height: 10%;
+	width: 70%;
+	background: yellow;
+}
+##CHAT_MAIN## .chat_user_input .chat_notice_msg
+{
+	background: lightgray;
+}
+##CHAT_MAIN## .chat_user_input .chat_notice_msg .close_chat_information
+{
+	float: right;
+	position: relative;
+	top: -20px;
+}
+
+##CHAT_MAIN## .chat_user_input .chat_message
+{
+	width: 80%;
+	padding: 0px;
+	margin: 0px;
+}
+##CHAT_MAIN## .chat_user_input .chat_send_button
+{
+	width: 10%;
+	padding: 0px;
+	margin: 0px;
+}
