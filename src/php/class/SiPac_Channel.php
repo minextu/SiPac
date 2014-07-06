@@ -19,16 +19,19 @@
  */
 class SiPac_Channel
 { 
-	private $chat;
+	private $id;
+	private $settings;
+	
 	
 	public $list;
 	public $ids;
 	public $new = array();
 	public $active;
 	
-	public function __construct($chat)
+	public function __construct($id, $settings)
 	{
-		$this->chat = $chat;
+		$this->id = $id;
+		$this->settings = $settings;
 	}
 	
 	public function add($channels, $is_id=false)
@@ -53,8 +56,8 @@ class SiPac_Channel
 	}
 	public function decode($channel)
 	{
-		if (!empty($_SESSION['SiPac'][$this->chat->id]['channel_titles'][$channel]))
-			$title =  $_SESSION['SiPac'][$this->chat->id]['channel_titles'][$channel];
+		if (!empty($_SESSION['SiPac'][$this->id]['channel_titles'][$channel]))
+			$title =  $_SESSION['SiPac'][$this->id]['channel_titles'][$channel];
 		else
 			$title = base64_decode($channel);
 		return $title;
@@ -83,13 +86,13 @@ class SiPac_Channel
 	}
 	public function check()
 	{
-		if (isset($_SESSION['SiPac'][$this->chat->id]['old_channels']))
+		if (isset($_SESSION['SiPac'][$this->id]['old_channels']))
 		{
 			foreach ($this->list as $channel)
 			{
-				if (!in_array($channel, $_SESSION['SiPac'][$this->chat->id]['old_channels']))
+				if (!in_array($channel, $_SESSION['SiPac'][$this->id]['old_channels']))
 				{
-					if ($this->chat->settings->get('can_join_channels') == false AND array_search($channel['title'], $this->chat->settings->get('channels')) === false)
+					if ($this->settings->get('can_join_channels') == false AND array_search($channel['title'], $this->settings->get('channels')) === false)
 					{
 						DIE("You are not allowed to join this channel!");
 					}
@@ -98,16 +101,16 @@ class SiPac_Channel
 			}
 		}
 	
-		$_SESSION['SiPac'][$this->chat->id]['old_channels'] = $this->list;
+		$_SESSION['SiPac'][$this->id]['old_channels'] = $this->list;
 	}
 	public function restore_old()
 	{
 		//restore old channels
-		if (isset($_SESSION['SiPac'][$this->chat->id]['old_channels'] ))
+		if (isset($_SESSION['SiPac'][$this->id]['old_channels'] ))
 		{
-			foreach ($_SESSION['SiPac'][$this->chat->id]['old_channels'] as $channel)
+			foreach ($_SESSION['SiPac'][$this->id]['old_channels'] as $channel)
 			{
-				if (array_search($channel, $this->list) === false AND $this->chat->settings->get('can_join_channels') == true)
+				if (array_search($channel, $this->list) === false AND $this->settings->get('can_join_channels') == true)
 				{
 					$this->list[] = $channel;
 				}	

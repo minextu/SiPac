@@ -93,21 +93,21 @@ class SiPac_MySQL
 		else
 			return mysqli_query($this->link, $sql);
 	}
-	private function fetch_assoc($mysql)
+	public function fetch_assoc($mysql)
 	{
 		if ($this->plugin == "mysql")
 			return mysql_fetch_assoc($mysql);
 		else
 			return mysqli_fetch_assoc($mysql);
 	}
-	private function fetch_object($mysql)
+	public function fetch_object($mysql)
 	{
 		if ($this->plugin == "mysql")
 			return mysql_fetch_object($mysql);
 		else
 			return mysqli_fetch_object($mysql);
 	}
-	private function num_rows($mysql)
+	public function num_rows($mysql)
 	{
 		if ($this->plugin == "mysql")
 			return mysql_num_rows($mysql);
@@ -115,7 +115,7 @@ class SiPac_MySQL
 			return mysqli_num_rows($mysql);
 	}
 
-	private function escape_string($string)
+	public function escape_string($string)
 	{
 		$this->connect();
 		
@@ -125,7 +125,7 @@ class SiPac_MySQL
 			return mysqli_real_escape_string($this->link, $string);
 	}
 
-	private function error()
+	public function error()
 	{
 		if ($this->plugin == "mysql")
 			return mysql_error();
@@ -145,9 +145,9 @@ class SiPac_MySQL
 		$dbExists = (bool) $row->exists;
 		return $dbExists;
 	}
-	public function get_posts($chat_id, $channels)
+	public function get_posts($chat_id, $channels, $min_id=0)
 	{
-		$chat_mysql = $this->query("SELECT * FROM sipac_entries WHERE chat_id LIKE '".$this->escape_string($chat_id)."' ORDER BY id ASC");
+		$chat_mysql = $this->query("SELECT * FROM sipac_entries WHERE chat_id LIKE '".$this->escape_string($chat_id)."' AND id > $min_id ORDER BY id ASC");
 
 		$posts = array();
 

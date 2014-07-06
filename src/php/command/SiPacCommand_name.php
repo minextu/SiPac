@@ -25,7 +25,11 @@ class SiPacCommand_name implements SiPacCommand
 		if (empty($parameter_parts[1]))
 			$user = $this->chat->nickname;
 		else if ($this->chat->settings->get('can_rename_others') == true)
+		{
 			$user = $parameter_parts[1];
+			if (substr($user, 0, 1) == "@")
+				$user = substr($user, 1);
+		}
 		else
 		{
 			return array("info_type"=>"error", "info_text"=>"<||no-permissons-rename-other-user||>");

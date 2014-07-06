@@ -52,11 +52,11 @@ window.chat_stop = function()
 	delete SiPacHttpRequest;
 }
 
-function add_chat(html_path, theme, id, client_num, channels,channel_titles, texts, layout)
+function add_chat(html_path, theme_path, id, client_num, channels,channel_titles, texts, layout)
 {
   chat_html_path = html_path;
   chat_objects_id[id] = chat_objects.length;
-  chat_objects[chat_objects.length] = new Chat(theme, id, client_num, channels,channel_titles, texts, layout);
+  chat_objects[chat_objects.length] = new Chat(theme_path, id, client_num, channels,channel_titles, texts, layout);
 }
 
 function chat_ajax()
@@ -196,11 +196,11 @@ function chat_error(error, clear)
   }
 }
 
-function Chat(theme, id, client_num, channels, channel_titles, texts, layout)
+function Chat(theme_path, id, client_num, channels, channel_titles, texts, layout)
 {
   this.chat = document.getElementById(id);
   this.num = chat_objects.length;
-  this.theme = theme;
+  this.theme_path = theme_path;
   this.layout_array  = layout;
   this.id = id;
   this.client_num = client_num;
@@ -234,12 +234,12 @@ function Chat(theme, id, client_num, channels, channel_titles, texts, layout)
   if (this.new_post_audio.canPlayType('audio/x-wav'))
   {
     this.new_post_audio.type = 'audio/x-wav';
-    this.new_post_audio.src = chat_html_path + "themes/" + this.theme + "/sound/new_post.wav";
+    this.new_post_audio.src = this.theme_path + "/sound/new_post.wav";
   }
   else
   {
     this.new_post_audio.type = 'audio/mpeg';
-    this.new_post_audio.src = chat_html_path + "themes/" + this.theme + "/sound/new_post.mp3";
+    this.new_post_audio.src = this.theme_path + "/sound/new_post.mp3";
   }
 }
 Chat.prototype.init = function()
@@ -533,7 +533,8 @@ Chat.prototype.change_channel = function (channel)
 	this.chat.getElementsByClassName("chat_userlist_channel_" + this.active_channel)[0].style.display = "none";
 	}catch(e){}
 	
-	document.getElementById(this.id + "_channel_" + channel).className = "chat_channel_selected";
+	try{
+	document.getElementById(this.id + "_channel_" + channel).className = "chat_channel_selected";}catch(e){}
 	
 	this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].style.display = "block";
 	this.chat.getElementsByClassName("chat_userlist_channel_" + channel)[0].style.display = "block";
@@ -635,18 +636,18 @@ Chat.prototype.information = function (info, type, nohide, onlyhide, noclose)
       info_msg_element_sub.className = "chat_notice_info";
 
     if (noclose != true)
-      info = "<span class='close_chat_information'><a href='#' onclick='chat_objects[" + this.num + "].information(undefined, undefined, undefined, true)'><img src='" + chat_html_path + "themes/" + this.theme + "/icons/delete.png' alt='(close)' title='close'></a></span>" + info;
+	    info = "<span class='close_chat_information'><a href='#' onclick='chat_objects[" + this.num + "].information(undefined, undefined, undefined, true)'><img src='" + this.theme_path + "/icons/delete.png' alt='(close)' title='close'></a></span>" + info;
 
     info = "<br>" + info;
 
     if (type == "info")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/information.png' alt='I'> " + this.texts['info-head'] + info; //Info:
+	    info = "<img src='" + this.theme_path + "/icons/information.png' alt='I'> " + this.texts['info-head'] + info; //Info:
     else if (type == "error")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/exclamation.png' alt='I'> " + this.texts['error-head'] + info; //Error:
+	    info = "<img src='" + this.theme_path + "/icons/exclamation.png' alt='I'> " + this.texts['error-head'] + info; //Error:
     else if (type == "warn")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/error.png' alt='I'> " + this.texts['warning-head'] + info; //Warning: 
+	    info = "<img src='" + this.theme_path + "/icons/error.png' alt='I'> " + this.texts['warning-head'] + info; //Warning: 
     else if (type == "success")
-      info = "<img src='" + chat_html_path + "themes/" + this.theme + "/icons/check.png' alt='I'> " + this.texts['success-head'] + info; //Success:
+	    info = "<img src='" + this.theme_path + "/icons/check.png' alt='I'> " + this.texts['success-head'] + info; //Success:
 
     info_msg_element_sub.innerHTML = info;
     var chat_num = this.num;

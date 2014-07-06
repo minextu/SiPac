@@ -35,32 +35,19 @@ class SiPac_User
 
 		$this->chat = $chat;
 		$this->chat_num = $chat->chat_num;
-		$this->layout = $this->chat->layout->arr;
+		$this->theme = $this->chat->layout->theme;
 		$this->settings = $this->chat->settings;
 		$this->db = $this->chat->db;
 	}
 
 	public function generate_html()
 	{
-		$user_html = $this->layout['user_html'];
-		$user_html = str_replace("!!USER!!", $this->nickname, $user_html);
-
 		if ($this->afk == 0)
 			$user_status = "<||online-status-text||>";
 		else
 			$user_status = "<||afk-status-text||>";
 
-		$user_html = str_replace("!!USER_STATUS!!", $user_status, $user_html);
-		if ($this->afk == 0)
-			$user_afk = "online";
-		else
-			$user_afk = "afk";
-			
-		$user_html = str_replace("!!USER_AFK!!", $user_afk, $user_html);
-		$user_html = str_replace("!!NUM!!", $this->chat_num, $user_html);
-		$user_html = str_replace("!!USER_ID!!", "user_".$this->id, $user_html);
-		$user_html = str_replace("!!USER_INFO!!", $this->generate_user_info(), $user_html);
-		$user_html = str_replace("!!USER_COLOR!!", $this->color, $user_html);
+		$user_html = $this->theme->get_userlist_entry($this->nickname, $user_status,  $this->generate_user_info(), $this->color, $this->id);
 
 		return $user_html;
 	}
@@ -83,7 +70,8 @@ class SiPac_User
 				if (!empty($info))
 				{
 					$info_parts = explode("||", $info);
-					$user_info_tmp[$info_parts[0]] = $info_parts[1];
+					if (isset($info_parts[1]))
+						$user_info_tmp[$info_parts[0]] = $info_parts[1];
 				}
 			}
 		}
@@ -91,8 +79,8 @@ class SiPac_User
 		$user_info = "";
 		foreach ($user_info_tmp as $info_head => $info)
 		{
-		//user dropdown infos
-		$user_info = $user_info .str_replace("!!INFO_HEAD!!", $info_head, str_replace("!!INFO!!", $info, $this->layout['user_info_entry']));
+			//user dropdown infos
+			$user_info = $user_info.$this->theme->get_user_info($info_head, $info);
 		}
 		return $user_info;
 	}

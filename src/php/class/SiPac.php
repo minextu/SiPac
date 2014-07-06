@@ -40,8 +40,18 @@ class SiPac_Chat
 	//initiate the chat: load settings, check all variables
 	public function init($settings, $is_new, $chat_variables, $channels, $chat_num)
 	{
-		$this->channel = new SiPac_Channel($this);
+		if ($chat_variables == false)
+			$this->id = $settings['chat_id'];
+		else
+			$this->id = $chat_variables['chat_id'];
 		
+		//load all settings for this chat
+		$this->settings = new SiPac_Settings($this->id);
+		$this->settings->load($settings);
+		
+
+		$this->channel = new SiPac_Channel($this->id, $this->settings);
+
 		/*
 		if not already set,
 		generate random id for this tab/window of the client
@@ -50,20 +60,13 @@ class SiPac_Chat
 		if ($chat_variables == false)
 		{
 			$this->client_num = "n" . time() . mt_rand(0, 10000);
-			$this->id = $settings['chat_id'];
 			$this->channel->active = false;
 		}
 		else
 		{
 			$this->client_num = $chat_variables['client_num'];
-			$this->id = $chat_variables['chat_id'];
 			$this->channel->active = $chat_variables['active_channel'];
 		}
-		
-		
-		//load all settings for this chat
-		$this->settings = new SiPac_Settings($this->id);
-		$this->settings->load($settings);
 		
 		//get the correct html path or load a custom
 		$this->html_path = $this->settings->get("html_path");

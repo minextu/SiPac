@@ -91,6 +91,6 @@ class SiPac_Language
 			unset($parts);
 		}
    
-   return $text.$language;
+		return $text;
 	}
 }

@@ -21,6 +21,9 @@ class SiPacCommand_invite implements SiPacCommand
 		if (!empty($parameters[0]))
 		{
 			$user = $parameters[0];
+			if (substr($user, 0, 1) == "@")
+				$user = substr($user, 1);
+				
 			$channel = $this->chat->channel->active;
 			
 			if (isset($parameters[1]) AND $parameters[1] == "true")

@@ -73,8 +73,13 @@ class SiPac_Message
 
 	public function get($last_id)
 	{
+		if (count($this->chat->channel->new) > 0)
+			$min_id = 0;
+		else
+			$min_id = $last_id;
+		
 		//load all posts
-		$db_response = $this->chat->db->get_posts($this->chat->id, $this->chat->channel->ids);
+		$db_response = $this->chat->db->get_posts($this->chat->id, $this->chat->channel->ids, $min_id);
 		
 		$new_posts = array();
 		$new_post_users = array();
@@ -106,25 +111,13 @@ class SiPac_Message
 					$post_type = "notify";
 					$post_array['message'] = $this->chat->language->translate($post_array['message']);
 					
-					if (isset($this->chat->layout->arr['notify_user']))
-						$post_array['message'] =   preg_replace('#\[user\](.*)\[/user\]#isU', str_replace("!!USER!!", "$1", $this->chat->layout->arr['notify_user']), $post_array['message']);
-					else
-						$post_array['message'] =   preg_replace('#\[user\](.*)\[/user\]#isU', "$1", $post_array['message']);
+
+					$post_array['message'] =   preg_replace('#\[user\](.*)\[/user\]#isU', $this->chat->layout->theme->get_nickname("$1"), $post_array['message']);
 				}
 				
-				if ($post_type == "notify")
-					$post_html = $this->chat->layout->arr['notify_html'];
-				else
-					$post_html = $this->chat->layout->arr['post_html'];
-				
-				$post_html = str_replace("!!USER!!", $post_user, $post_html);
-				$post_html = str_replace("!!MESSAGE!!", $post_array['message'], $post_html);
-				$post_html = str_replace("!!TYPE!!", $post_type, $post_html);
 				
 				$message_style = explode("|||", $post_array['style']);
 				$color = $message_style[0];
-				
-				$post_html = str_replace("!!USER_COLOR!!", $color, $post_html);
 				
 				if ($this->chat->settings->get('time_24_hours'))
 					$date = date("H:i", $post_array['time']);
@@ -134,8 +127,8 @@ class SiPac_Message
 				if (date("d.m.Y", $post_array['time']) != date("d.m.Y", time()))
 					$date = date($this->chat->settings->get('date_format'), $post_array['time']). " " . $date;
 				
-				$post_html = str_replace("!!TIME!!", $date, $post_html);
-				
+				$post_html = $this->chat->layout->theme->get_message_entry($post_array['message'], $post_user, $post_type, $color, $date);
+
 				
 				$new_posts[$post_array['channel']][] = $post_html;
 				$new_post_users[$post_array['channel']][] = $post_user_name;

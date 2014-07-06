@@ -21,16 +21,93 @@ class SiPac_Layout
 {
 	private $js_chat;
 	private $html_code;
+	public $settings;
 	private $chat;
 	
 	public $is_mobile = false;
-	public $arr;
+	public $theme;
 	public $cache_folder;
 	
 	public function __construct($chat)
 	{
 		$this->chat = $chat;
 	}
+	
+	public  function load()
+	{
+		$custom_layout_php_path = dirname(__FILE__) . "/../../../conf/themes/".$this->chat->settings->get('theme');
+		$custom_layout_path = $this->chat->html_path."conf/themes/".$this->chat->settings->get("theme");
+		
+		$default_layout_php_path = dirname(__FILE__) . "/../../themes/".$this->chat->settings->get('theme');
+		$default_layout_path = $this->chat->html_path."src/themes/".$this->chat->settings->get("theme");
+		
+		$is_mobile = check_mobile();
+		
+		/*if ($is_mobile && is_dir($layout_php_path))
+			$this->is_mobile = true;*/
+			
+		$theme_class = "SiPacTheme_".$this->chat->settings->get('theme');
+		
+		
+		if ($is_mobile == true AND file_exists($custom_layout_php_path."_mobile/$theme_class.php"))
+		{
+			$this->is_mobile = true;
+			$layout_php_path = $custom_layout_php_path."_mobile";
+			$layout_path = $custom_layout_path."_mobile";
+			require("$layout_php_path/$theme_class.php");
+			$this->theme = new $theme_class();
+		}
+		else if ($is_mobile == true AND file_exists($default_layout_php_path."_mobile/$theme_class.php"))
+		{
+			$this->is_mobile = true;
+			$layout_php_path = $default_layout_php_path."_mobile";
+			$layout_path = $default_layout_path."_mobile";
+			require("$layout_php_path/$theme_class.php");
+			$this->theme = new $theme_class();
+		}
+		else if (file_exists($custom_layout_php_path."/$theme_class.php"))
+		{
+			$layout_php_path = $custom_layout_php_path;
+			$layout_path = $custom_layout_path;
+			require("$layout_php_path/$theme_class.php");
+			$this->theme = new $theme_class();
+		}
+		else if (file_exists($default_layout_php_path."/$theme_class.php"))
+		{
+			$layout_php_path = $default_layout_php_path;
+			$layout_path = $default_layout_path;
+			require("$layout_php_path/$theme_class.php");
+			$this->theme = new $theme_class();
+		}
+		//Check for a deprecated theme
+		else if (dirname(__FILE__) . "/../../../themes/".$this->chat->settings->get('theme')."/layout.php")
+		{
+			$layout_php_path = dirname(__FILE__) . "/../../../themes/".$this->chat->settings->get('theme')."_mobile";
+			$layout_path = $this->chat->html_path."themes/".$this->chat->settings->get("theme")."_mobile";
+			$is_mobile = check_mobile();
+			if ($is_mobile && is_dir($layout_php_path))
+				$this->is_mobile = true;
+			else
+			{
+				$layout_php_path = dirname(__FILE__) . "/../../../themes/".$this->chat->settings->get('theme');
+				$layout_path = $this->chat->html_path."themes/".$this->chat->settings->get("theme");
+			}
+			
+			require(dirname(__FILE__)."/Compatibility/SiPac_Old_Theme_Wrapper.php");
+			$this->theme = new SiPac_Old_Theme_Wrapper();
+			$this->theme->prepare($layout_php_path, $this->chat->settings->get('theme'), $this->chat->chat_num);
+		}
+		else
+			die($layout_php_path."/$theme_class.php not found!");
+		
+		$js_chat = "chat_objects[".$this->chat->chat_num."]";
+		$this->theme->set_variables($layout_path, $js_chat);
+		
+		$this->settings = $this->theme->get_settings();
+		$this->settings['php_path'] = $layout_php_path;
+		$this->settings['html_path'] = $layout_path;
+	}
+	
 	//generate and return the html code for the chat
 	public function draw()
 	{   
@@ -62,8 +139,12 @@ class SiPac_Layout
 	}
 	private function generate_layout_html($css_code=false)
 	{
+		$user_num = "<span class='chat_user_num'>?</span>";
+		$smileys = $this->generate_smileys();
+		
+		
 		//save the html code of the layout
-		$html_code = $this->arr['html'];
+		$html_code = $this->theme->get_layout($user_num, $smileys);
 	
 		//add the chat id to the div with the class 'chat_main'
 		$html_code =str_replace('"chat_main"', '"chat_main" id="' . $this->chat->id . '"', str_replace("'chat_main'", "'chat_main' id='".$this->chat->id."'", $html_code));
@@ -88,22 +169,20 @@ class SiPac_Layout
 			document.getElementById('".$this->chat->id."').appendChild(style_obj);
 			</script>";
 		}
-		$html_code = str_replace("!!NUM!!", $this->chat->chat_num, $html_code);
-		$html_code = str_replace("!!USER_NUM!!", "<span class='chat_user_num'>?</span>", $html_code);
-		$html_code = str_replace("!!SMILEYS!!", $this->generate_smileys(), $html_code);
-
+		
 		return $html_code;
 	}
   
 	private function generate_layout_css()
 	{
-	$css_file = str_replace("\n", " ", file_get_contents($this->arr['path']."/chat.css"));
-	$id_css   = "#".$this->chat->id;
-	
-	$css_files_parts = explode("{", $css_file);
-	$new_css_file = str_replace("##CHAT_MAIN##", $id_css, $css_file);
-	
-	return $new_css_file;
+		$css_file = $this->settings['php_path']."/".$this->settings['css_file'];
+		$css_code = str_replace("\n", " ", file_get_contents($css_file));
+		$id_css   = "#".$this->chat->id;
+		
+		$css_files_parts = explode("{", $css_file);
+		$new_css_file = str_replace("##CHAT_MAIN##", $id_css, $css_code);
+		
+		return $new_css_file;
 	}
   
 	private function generate_js()
@@ -115,8 +194,10 @@ class SiPac_Layout
 			$js_chat = $js_chat."chat_text['$key'] = '".addslashes($text)."';";
 		}
 	
+		$channel_tab = $this->theme->get_channel_tab("!!CHANNEL!!", "!!ID!!", "!!CHANNEL_CHANGE_FUNCTION!!", "!!CHANNEL_CLOSE_FUNCTION!!");
+		
 		$js_chat = $js_chat."var chat_layout = new Array();";
-		$js_chat = $js_chat."chat_layout['channel_tab'] = '".addslashes(trim(str_replace("	", " ", str_replace("\n", " ", $this->arr['channel_tab']))))."';";
+		$js_chat = $js_chat."chat_layout['channel_tab'] = '".addslashes(trim(str_replace("	", " ", str_replace("\n", " ", $channel_tab))))."';";
 	
 		$js_chat = $js_chat."var chat_channels = new Array(";
 		foreach ($this->chat->channel->list as $key => $channel)
@@ -137,16 +218,18 @@ class SiPac_Layout
 		$js_chat = $js_chat.");";
 	
 		/* generate js function arguments, to start the chat*/
-		$js_chat =$js_chat. "add_chat('".$this->chat->html_path."','" . $this->chat->settings->get('theme') . "','".$this->chat->id."', '".$this->chat->client_num."', chat_channels, chat_channel_titles, chat_text, chat_layout";
+		$js_chat =$js_chat. "add_chat('".$this->chat->html_path."','" . $this->settings['html_path'] . "','".$this->chat->id."', '".$this->chat->client_num."', chat_channels, chat_channel_titles, chat_text, chat_layout";
 	
 
 	
 		$js_chat = $js_chat.");";
 		
+		
 		//load all javascript functions of the layout
-		if (!empty($this->arr['javascript_functions']))
+		$javascript_functions = $this->theme->get_js_functions();
+		if (!empty($javascript_functions))
 		{
-			foreach ($this->arr['javascript_functions'] as $name => $function)
+			foreach ($javascript_functions as $name => $function)
 			{
 				$js_chat = $js_chat."chat_objects[chat_objects.length-1].$name = $function;";
 					if ($name == "layout_init")
@@ -160,67 +243,23 @@ class SiPac_Layout
 	private function generate_smileys()
 	{
 		$chat_smileys = "";
-		if ($this->chat->settings->get('smiley_width') == "!!AUTO!!")
+		if (isset($this->settings['smiley_width']))
+			$width = " width='" .$this->settings['smiley_width'] . "'";
+		else
 			$width = "";
+		if (isset($this->settings['smiley_height']))
+			$height = " height='" .$this->settings['smiley_height'] . "'";
 		else
-			$width = " width='" . $this->chat->settings->get('smiley_width') . "px'";
-		if ($this->chat->settings->get('smiley_height') == "!!AUTO!!" AND $this->chat->settings->get('smiley_width') == "!!AUTO!!" AND isset($this->arr['default_smiley_height']))
-			$height = " height='" .$this->arr['default_smiley_height'] . "'";
-		else if ($this->chat->settings->get('smiley_height') == "!!AUTO!!")
 			$height = "";
-		else
-			$height = " width='" . $this->chat->settings->get('smiley_height') . "px'";
+		
 		foreach ($this->chat->settings->get('smileys') as $smiley_code => $smiley_url)
 		{
 			if (strpos($smiley_url, "http://") === false)
-				$smiley_url = $this->chat->html_path . "themes/" . $this->chat->settings->get('theme') . "/smileys/" . $smiley_url;
+				$smiley_url = $this->settings['html_path']."/smileys/" . $smiley_url;
 			$smiley_code  = htmlentities($smiley_code);
 			$chat_smileys = $chat_smileys . "<span style='margin-right: 3px; cursor: pointer;' onclick='chat_objects[chat_objects_id[\"".$this->chat->id."\"]].add_smiley(\" " . $smiley_code . "\");'><img$width$height src='" . $smiley_url . "' title='" . $smiley_code . "' alt='" . $smiley_code . "'></span>";
 		}
 		return $chat_smileys;
-	}
-  
-	public  function load()
-	{
-		$is_mobile = check_mobile();
-    
-		$layout_php_path = dirname(__FILE__) . "/../../../themes/".$this->chat->settings->get('theme')."_mobile";
-     
-		if ($is_mobile && is_dir($layout_php_path))
-			$this->is_mobile = true;
-		else
-			$layout_php_path = dirname(__FILE__) . "/../../../themes/".$this->chat->settings->get('theme');
-		
-		$layout_path = $this->chat->html_path."themes/".$this->chat->settings->get("theme");
-		
-		if (file_exists($layout_php_path."/layout.php"))
-			require($layout_php_path."/layout.php");
-		else
-			die($layout_php_path."/layout.php not found!");
-		
-		$layout_array['path'] = $layout_php_path;
-		$layout_array['html'] = $chat_layout;
-		$layout_array['user_html'] = $chat_layout_user_entry;
-		$layout_array['default_smiley_height'] = $default_smiley_height;
-		$layout_array['post_html'] = $chat_layout_post_entry;
-		
-		if (isset($chat_layout_user_info_entry))
-			$layout_array['user_info_entry'] = $chat_layout_user_info_entry;
-		else
-			$layout_array['user_info_entry'] = "<li>!!INFO_HEAD!!: !!INFO!!</li>";
-				
-		if (isset($chat_layout_notify_user))
-			$layout_array['notify_user'] = $chat_layout_notify_user;
-				
-		if (isset($chat_layout_channel_tab))
-			$layout_array['channel_tab'] = $chat_layout_channel_tab;
-		else
-			$layout_array['channel_tab'] = "<li id='!!ID!!'><a href='javascript:void(0);' onclick='!!CHANNEL_CHANGE_FUNCTION!!'>!!CHANNEL!!</a></li>";
-				
-		$layout_array['notify_html'] = $chat_layout_notify_entry;
-		$layout_array['javascript_functions'] = $chat_layout_functions;
-		
-		$this->arr = $layout_array;
 	}
 }
 ?> 

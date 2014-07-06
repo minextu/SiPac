@@ -18,7 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-$SiPac_version = "0.0.4-git (alpha5)";
+$SiPac_version = "0.0.4-git (alpha6)";
 
 //initiate the session, if not already started
 if (strlen(session_id()) < 1)

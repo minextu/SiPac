@@ -25,6 +25,9 @@ if (isset($_POST['mysql_send']))
 		else
 			die("Error: wrong MySQL extension!");
 		
+		require_once(dirname(__FILE__)."/php/class/SiPac_Channel.php");
+		$channel = new SiPac_Channel(false, false);
+		
 		$mysql_return = $db->check(true);
 		if ($mysql_return != true)
 				echo "<div style='background:orange; color: white'>MySQL Error. Check the MySQL acess data.</div>";
@@ -37,6 +40,23 @@ if (isset($_POST['mysql_send']))
 				echo "<div style='background:orange; color: white'>Your MySQL tables are already up to date!</div>";
 			else
 			{
+				$entries_mysql = $db->query("SELECT * from chat_entries");
+				while ($entry = $db->fetch_object($entries_mysql))
+				{
+					$new_channel_name = $channel->encode($entry->channel);
+					$new_chat_id  = preg_replace('/chat_/', "", $entry->chat_id, 1); 
+					$update_entry = $db->query("UPDATE chat_entries SET channel='".$db->escape_string($new_channel_name)."', chat_id='".$new_chat_id."' WHERE id= '".$entry->id."'");
+					echo $update_entry;
+				}
+				$users_mysql = $db->query("SELECT * from chat_users");
+				while ($user = $db->fetch_object($users_mysql))
+				{
+					$new_channel_name = $channel->encode($user->channel);
+					$new_chat_id  = preg_replace('/chat_/', "", $user->chat_id, 1); 
+					$update_user = $db->query("UPDATE chat_users SET channel='".$db->escape_string($new_channel_name)."', chat_id='".$new_chat_id."' WHERE id= '".$user->id."'");
+					echo $update_user;
+				}
+				
 				echo $db->query ("ALTER TABLE chat_users RENAME TO sipac_users");
 				echo $db->query ("ALTER TABLE chat_entries RENAME TO sipac_entries");
 				echo $db->query("ALTER TABLE sipac_entries DROP highlight");

@@ -21,6 +21,8 @@ class SiPacCommand_msg implements SiPacCommand
 		if (!empty($parameters[0]))
 		{
 			$user = $parameters[0];
+			if (substr($user, 0, 1) == "@")
+				$user = substr($user, 1);
 			
 			if (isset($parameters[1]))
 				$message = $parameters[1];
