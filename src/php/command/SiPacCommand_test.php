@@ -2,7 +2,7 @@
 
 class SiPacCommand_test implements SiPacCommand
 {
-	public $usage = "/test [type] [name]";
+	public $usage = "/test <type> <name>";
 	public $description = "Executes a custom proxy or function [type]. To test the Proxy \"SiPacProxy_example\" you would enter \"/test proxy example\"";
   
 	public function set_variables($chat, $parameters)

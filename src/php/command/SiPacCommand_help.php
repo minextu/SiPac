@@ -67,7 +67,7 @@ class SiPacCommand_help implements SiPacCommand
 		{
 			while (false !== ($file = readdir($handle)))
 			{
-				if ($file != "." && $file != "..") 
+				if ($file != "." AND $file != ".." AND $file != ".htaccess") 
 				{
 					$class_name = str_replace(".php", "", $file);
 					$command_files[$class_name] = $file;
