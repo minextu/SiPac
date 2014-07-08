@@ -678,7 +678,7 @@ Chat.prototype.save_settings = function()
 	var today = new Date();
 	var expires = new Date(today.getTime() + 365 * 24 * 60 * 60 * 1000);
 	expires = expires.toGMTString();
-	document.cookie="SiPac_" + this.id + "=" + this.notifications_enabled + "|" + this.sound_enabled + "|" + this.invite_enabled + "; expires=" + expires + ";";
+	document.cookie="SiPac_settings_" + this.id + "=" + this.notifications_enabled + "|" + this.sound_enabled + "|" + this.invite_enabled + "; expires=" + expires + ";";
 }
 Chat.prototype.restore_settings = function()
 {
@@ -687,7 +687,7 @@ Chat.prototype.restore_settings = function()
 	for (var i = 0; i < cookies.length; i++)
 	{
 		var cookie_info = cookies[i].split("=");
-		if (cookie_info[0] == "SiPac_" + this.id)
+		if (cookie_info[0].replace(" ", "") == "SiPac_settings_" + this.id)
 		{
 			var settings = cookie_info[1].split("|");
 			this.notifications_enabled = (settings[0] === "true");
