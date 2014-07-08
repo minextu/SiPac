@@ -32,7 +32,9 @@ class SiPacCommand_invite implements SiPacCommand
 				{
 					$join_return = $this->chat->db->add_task("join|".$channel."|".$this->chat->channel->decode($channel), $user, $this->chat->channel->encode($this->chat->settings->get('channels')[0]), $this->chat->id);
 					if ($join_return == false)
-							return array("info_type"=>"error", "info_text"=>"<||user-not-found-text|".$user."||>");
+						return array("info_type"=>"error", "info_text"=>"<||user-not-found-text|".$user."||>");
+					else 
+						return array("info_type"=>"success", "info_text"=>"<||user-invited-successfully-text|".$user."||>");
 				}
 				else
 					return array('info_type' => "error",'info_text' => "<||no-permisson-text||>");
@@ -42,6 +44,8 @@ class SiPacCommand_invite implements SiPacCommand
 				$invite_return = $this->chat->db->add_task("invite|".$channel."|".$this->chat->channel->decode($channel)."|".$this->chat->nickname, $user, $this->chat->channel->encode($this->chat->settings->get('channels')[0]), $this->chat->id);
 				if ($invite_return == false)
 					return array("info_type"=>"error", "info_text"=>"<||user-not-found-text|".$user."||>");
+				else
+				 	return array("info_type"=>"success", "info_text"=>"<||user-invited-successfully-text|".$user."||>");
 			}
 		}
 		else

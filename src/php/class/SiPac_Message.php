@@ -94,8 +94,8 @@ class SiPac_Message
 			{
 				$post_array = array("message"=>$post['message'], "type"=>$post['type'], "channel"=>$post['channel'],"user"=>$post['user'],"time"=>$post['time'], "style" => $post['style']);
 				$post_array = $this->chat->proxy->check($post_array, "client");
+				$message_no_html = $post['message'];
 				
-				$post_user_name = $post_array['user'];
 				if ($post_array['type'] == 0) //normal post
 				{
 					$post_user = $post_array['user'];
@@ -110,9 +110,10 @@ class SiPac_Message
 					$post_user = "";
 					$post_type = "notify";
 					$post_array['message'] = $this->chat->language->translate($post_array['message']);
-					
+					$message_no_html = $this->chat->language->translate($message_no_html);
 
 					$post_array['message'] =   preg_replace('#\[user\](.*)\[/user\]#isU', $this->chat->layout->theme->get_nickname("$1"), $post_array['message']);
+					$message_no_html =   preg_replace('#\[user\](.*)\[/user\]#isU', "$1", $message_no_html);
 				}
 				
 				
@@ -131,8 +132,8 @@ class SiPac_Message
 
 				
 				$new_posts[$post_array['channel']][] = $post_html;
-				$new_post_users[$post_array['channel']][] = $post_user_name;
-				$new_post_messages[$post_array['channel']][] = $post_array['message'];
+				$new_post_users[$post_array['channel']][] = $post_user;
+				$new_post_messages[$post_array['channel']][] = $message_no_html;
 			}
 			//save the highest id
 			$updated_last_id = $post['id'];

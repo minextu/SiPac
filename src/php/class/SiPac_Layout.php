@@ -42,9 +42,6 @@ class SiPac_Layout
 		$default_layout_path = $this->chat->html_path."src/themes/".$this->chat->settings->get("theme");
 		
 		$is_mobile = check_mobile();
-		
-		/*if ($is_mobile && is_dir($layout_php_path))
-			$this->is_mobile = true;*/
 			
 		$theme_class = "SiPacTheme_".$this->chat->settings->get('theme');
 		
@@ -111,20 +108,18 @@ class SiPac_Layout
 	//generate and return the html code for the chat
 	public function draw()
 	{   
-		$this->cache_folder = md5($this->chat->id.$this->chat->html_path.$this->chat->settings->get('theme'));
+		$this->cache_folder = md5($this->chat->id.$this->chat->html_path.$this->chat->settings->get('theme').$this->is_mobile);
 		
 		$GLOBALS['global_chat_num']  = $GLOBALS['global_chat_num'] + 1;
 		if ($this->chat->settings->get('use_cache'))
 		{
-			$cache_folder = dirname(__FILE__) . "/../../../cache/".$this->cache_folder."/";	
-			if ($this->is_mobile)
-				$cache_folder = $cache_folder."mobile/";
+			$cache_folder = dirname(__FILE__) . "/../../../cache/".$this->cache_folder."/";
 				
 			if (is_dir($cache_folder) == false)
 			{
 				mkdir($cache_folder, 0777);
 				
-				$html_code = $this->chat->ranslate($this->generate_layout_html());
+				$html_code = $this->chat->language->translate($this->generate_layout_html());
 				file_put_contents($cache_folder."layout.html", $html_code);
 				file_put_contents($cache_folder."layout.css", $this->generate_layout_css());
 			}
@@ -154,8 +149,6 @@ class SiPac_Layout
 		if (empty($css_code))
 		{
 			$cache_folder = $this->chat->html_path."cache/".$this->cache_folder."/";
-			if ($this->is_mobile)
-				$cache_folder = $cache_folder."mobile/";
 			$html_code = "<link rel='stylesheet' type='text/css' href='".$cache_folder."layout.css'>".$html_code;
 		}
 		else
@@ -191,7 +184,7 @@ class SiPac_Layout
 		var chat_text = new Array();";
 		foreach ($this->chat->language->text as $key => $text)
 		{
-			$js_chat = $js_chat."chat_text['$key'] = '".addslashes($text)."';";
+			$js_chat = $js_chat."chat_text['$key'] = '".addslashes(utf8_decode($text))."';";
 		}
 	
 		$channel_tab = $this->theme->get_channel_tab("!!CHANNEL!!", "!!ID!!", "!!CHANNEL_CHANGE_FUNCTION!!", "!!CHANNEL_CLOSE_FUNCTION!!");

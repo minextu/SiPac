@@ -52,6 +52,8 @@ $chat_text = array(
 "arguments-missing-text" => "Fehlendes Argument! Schreib /help für den Syntax.",
 "no-user-entered-text" => "You have to enter a user!",
 
+"user-invited-successfully-text" => "%1 wurde erfolgreich eingeladen diesem Channel beizutreten!",
+
 "me-random-text-1" => "hat etwas besseres zu tun",
 "me-random-text-2" => "Hat sich in %1 verliebt",
 "me-random-text-3" => "wünscht sich er/sie hätte den Text nicht vergessen",
@@ -59,16 +61,20 @@ $chat_text = array(
 "me-random-text-5" => "hat %1 im Auge",
 
 /* Kick */
+"reason-for-kick-text" => "Grund für den Kick:",
 "kick-no-reason-text" => "Kein Grund",
 "you-were-kicked-text" => "Du wurdest gekickt! (%1)",
 "you-were-kicked-by-user-text" => "Du wurdest von %1 gekickt! (%2)",
-"reason-for-kick-text" => "Grund für den Kick:",
 
 /* Notice Popup */
 "info-head" => "Info:",
 "error-head" => "Fehler:",
 "warning-head" => "Warnung:",
-"success-head" => "Erfolg:",	
+"success-head" => "Erfolg:",
+
+"message-empty-text" => "Es wurde nichts eingegeben!",
+"name-change-text" => "Du heißt jetzt \"%1\"",
+"user-invited-you-to-channel-text" => "Du wurdest von %1 eingeladen, dem Channel %2 beizutreten. Möchtest du diesem Channel jetzt beitreten?",
 
 /* Desktop Notifications */
 "desktop-notifications-enabled-head" => "Erfolg",
@@ -79,16 +85,15 @@ $chat_text = array(
 "log-info"=>"Info",
 
 /* theme translations */
-"message-input-placeholder" => "Bitte gib eine Nachricht ein...",
+"message-input-placeholder" => "Bitte eine Nachricht eingeben...",
 "send-button-text" => "Senden",
 "room-loading-text" => "Der Raum wird geladen. Bitte warten...",
 "userlist-head" => "Benutzerliste (%1)",
 "settings-head" => "Einstellungen",
 "smileys-head" => "Smileys",
 "enter-channel-name-text" => "Bitte gib einen Channel Namen ein",
-"enable-sound-text" => "Sound Aktivieren",
 "enable-desktop-notifications-text" => "Desktop Benachrichtigungen aktivieren",
-
-"message-empty-text" => "Es wurde nichts eingegeben!"
+"enable-sound-text" => "Sound Aktivieren",
+"enable-invite-text" => "Einladungen aktivieren"
 );
 ?>

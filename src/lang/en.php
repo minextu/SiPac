@@ -51,6 +51,7 @@ $chat_text = array(
 "no-channel-entered" =>"You must enter a channel!",
 "arguments-missing-text" => "Missing argument! Type /help for the syntax.",
 "no-user-entered-text" => "You have to enter a user!",
+"user-invited-successfully-text" => "%1 was  successfully invited to join this channel!",
 
 "me-random-text-1" => "has something better to do",
 "me-random-text-2" => "has fallen in love with %1",
@@ -70,6 +71,10 @@ $chat_text = array(
 "warning-head" => "Warning:",
 "success-head" => "Success:",	
 
+"message-empty-text" => "Nothing entered",
+"name-change-text" => "You are now called \"%1\"",
+"user-invited-you-to-channel-text" => "You were invited by %1 to join the channel %2. Do you want to join this channel now?",
+
 /* Desktop Notifications */
 "desktop-notifications-enabled-head" => "Success",
 "desktop-notifications-enabled-text" => "Desktop Notifications are now enabled",
@@ -86,9 +91,8 @@ $chat_text = array(
 "settings-head" => "Settings",
 "smileys-head" => "Smileys",
 "enter-channel-name-text" => "Please enter a channel name",
-"enable-sound-text" => "Enable Sound",
 "enable-desktop-notifications-text" => "Enable Desktop Notifications",
-
-"message-empty-text" => "Nothing entered"
+"enable-sound-text" => "Enable Sound",
+"enable-invite-text" => "Enable Invitations"
 );
 ?>

@@ -1,9 +1,4 @@
 <?php
-function rrmdir($dir) { 
-  foreach(glob($dir . '/*') as $file) { 
-    if(is_dir($file)) rrmdir($file); else unlink($file); 
-  } rmdir($dir); 
-}
 class SiPacCommand_clear implements SiPacCommand
 {
 	public $usage = "/clear";
@@ -22,13 +17,26 @@ class SiPacCommand_clear implements SiPacCommand
 	{
 		$cache_folder = dirname(__FILE__) . "/../../../cache/";	
 		if (is_dir($cache_folder))
-			rrmdir($cache_folder);
+			$this->delete_contents($cache_folder);
 			
 		return array(
-			"info_type" => "info",
+			"info_type" => "success",
 			"info_text" => "Successfully deleted the cache. Please reload!",
 			"info_nohide" => true
 		);
+	}
+	
+	private function delete_contents($dir, $delete_dir=false)
+	{
+		foreach(glob($dir . '/*') as $file) 
+		{ 
+			if(is_dir($file)) 
+				$this->delete_contents($file, true); 
+			else 
+				unlink($file); 
+		}
+		if ($delete_dir == true)
+			rmdir($dir);
 	}
 }
 

@@ -211,9 +211,10 @@ function Chat(theme_path, id, client_num, channels, channel_titles, texts, layou
   this.first_start = true;
   this.new_channels = new Array();
   this.active_channel = "";
-  this.enable_sound = true;
   
   this.notifications_enabled = false;
+  this.invite_enabled = true;
+  this.sound_enabled = true;
 
   this.add_channel(undefined, undefined, true);
   this.change_channel(this.channels[0]);
@@ -257,8 +258,22 @@ Chat.prototype.init = function()
   
   scroll(this.chat, "chat_conversation", 0, true);
   
-  if (typeof this.layout_notification_status != "undefined")
-	  this.layout_notification_status(this.notifications_enabled);
+  this.restore_settings();
+  
+  if (this.notifications_enabled == true)
+	  this.enable_notifications();
+  else
+	  this.disable_notifications();
+  
+  if (this.sound_enabled == true)
+	  this.enable_sound();
+  else
+	  this.disable_sound();
+  
+  if (this.invite_enabled == true)
+	  this.enable_invite();
+  else
+	  this.disable_invite();
 };
 Chat.prototype.send_message = function (chat_message)
 {
@@ -313,7 +328,7 @@ Chat.prototype.handle_chat_tasks = function (answer)
   if (answer['get']['username'] != undefined && this.username != answer['get']['username'] && this.first_start != true || this.first_start == true)
   {
     if (this.first_start != true)
-      this.information("You are now: \"" + answer['get']['username'] + "\"", "info");
+      this.information(this.texts['name-change-text'].replace("%1", answer['get']['username']),  "info");
 
     try
     {
@@ -435,8 +450,8 @@ Chat.prototype.add_entries = function (channel, entries, users, messages)
     for (var i = 0; i < entries.length; i++)
     {
       chat_window.innerHTML += entries[i];
-	  if (users[i] != this.username && this.notifications_enabled == true)
-		this.show_notification(users[i], messages[i]);
+	if (users[i] != this.username && this.notifications_enabled == true && !this.first_start)
+		  this.show_notification(users[i] + " (" + this.channel_titles[this.channels.indexOf(channel)] + ")", messages[i]);
     }
     if (this.first_start)
       scroll(this.chat, "chat_conversation", 0, true);
@@ -463,7 +478,7 @@ Chat.prototype.add_entries = function (channel, entries, users, messages)
       {
         new_messages++;
         new_messages_status(false);
-        if (this.enable_sound == true)
+        if (this.sound_enabled == true)
           chat_play_sound(this.new_post_audio);
       }
     }
@@ -579,15 +594,15 @@ Chat.prototype.handle_server_tasks = function (tasks)
       this.add_channel(task_parts[1], task_parts[2]);
       this.change_channel(task_parts[1]);
     }
-   else  if (task_parts[0] == "invite")
+   else  if (task_parts[0] == "invite" && this.invite_enabled == true)
 	{
-        if (this.enable_sound == true)
+        if (this.sound_enabled == true)
           chat_play_sound(this.new_post_audio);
 		
 		new_messages++;
         new_messages_status(false);
 		
-		var confirm_return = confirm(task_parts[3] + " wants to invite you to the channel \"" + task_parts[2] + "\". Do you want to join this channel?");
+		var confirm_return = confirm(this.texts['user-invited-you-to-channel-text'].replace("%1", task_parts[3]).replace("%2", task_parts[2]));
 		if (confirm_return == true)
 		{
 			this.add_channel(task_parts[1], task_parts[2]);
@@ -636,7 +651,7 @@ Chat.prototype.information = function (info, type, nohide, onlyhide, noclose)
       info_msg_element_sub.className = "chat_notice_info";
 
     if (noclose != true)
-	    info = "<span class='close_chat_information'><a href='#' onclick='chat_objects[" + this.num + "].information(undefined, undefined, undefined, true)'><img src='" + this.theme_path + "/icons/delete.png' alt='(close)' title='close'></a></span>" + info;
+	    info = "<span class='close_chat_information'><a href='javascript:void(0)' onclick='chat_objects[" + this.num + "].information(undefined, undefined, undefined, true)'><img src='" + this.theme_path + "/icons/delete.png' alt='(close)' title='close'></a></span>" + info;
 
     info = "<br>" + info;
 
@@ -658,42 +673,115 @@ Chat.prototype.information = function (info, type, nohide, onlyhide, noclose)
       }, 5000);
   }
 };
+Chat.prototype.save_settings = function()
+{
+	var today = new Date();
+	var expires = new Date(today.getTime() + 365 * 24 * 60 * 60 * 1000);
+	expires = expires.toGMTString();
+	document.cookie="SiPac_" + this.id + "=" + this.notifications_enabled + "|" + this.sound_enabled + "|" + this.invite_enabled + "; expires=" + expires + ";";
+}
+Chat.prototype.restore_settings = function()
+{
+	var cookie = document.cookie;
+	var cookies = cookie.split(";")
+	for (var i = 0; i < cookies.length; i++)
+	{
+		var cookie_info = cookies[i].split("=");
+		if (cookie_info[0] == "SiPac_" + this.id)
+		{
+			var settings = cookie_info[1].split("|");
+			this.notifications_enabled = (settings[0] === "true");
+			this.sound_enabled = (settings[1] === "true");
+			this.invite_enabled = (settings[2] === "true");
+		}
+	}
+}
+Chat.prototype.disable_sound = function()
+{
+	this.sound_enabled = false;
+	if (typeof this.layout_sound_status != "undefined")
+		this.layout_sound_status(false);
+	
+	this.save_settings();
+};
+Chat.prototype.enable_sound = function()
+{
+	this.sound_enabled = true;
+	if (typeof this.layout_sound_status != "undefined")
+		this.layout_sound_status(true);
+	
+	this.save_settings();
+};
+Chat.prototype.disable_invite= function()
+{
+	this.invite_enabled = false;
+	if (typeof this.layout_invite_status != "undefined")
+		this.layout_invite_status(false);
+	
+	this.save_settings();
+};
+Chat.prototype.enable_invite = function()
+{
+	this.invite_enabled = true;
+	if (typeof this.layout_invite_status != "undefined")
+		this.layout_invite_status(true);
+	
+	this.save_settings();
+};
 Chat.prototype.disable_notifications = function()
 {
 	this.notifications_enabled = false;
 	if (typeof this.layout_notification_status != "undefined")
 		this.layout_notification_status(false);
+	
+	this.save_settings();
 };
 Chat.prototype.enable_notifications = function()
 {
-	this.notifications_enabled = false;
-	if (typeof this.layout_notification_status != "undefined")
-		this.layout_notification_status(false);
-	
 	var Notification = window.Notification || window.mozNotification || window.webkitNotification;
-	var chat = this;
-	Notification.requestPermission(function (permission) 
+	if (Notification.permission != "granted")
 	{
-		if (permission == "granted")
+		this.notifications_enabled = false;
+		if (typeof this.layout_notification_status != "undefined")
+			this.layout_notification_status(false);
+		this.save_settings();
+		var chat = this;
+		Notification.requestPermission(function (permission) 
 		{
-			chat.notifications_enabled = true;
-			if (typeof chat.layout_notification_status != "undefined")
-				chat.layout_notification_status(true);
-			chat.show_notification(chat.texts['desktop-notifications-enabled-head'],chat.texts['desktop-notifications-enabled-text']);
-		}
-		else
-		{
-			chat.notifications_enabled = false;
-			if (typeof chat.layout_notification_status != "undefined")
-				chat.layout_notification_status(false);
-		}
-	});
+			if (permission == "granted")
+			{
+				chat.notifications_enabled = true;
+				if (typeof chat.layout_notification_status != "undefined")
+					chat.layout_notification_status(true);
+				chat.show_notification(chat.texts['desktop-notifications-enabled-head'],chat.texts['desktop-notifications-enabled-text']);
+				
+				chat.save_settings();
+			}
+			else
+			{
+				chat.notifications_enabled = false;
+				if (typeof chat.layout_notification_status != "undefined")
+					chat.layout_notification_status(false);
+				
+				chat.save_settings();
+			}
+		});
+	}
+	else
+	{
+		this.notifications_enabled = true;
+		if (typeof this.layout_notification_status != "undefined")
+			this.layout_notification_status(true);
+		this.show_notification(this.texts['desktop-notifications-enabled-head'],this.texts['desktop-notifications-enabled-text']);
+		
+		this.save_settings();
+	}
 };
-Chat.prototype.show_notification = function(user, message)
+Chat.prototype.show_notification = function(head, message)
 {
 	var Notification = window.Notification || window.mozNotification || window.webkitNotification;
 	
-	var instance = new Notification(user, 
+	var instance = new Notification(head, 
 						 {
 							body: message
 						}

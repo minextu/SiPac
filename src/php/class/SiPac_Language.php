@@ -40,7 +40,10 @@ class SiPac_Language
 		$language_path = dirname(__FILE__)."/../../lang/";
 		
 		global $chat_text;
-		(@include_once ($language_path.$language.".php")) OR die("Invalid Language");
+		if (is_file($language_path.$language.".php"))
+			include_once ($language_path.$language.".php");
+		else
+			die("Invalid Language");
 		
 		return $chat_text;
 	}
