@@ -43,11 +43,17 @@ class SiPac_User
 	public function generate_html()
 	{
 		if ($this->afk == 0)
+		{
 			$user_status = "<||online-status-text||>";
+			$user_afk = "online";
+		}
 		else
+		{
 			$user_status = "<||afk-status-text||>";
+			$user_afk = "afk";
+		}
 
-		$user_html = $this->theme->get_userlist_entry($this->nickname, $user_status,  $this->generate_user_info(), $this->color, $this->id);
+		$user_html = $this->theme->get_userlist_entry($this->nickname, $user_status,  $user_afk, $this->generate_user_info(), $this->color, $this->id);
 
 		return $user_html;
 	}

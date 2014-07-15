@@ -58,11 +58,12 @@ class SiPac_Old_Theme_Wrapper extends SiPacTheme
 		return $layout;
 	}
 	
-	public function get_userlist_entry($nickname, $status, $info, $color, $id)
+	public function get_userlist_entry($nickname, $status, $afk, $info, $color, $id)
 	{
 		$layout = str_replace("!!USER!!", $nickname, $this->arr['user_html']);
 		$layout = str_replace("!!NUM!!", $this->num, $layout);
 		$layout = str_replace("!!USER_STATUS!!", $status, $layout);
+		$layout = str_replace("!!USER_AFK!!", $afk, $layout);
 		$layout = str_replace("!!USER_INFO!!", $info, $layout);
 		$layout = str_replace("!!USER_COLOR!!", $color, $layout);
 		$layout = str_replace("!!USER_ID!!", $id, $layout);

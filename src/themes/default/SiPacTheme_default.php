@@ -65,7 +65,7 @@ class SiPacTheme_default extends SiPacTheme
 		";
 	}
 	
-	public function get_userlist_entry($nickname, $status, $info, $color, $id)
+	public function get_userlist_entry($nickname, $status, $afk, $info, $color, $id)
 	{
 		$js = $this->js_chat;
 		
@@ -76,16 +76,18 @@ class SiPacTheme_default extends SiPacTheme
 		
 		return 
 		"
-			<div class='chat_user' id='$id' onmouseover='$js.user_options(\"$id\", \"show\");' onmouseout='$js.user_options(\"$id\", \"hide\");'>
-			<div  class='chat_user_name' $style>
-				<span onclick='$js.insert_user(this.innerHTML);' style='cursor: pointer;'>$nickname</span>
-				<span class='chat_user_status'>[$status]</span>
-			</div>
-			
-			<div class='chat_user_bottom' style='display: none;'>
-			<div class='chat_user_info'>$info</div>
-			</div>
-			</div>
+			<span class='chat_user_$afk'>
+				<div class='chat_user' id='$id' onmouseover='$js.user_options(\"$id\", \"show\");' onmouseout='$js.user_options(\"$id\", \"hide\");'>
+					<div  class='chat_user_name' $style>
+						<span onclick='$js.insert_user(this.innerHTML);' style='cursor: pointer;'>$nickname</span>
+						<span class='chat_user_status'>[$status]</span>
+					</div>
+					
+					<div class='chat_user_bottom' style='display: none;'>
+						<div class='chat_user_info'>$info</div>
+					</div>
+				</div>
+			</span>
 		";
 	}
 	

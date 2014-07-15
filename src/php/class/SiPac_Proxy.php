@@ -29,32 +29,30 @@ class SiPac_Proxy
 	public function check($post_array, $type, $check_spam=true)
 	{
 		$proxy_folder = dirname(__FILE__)."/../proxy/".$type;
-		if ($handle = opendir($proxy_folder))
+		$files = scandir($proxy_folder);
+		foreach ($files as $file)
 		{
-			while (false !== ($file = readdir($handle)))
+			if ($file != "." && $file != "..") 
 			{
-				if ($file != "." && $file != "..") 
-				{
-					$class_name = str_replace(".php", "", $file);
-					$proxy_name = str_replace("SiPacProxy_", "", $class_name);
+				$class_name = str_replace(".php", "", $file);
+				$class_name = preg_replace('/(?<=^|\s)SiPacProxy_([0-9]+)/i', 'SiPacProxy', $class_name);
+				$proxy_name = str_replace("SiPacProxy_", "", $class_name);
 					
-					if (in_array($proxy_name, $this->chat->settings->get("disabled_".$type."_proxies")) == false AND ($proxy_name != "spam" OR $check_spam == true))
+				if (in_array($proxy_name, $this->chat->settings->get("disabled_".$type."_proxies")) == false AND ($proxy_name != "spam" OR $check_spam == true))
+				{
+					include_once($proxy_folder."/".$file);
+						
+					if (class_exists($class_name))
 					{
-						include_once($proxy_folder."/".$file);
+						$proxy = new $class_name;
+						$proxy->set_variables($this->chat, $post_array);
 						
-						if (class_exists($class_name))
-						{
-							$proxy = new $class_name;
-							$proxy->set_variables($this->chat, $post_array);
-						
-							$post_array = $proxy->execute();
+						$post_array = $proxy->execute();
 						}
-						else
-							die('Classname is not "'.$class_name.'"');
-					}
+					else
+						die('Classname is not "'.$class_name.'"');
 				}
 			}
-			closedir($handle);
 		}
 		
 		$post_array = $this->check_custom_proxy($post_array, $type);
@@ -75,6 +73,7 @@ class SiPac_Proxy
 		{
 			include_once($proxy_folder."/SiPacProxy_".$proxy_name.".php");
 			$class_name = "SiPacProxy_".$proxy_name;
+
 			if (class_exists($class_name))
 			{
 				$proxy = new $class_name;

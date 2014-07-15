@@ -16,9 +16,9 @@ class SiPacProxy_smileys implements SiPacProxy
 				$smiley_url = $this->chat->layout->settings['html_path'] . "/smileys/" . $smiley_url;
 		
 			$smiley_code_html = addslashes(htmlentities($smiley_code, ENT_QUOTES));
-			$smiley_code      = str_replace("|", "&#x007C;", " " . htmlentities($smiley_code));
+			$smiley_code      = " ".htmlentities($smiley_code);
 		
-			$this->post['message'] = str_replace($smiley_code, "<img style='max-height: 20px;margin-right: 3px;' src='" . $smiley_url . "' title='" . $smiley_code_html . "' alt='" . $smiley_code_html . "'>", " " . $this->post['message']);
+			$this->post['message'] = str_replace($smiley_code, " <img style='max-height: 20px;margin-right: 3px;' src='" . $smiley_url . "' title='" . $smiley_code_html . "' alt='" . $smiley_code_html . "'>", " " . $this->post['message']);
 		}
 		$this->post['message'] = trim($this->post['message']);
 		

@@ -46,7 +46,7 @@ class SiPacTheme_default extends SiPacTheme
 		";
 	}
 	
-	public function get_userlist_entry($nickname, $status, $info, $color, $id)
+	public function get_userlist_entry($nickname, $status, $afk, $info, $color, $id)
 	{
 		$js = $this->js_chat;
 		

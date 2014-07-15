@@ -344,7 +344,6 @@ to { background: #e4e8ad; }
 }*/
 ##CHAT_MAIN## .chat_user
 {
-	width: 100%;
 	background: #f0f0f0;
 	font-size: 15px;
 	border-top: 1px solid #d7dbdc;
@@ -352,7 +351,7 @@ to { background: #e4e8ad; }
 	margin-bottom: 5px;
 	min-height: 40px;
 	padding: 0 0px;
-    transition: all 0.1s;
+	transition: all 0.1s;
 }
 ##CHAT_MAIN## .chat_user:hover
 {
@@ -366,16 +365,28 @@ to { background: #e4e8ad; }
 	font-weight: bold;
 	color: #225bb1;
 	font-size: 16px;
+	padding: 0 5px;
 }
 ##CHAT_MAIN## .chat_user .chat_user_status
 {
 	float: right;
+	padding: 0 5px;
 }
 
 ##CHAT_MAIN## .chat_user_info div
 {
-	width: 100%;
-	padding-bottom: 5px;
+	padding: 0 5px 5px;
+}
+
+
+##CHAT_MAIN## .chat_user_afk .chat_user
+{
+	background:  #c7c7c7;
+}
+##CHAT_MAIN## .chat_user_afk .chat_user .chat_user_name
+{
+	background: #aab1b2;
+	color: #8496b1;
 }
 
 /*chat notice */

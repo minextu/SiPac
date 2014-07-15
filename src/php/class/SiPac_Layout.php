@@ -108,7 +108,7 @@ class SiPac_Layout
 	//generate and return the html code for the chat
 	public function draw()
 	{   
-		$this->cache_folder = md5($this->chat->id.$this->chat->html_path.$this->chat->settings->get('theme').$this->is_mobile);
+		$this->cache_folder = md5($this->chat->id.$this->chat->html_path.$this->chat->settings->get('theme').$this->is_mobile.$this->chat->settings->get("language"));
 		
 		$GLOBALS['global_chat_num']  = $GLOBALS['global_chat_num'] + 1;
 		if ($this->chat->settings->get('use_cache'))
@@ -119,7 +119,7 @@ class SiPac_Layout
 			{
 				mkdir($cache_folder, 0777);
 				
-				$html_code = $this->chat->language->translate($this->generate_layout_html());
+				$html_code = utf8_decode($this->chat->language->translate($this->generate_layout_html()));
 				file_put_contents($cache_folder."layout.html", $html_code);
 				file_put_contents($cache_folder."layout.css", $this->generate_layout_css());
 			}
@@ -249,7 +249,7 @@ class SiPac_Layout
 		{
 			if (strpos($smiley_url, "http://") === false)
 				$smiley_url = $this->settings['html_path']."/smileys/" . $smiley_url;
-			$smiley_code  = htmlentities($smiley_code);
+			$smiley_code  = htmlentities($smiley_code, ENT_QUOTES);
 			$chat_smileys = $chat_smileys . "<span style='margin-right: 3px; cursor: pointer;' onclick='chat_objects[chat_objects_id[\"".$this->chat->id."\"]].add_smiley(\" " . $smiley_code . "\");'><img$width$height src='" . $smiley_url . "' title='" . $smiley_code . "' alt='" . $smiley_code . "'></span>";
 		}
 		return $chat_smileys;

@@ -24,7 +24,7 @@ abstract class SiPacTheme
 	abstract public function get_js_functions();
 	abstract public function get_settings();
   
-	public function get_userlist_entry($nickname, $status, $info, $color, $id)
+	public function get_userlist_entry($nickname, $status, $afk, $info, $color, $id)
 	{
 		if (!empty($color))
 			$style = "style='color:$color;'";

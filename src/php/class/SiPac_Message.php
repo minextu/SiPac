@@ -110,9 +110,8 @@ class SiPac_Message
 					$post_user = "";
 					$post_type = "notify";
 					$post_array['message'] = $this->chat->language->translate($post_array['message']);
-					$message_no_html = $this->chat->language->translate($message_no_html);
-
 					$post_array['message'] =   preg_replace('#\[user\](.*)\[/user\]#isU', $this->chat->layout->theme->get_nickname("$1"), $post_array['message']);
+					$message_no_html = $this->chat->language->translate($message_no_html);
 					$message_no_html =   preg_replace('#\[user\](.*)\[/user\]#isU', "$1", $message_no_html);
 				}
 				

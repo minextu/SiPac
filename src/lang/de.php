@@ -48,9 +48,9 @@ $chat_text = array(
 "user-not-found-text" => "Benutzer %1 wurde nicht gefunden",
 "newname-not-entered-text" => "Es wurde kein neuer Name eingegeben!",
 "no-reason-for-not-afk-text" => "Es kann kein Grund dafür angegeben werden, dass du zurück bist!",
-"no-channel-entered" =>"Es muss ein Channel angegebn werden!",
+"no-channel-entered" =>"Es muss ein Channel angegeben werden!",
 "arguments-missing-text" => "Fehlendes Argument! Schreib /help für den Syntax.",
-"no-user-entered-text" => "You have to enter a user!",
+"no-user-entered-text" => "Es muss ein Benutzer angegeben werden!",
 
 "user-invited-successfully-text" => "%1 wurde erfolgreich eingeladen diesem Channel beizutreten!",
 

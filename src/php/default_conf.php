@@ -33,7 +33,6 @@ function return_default_settings()
 	"html_path" => "!!AUTO!!",
 	"database_type" => "mysqli",
 	"theme" => "default",
-	"rows" => '1',
 	"replace_own_username" => false,
 	"deactivate_afk" => false,
 	"auto_detect_no_afk" => true,
@@ -49,8 +48,6 @@ function return_default_settings()
 		":/" => "worried.png",
 		"*?*" => "question.png"
 	),
-	"smiley_width" => "!!AUTO!!",
-	"smiley_height" => "!!AUTO!!",
 	"time_24_hours" => true,
 	"date_format" => "d.m.y",
 	"channels" => array(
@@ -79,6 +76,7 @@ function return_default_settings()
 	"can_rename_others" => true,
 	"can_invite" => true,
 	"can_force_invite" => true,
+	"disable_bbcode" => false,
 	
 	"spam_max_count" => 6,
 	"spam_count_interval" => 2,
@@ -94,7 +92,6 @@ function return_default_settings()
 	
 	
 	"debug" => false,
-	"include_file" => false,
 	"user_color" => false,
 	"user_afk_class" => "!!AUTO!!",
 	"user_online_class" => "!!AUTO!!"
