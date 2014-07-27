@@ -38,7 +38,7 @@ function draw_chat($chat_id)
 	$chat_settings['theme'] = $chat_settings['design'];
   
   $chat = new SiPac_Chat($chat_settings);
-  
+  $chat->debug->add("You are using a deprecated methode to draw the chat!", 1);
   return $chat->draw();
 }
 ?>

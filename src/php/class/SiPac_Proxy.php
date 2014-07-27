@@ -50,7 +50,7 @@ class SiPac_Proxy
 						$post_array = $proxy->execute();
 						}
 					else
-						die('Classname is not "'.$class_name.'"');
+						$this->chat->debug->add("Proxy found, but the classname is not '$class_name'", 1);
 				}
 			}
 		}
@@ -71,18 +71,24 @@ class SiPac_Proxy
 		
 		foreach ($custom_proxy_array as $proxy_name)
 		{
-			include_once($proxy_folder."/SiPacProxy_".$proxy_name.".php");
+			$proxy_path = $proxy_folder."/SiPacProxy_".$proxy_name.".php";
 			$class_name = "SiPacProxy_".$proxy_name;
-
-			if (class_exists($class_name))
+			if (file_exists($proxy_path))
 			{
-				$proxy = new $class_name;
-				$proxy->set_variables($this->chat, $post_array);
-					
-				$post_array = $proxy->execute();
+				include_once($proxy_path);
+
+				if (class_exists($class_name))
+				{
+					$proxy = new $class_name;
+					$proxy->set_variables($this->chat, $post_array);
+						
+					$post_array = $proxy->execute();
+				}
+				else
+					$this->chat->debug->add("Proxy found, but the classname is not '$class_name'", 1);
 			}
 			else
-				die('Classname is not "'.$proxy_name.'"');
+				$this->chat->debug->add($class_name.".php doesn't exist in 'conf/proxy/'!", 1);
 		}
 		return $post_array;
 	}
@@ -105,7 +111,7 @@ class SiPac_Proxy
 				return $function->execute();
 			}
 			else
-				die('Classname is not "'.$function_name.'"');
+				$this->chat->debug->add('Classname is not "'.$function_name.'"', 0);
 		}
 		else
 			return true;

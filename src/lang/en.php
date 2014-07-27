@@ -52,6 +52,7 @@ $chat_text = array(
 "arguments-missing-text" => "Missing argument! Type /help for the syntax.",
 "no-user-entered-text" => "You have to enter a user!",
 "user-invited-successfully-text" => "%1 was  successfully invited to join this channel!",
+"debug-changed-text" => "Debug was successfully	changed!",
 
 "me-random-text-1" => "has something better to do",
 "me-random-text-2" => "has fallen in love with %1",

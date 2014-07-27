@@ -117,14 +117,21 @@ class SiPac_User
 	{
 		$user_info = $this->get_user_info_string();
 		$user_style = $this->style;
-		$this->chat->db->update_user($this->nickname, $this->channel, $this->chat->id, time(), $this->is_writing, $this->afk, $user_info, $user_style);
+		$db_response = $this->chat->db->update_user($this->nickname, $this->channel, $this->chat->id, time(), $this->is_writing, $this->afk, $user_info, $user_style);
+		if ($db_response !== true)
+			$this->chat->debug->add("Failed to update users (response: ".$db_response.";user: ".$this->nickname.";channel: ".$this->channel.";id:".$this->chat->id.")", 0);
 	}
 	public function save_user($add_notify)
 	{
 		$user_info = $this->get_user_info_string();
 		$user_style = $this->style;
 		
-		$this->chat->db->save_user($this->nickname, $this->channel, $user_info, $user_style, $this->ip, $this->chat->id);
+		$db_response = $this->chat->db->save_user($this->nickname, $this->channel, $this->afk, $user_info, $user_style, $this->ip, $this->chat->id);
+		if ($db_response !== true)
+		{
+			$this->chat->debug->add("Failed to save users (response: ".$db_response.";user: ".$this->nickname.";channel: ".$this->channel.";id:".$this->chat->id.")", 0);
+			return false;
+		}
 		
 		if ($add_notify)
 		{

@@ -18,7 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-$SiPac_version = "0.0.4-git (alpha8)";
+$SiPac_version = "0.0.4-git (alpha9)";
 
 //initiate the session, if not already started
 if (strlen(session_id()) < 1)
@@ -89,7 +89,7 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 					$chat_variables[$chat_variable[0]] = urldecode($chat_variable[1]);
 				}
 				if (isset($chat_variables) AND isset($chat_variables['writing']) AND isset($chat_variables['client_num']) 
-				AND isset($chat_variables['chat_id']) AND isset($chat_variables['active_channel']) AND isset($chat_variables['channels']))
+					AND isset($chat_variables['chat_id']) AND isset($chat_variables['active_channel']) AND isset($chat_variables['channels']))
 				{
 					//split all channels
 					$chat_channels = explode("|||", $chat_variables['channels']);
@@ -144,6 +144,14 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 					//check_changes can contain messages, so merge with the orginal json_answer
 					$tmp_json_answer['get'] = array_merge($tmp_json_answer['get'], $check_changes['get']);
 	  
+					//add debug entries
+					foreach ($SiPac->channel->ids as $channel)
+					{
+						$tmp_json_answer['debug'][$channel] = $SiPac->debug->get($SiPac->settings->get('debug_level'), $channel);
+					}
+					//if (!empty($tmp_json_answer['debug'][0]))
+						$tmp_json_answer['debug'][0] = $SiPac->debug->get($SiPac->settings->get('debug_level'), 0);
+					
 					//save the tmp json array in the real one
 					$json_answer[] = $tmp_json_answer;
 				}

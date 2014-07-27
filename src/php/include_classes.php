@@ -31,6 +31,7 @@ require_once("class/SiPac_Language.php");
 require_once("class/SiPac_Afk.php");
 require_once("class/SiPac_Layout.php");
 require_once("class/SiPac_Settings.php");
+require_once("class/SiPac_Debug.php");
 
 require_once("class/Interface/SiPacCommand.php");
 require_once("class/Interface/SiPacProxy.php");

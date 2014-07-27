@@ -29,6 +29,7 @@ class SiPac_Chat
 	public $afk;
 	public $is_writing = false;
 	public $new_nickname;
+	public $is_new = false;
 	
 	private $db_error;
 	
@@ -44,9 +45,13 @@ class SiPac_Chat
 			$this->id = $settings['chat_id'];
 		else
 			$this->id = $chat_variables['chat_id'];
+			
+		$this->is_new = $is_new;
+		
+		$this->debug = new SiPac_Debug($this->id, $this->is_new);
 		
 		//load all settings for this chat
-		$this->settings = new SiPac_Settings($this->id);
+		$this->settings = new SiPac_Settings($this->id, $this->debug);
 		$this->settings->load($settings);
 		
 
@@ -75,7 +80,7 @@ class SiPac_Chat
 		
 		//check, if all mysql settings are given
 		if ($this->settings->get('mysql_hostname') == false OR $this->settings->get('mysql_username') == false OR $this->settings->get('mysql_password') === false OR $this->settings->get('mysql_database') == false)
-			die("Missing MySQL Settings!");
+			$this->debug->error("Missing MySQL Settings!");
 		else
 		{
 			//start mysql connection
@@ -84,11 +89,11 @@ class SiPac_Chat
 			else if ($this->settings->get('database_type') == "mysql")
 				$this->db = new SiPac_MySQL($this->settings->get('mysql_hostname'), $this->settings->get('mysql_username'), $this->settings->get('mysql_password'), $this->settings->get('mysql_database'), "mysql");
 			else
-				die("Unknown database type!");
+				$this->debug->error("Unknown database type!");
 			//check the connection
 			$this->db_error = $this->db->check();
 			if ($this->db_error !==  true)
-				die($this->db_error);
+				$this->debug->error($this->db_error);
 		}
 		
 		if ($channels == false)
@@ -98,34 +103,36 @@ class SiPac_Chat
 		if ($is_new == true)
 		{
 			//check for the update.php
-			if ($this->settings->get('debug') == false)
+			if ($this->settings->get('development') == false)
 			{
 				$update_file = dirname(__FILE__)."/../../update.php";	
 				if (file_exists($update_file))
 				{
-					die("Please delete the update.php inside folder 'src' where SiPac is installed!");
+					$this->debug->add("Please delete the update.php inside folder 'src' where SiPac is installed!", 1);
 				}
 			}
 			//check cache folder permissions
 			$cache_folder = "/../../../cache/";	
 			if (substr(decoct(fileperms(dirname(__FILE__).$cache_folder)), -3) != 777)
 			{
-				die("Wrong Permissions for the cache folder. Please change it to 777");
+				$this->debug->add("Wrong Permissions for the cache folder. Please change it to 777", 1);
 			}
 			//check log folder permissions
 			$log_folder = "/../../../log/";	
 			if (substr(decoct(fileperms(dirname(__FILE__).$log_folder)), -3) != 777)
 			{
-				die("Wrong Permissions for the log folder. Please change it to 777");
+				$this->debug->add("Wrong Permissions for the log folder. Please change it to 777", 1);
 			}
 			
 			//restore old channels
 			$this->channel->restore_old();
 			
 			//clean the db (remove old messages)
-			$this->db->clean_up($this->channel->ids, $this->settings->get('max_messages'), $this->id);
+			$db_response = $this->db->clean_up($this->channel->ids, $this->settings->get('max_messages'), $this->id);
+			if ($db_response !== true)
+					$this->debug->add("Failed to clean up the db (response: ".$db_response.";)", 0);
 			
-			//reset the Chat (reset a possible kick)
+			//reset the Chat (reset the userlist, or a possible kick)
 			$this->reset();
 		}
 		
@@ -135,7 +142,7 @@ class SiPac_Chat
 			$this->chat_num =  $GLOBALS['global_chat_num'] ;
 		else
 			$this->chat_num = $chat_num;
-
+		
 		$this->afk = new SiPac_Afk($this);
 		
 		$this->language = new SiPac_Language($this->settings);
@@ -160,6 +167,10 @@ class SiPac_Chat
 	private function reset()
 	{
 		unset($_SESSION['SiPac'][$this->id]['kick']);
+		foreach ($this->channel->ids as $channel)
+		{
+			$_SESSION['SiPac'][$this->id]['userlist'][$this->client_num][$channel] = array();
+		}
 	}
 	
 	public function handle_userlist()
@@ -215,12 +226,9 @@ class SiPac_Chat
 					}
 					$this->kick($client_text, $notification_text);
 				}
-				/*
-				else if ($action_parts[0] == "message")
-				$array['actions'][] = "message|" . $action_parts[1];
 				else
-					$chat_debug['warn'][] = "Action " . $action_parts[0] . " not defined!";*/
-		
+					$this->debug->add("Task '". $task_parts[1] . "' is not defined!", 1);
+			
 				$this->db->add_task("", $this->nickname, $channel, $this->id);
 			}
 		}
@@ -233,14 +241,19 @@ class SiPac_Chat
 		foreach ($this->channel->ids as $channel)
 		{
 				$this->message->send($notification_text, $channel, 1);
-				$this->db->delete_user($this->nickname, $channel, $this->id);
+				$db_response = $this->db->delete_user($this->nickname, $channel, $this->id);
+				if ($db_response !== true)
+				{
+					$this->debug->add("Failed to delete a user (response: ".$db_response.";name: ".$this->nickname.";channel: ".$channel.";chat_id:".$this->id.")", 0);
+					break;
+				}
 		}
 	}
 	
 	private function check_kick()
 	{
 		if (!empty($_SESSION['SiPac'][$this->id]['kick']))
-			die($this->language->translate($_SESSION['SiPac'][$this->id]['kick']));
+			$this->debug->error($this->language->translate($_SESSION['SiPac'][$this->id]['kick']));
 		else
 			return false;
 	}
@@ -272,9 +285,14 @@ class SiPac_Chat
 		{
 			foreach($this->channel->ids as $channel)
 			{
+					$db_response = $this->db->delete_user($_SESSION['SiPac'][$this->id]['nickname'], $channel, $this->id);
+					if ($db_response !== true)
+					{
+						$this->debug->add("Failed to delete a user (response: ".$db_response.";name: ".$this->nickname.";channel: ".$channel.";chat_id:".$this->id.")", 0);
+						break;
+					}
 					$this->message->send("<||rename-notification|".$_SESSION['SiPac'][$this->id]['nickname']." |".$this->nickname."||>", $channel, 1, 0);
-					$this->db->delete_user($_SESSION['SiPac'][$this->id]['nickname'], $channel, $this->id);
-					
+										
 					//add new user
 					$ip = $_SERVER['REMOTE_ADDR'];
 					$user_array = array("id" => "user", "name" => $this->nickname, "writing" => false, "afk" => false, "info" => $this->settings->get('user_infos'), "ip" => $ip, "channel" => $channel, "style" => $this->settings->get('user_color')."|||" );

@@ -53,10 +53,10 @@ class SiPacTheme_default extends SiPacTheme
 								<br><input type ='checkbox' class='chat_invite_checkbox' checked='checked' onclick='if ($js.invite_enabled == true) { $js.disable_invite() } else { $js.enable_invite() } '><||enable-invite-text||>
 							</div>
 						</div>
-							<div class='chat_element' style='text-align: center;'>
+						<div class='chat_element' style='text-align: center;'>
 							<div class='chat_element_head'><img src='".$this->path."/icons/emoticon_grin.png' alt=''><||smileys-head||><span class='chat_element_arrow'></span></div>
 							<div class='chat_element_text'>
-								<span>$smileys</span>
+							<span>$smileys</span>
 							</div>
 						</div>
 					</div>
@@ -144,6 +144,8 @@ class SiPacTheme_default extends SiPacTheme
 	
 	public function get_js_functions()
 	{
+		$js = $this->js_chat;
+		
 		$functions['layout_init'] = '
 		function ()
 		{
@@ -155,6 +157,7 @@ class SiPacTheme_default extends SiPacTheme
 				chat_elements[i].getElementsByClassName("chat_element_head")[0].addEventListener("click", function() { chat.show_hide_element(this) }, false);
 				chat_elements[i].getElementsByClassName("chat_element_head")[0].style.cursor = "pointer";
 			}
+			this.debug_open = false;
 		}
 		';
 		$functions['show_hide_element'] = '
@@ -176,6 +179,22 @@ class SiPacTheme_default extends SiPacTheme
 			}
 		}
 		';
+		$functions['add_element'] = "
+		function (head, text, icon, class_name)
+		{
+			icon = '".$this->path."/icons/' + icon;
+			if (class_name == undefined)
+				class_name = 'chat_layout_default_element';
+			var chat = this;
+			this.chat.getElementsByClassName('chat_right')[0].innerHTML += 
+					'<div class=\"' + class_name + '\"><div class=\"chat_element\" style=\"text-align: center;\">' +
+							'<div class=\"chat_element_head\" style=\"cursor: pointer;\" onclick=\"$js.show_hide_element(this)\"><img src=\"' + icon + '\" alt=\"\">' + head + '<span class=\"chat_element_arrow\"></span></div>' +
+							'<div class=\"chat_element_text\">' +
+							 text +
+							'</div>' +
+					'</div></div>';
+		}
+		";
 		$functions['user_options'] = "
 		function (user_id, action)
 		{
@@ -217,6 +236,38 @@ class SiPacTheme_default extends SiPacTheme
 				document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML = "[" + this.texts["writing-status"] + "]";
 			else if (this.old_user_status[username] != undefined)
 				document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML =  this.old_user_status[username];
+		}
+		';
+		$functions['layout_add_debug'] ='
+		function (type, text, channel)
+		{
+			if (this.debug_open == false)
+				this.add_element("debug", "", "page.png", "chat_debug");
+			this.debug_open = true;
+			
+			channel = this.channel_titles[this.channels.indexOf(channel)];
+			switch (type)
+			{
+				case 0:
+					var color = "red";
+					break;
+				case 1:
+					var color = "orange";
+					break;
+				case 2:
+					var color = "blue";
+					break;
+				case 3:
+					var color = "green";
+					break;
+				default:
+					var color = "black";
+					break;
+			}
+			
+			var debug = this.chat.getElementsByClassName("chat_debug")[0].getElementsByClassName("chat_element_text")[0];
+			debug.innerHTML += "<div style=\'color: " + color + "\' class=\'chat_entry_debug\'>" + channel + ": " + text + "</div>";
+			debug.scrollTop = debug.scrollHeight;
 		}
 		';
 		$functions['layout_notification_status'] ='

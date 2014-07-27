@@ -18,6 +18,7 @@
  */
 //AJAX//
 httpobject = new XMLHttpRequest();
+chat_ajax_timeout = 1000;
 
 chat_extra_send = "";
 chat_extra_send_objects = new Array();
@@ -52,11 +53,12 @@ window.chat_stop = function()
 	delete SiPacHttpRequest;
 }
 
-function add_chat(html_path, theme_path, id, client_num, channels,channel_titles, texts, layout)
+function add_chat(html_path, theme_path, id, client_num, channels,channel_titles, texts, layout, ajax_timeout)
 {
   chat_html_path = html_path;
   chat_objects_id[id] = chat_objects.length;
   chat_objects[chat_objects.length] = new Chat(theme_path, id, client_num, channels,channel_titles, texts, layout);
+	chat_ajax_timeout = ajax_timeout;
 }
 
 function chat_ajax()
@@ -128,7 +130,7 @@ function chat_ajax()
           chat_extra_send_objects = new Array();
           
           window.clearTimeout(chat_error_timeout);
-          chat_timeout = window.setTimeout(chat_ajax, 1000);
+          chat_timeout = window.setTimeout(chat_ajax, chat_ajax_timeout);
           chat_is_ajax = false;
        // }
         //catch (e)
@@ -180,13 +182,12 @@ function chat_error(error, clear)
     chat_error_text += " (Timeout)";
 
   chat_error_information_text = chat_error_text + ". " + chat_error_num + ". Try...";
-  console.error(chat_error_text);
   for (var i = 0; i < chat_objects.length; i++)
   {
     if (old_chat_error_information_text != chat_error_information_text)
       chat_objects[i].information(chat_error_information_text, "error", true, undefined, true);
     if (old_chat_error_text != chat_error_text)
-      chat_objects[i].add_debug_entry("error", chat_error_text);
+      chat_objects[i].add_debug_entry(0, chat_error_text);
   }
 
   if (error == undefined)
@@ -249,11 +250,14 @@ Chat.prototype.init = function()
   try{
     this.chat.getElementsByClassName('chat_message')[0].addEventListener("keydown", function (e) { chat_objects[chat_num].check_return(e)}, false);
   }catch(e){
-    this.add_debug_entry("warn", "Missing chat_message in this theme!");
+    this.add_debug_entry(0, "Missing chat_message in this theme!");
   }try{
     this.chat.getElementsByClassName('chat_send_button')[0].addEventListener("click", function () { chat_objects[chat_num].send_message() }, false);
   }catch(e){
-    this.add_debug_entry("warn", "Missing chat_send_button in this theme!");}
+    this.add_debug_entry(0, "Missing chat_send_button in this theme!");}
+	if (this.chat.getElementsByClassName("chat_channels_ul")[0] == undefined)
+		this.add_debug_entry(1, "Missing chat_channels_ul in theme!");
+	
   this.chat.addEventListener("mousemove", new_messages_status, false);
   
   scroll(this.chat, "chat_conversation", 0, true);
@@ -364,8 +368,14 @@ Chat.prototype.handle_chat_tasks = function (answer)
         this.handle_userlist(answer['get']['userlist'][this.channels[i]], this.channels[i]);
     }
   }
-
-  this.add_debug_entries(answer['debug']);
+    for (var i = 0; i < this.channels.length; i++)
+    {
+			if (answer['debug'][this.channels[i]] != undefined)
+				this.add_debug_entries(answer['debug'][this.channels[i]], this.channels[i]);
+		}
+		
+		if (answer['debug'][0] != undefined)
+			this.add_debug_entries(answer['debug'][0], this.active_channel);
 
   if (answer['get']['tasks'] != undefined)
     this.handle_server_tasks(answer['get']['tasks']);
@@ -519,8 +529,6 @@ Chat.prototype.add_channel = function (channel, channel_title, noadd)
 	  {
 			if (this.chat.getElementsByClassName("chat_channels_ul")[0] != undefined)
 				this.chat.getElementsByClassName("chat_channels_ul")[0].innerHTML +=	 this.generate_channel_html(channel, channel_title);
-			else
-			this.add_debug_entry("warn", "Missing chat_channels_ul in theme!");
 			
 			this.chat.getElementsByClassName("chat_conversation")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative; display: none;' class='chat_conversation_channel_" + channel + "'></div>";
 			this.chat.getElementsByClassName("chat_userlist")[0].innerHTML += "<div style='width: 100%; height: 100%; top: 0px; left: 0px; padding: 0px; margin: 0px; position: relative; display: none;' class='chat_userlist_channel_" + channel + "'></div>";
@@ -619,7 +627,7 @@ Chat.prototype.handle_server_tasks = function (tasks)
       this.information(task_parts[1], "error", true, false, true);
     }
    else 
-      console.debug("Unknown task '" + task_parts[0] + "'!"); 
+      this.add_debug_entry("Unknown task '" + task_parts[0] + "'!", 0); 
   }
 }
 
@@ -812,34 +820,49 @@ Chat.prototype.add_smiley = function (code)
   this.chat.getElementsByClassName("chat_message")[0].focus();
 
 };
-Chat.prototype.add_debug_entries = function (debug_entries)
+Chat.prototype.add_debug_entries = function (debug_entries, channel)
 {
   if (debug_entries != undefined)
   {
     for (var i in debug_entries)
     {
-      this.add_debug_entry(debug_entries[i]['type'], debug_entries[i]['text']);
+      this.add_debug_entry(debug_entries[i]['type'], debug_entries[i]['text'], channel);
     }
   } 
 }
-Chat.prototype.add_debug_entry = function (type, text)
+Chat.prototype.add_debug_entry = function (type, text, channel, timeout)
 {
-  var time = new Date();
-  try{
-    this.chat.getElementsByClassName('chat_conversation_channel_' + this.active_channel)[0].innerHTML += "<div class='chat_entry_debug'><span class='chat_entry_user'>" + type + ": </span><span class='chat_entry_message'>" + text + "</span><span class='chat_entry_date'>" + time.getHours() + ":" + time.getMinutes() + "</span></div>";
-  }catch(e){}
-    scroll(this.chat, "chat_conversation", 20, true);
-  switch(type)
-  {
-    case "warn":
-      console.warn(text);
-      break;
-    case "error":
-       console.error(text);
-    default:
-       console.debug(text);
-       break;
-  }
+	if (timeout != true)
+	{
+		switch(type)
+		{
+			case 0:
+				console.error(text);
+				break;
+			case 1:
+				console.warn(text);
+				break;
+			default:
+				console.debug(text);
+				break;
+		}
+	}
+	if (this.first_start == true)
+	{
+		var chat = this;
+		window.setTimeout(function() { chat.add_debug_entry(type, text, channel, true) }, 100);			
+		return false;
+	}
+	
+	if (channel == undefined)
+		channel = this.active_channel;
+	if (typeof this.layout_add_debug != "undefined")
+		this.layout_add_debug(type, text, channel);
+	else
+	{
+		this.chat.getElementsByClassName('chat_conversation_channel_' + channel)[0].innerHTML += "<div class='chat_entry_debug'><span class='chat_entry_message'>" + text + "</span></div>";	
+	}
+  scroll(this.chat, "chat_conversation", 20, true);
 };
 Chat.prototype.insert_command = function(command, auto_send)
 {

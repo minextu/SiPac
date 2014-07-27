@@ -35,7 +35,7 @@ class SiPacCommand_test implements SiPacCommand
 					$post_array = $proxy->execute();
 				}
 				else
-					die('Classname is not "'.$proxy_name.'"');		
+					$this->chat->debug->add('Classname is not "'.$proxy_name.'"', true);	
 					
 				return array("info_type" => "info", "info_text" => print_r($post_array, true), 'info_nohide' => true);
 			}
@@ -55,7 +55,7 @@ class SiPacCommand_test implements SiPacCommand
 					$answer = $proxy->execute();
 				}
 				else
-					die('Classname is not "'.$proxy_name.'"');		
+					$this->chat->debug->add('Classname is not "'.$proxy_name.'"', true);
 					
 				return array("info_type" => "info", "info_text" => $answer, 'info_nohide' => true);
 			}

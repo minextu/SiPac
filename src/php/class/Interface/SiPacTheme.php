@@ -94,5 +94,15 @@ abstract class SiPacTheme
 			</li>
 		";
 	}
+	
+	public function get_post_date($date, $time_format, $date_format)
+	{
+		$date_text = date($time_format, $date);
+				
+		if (date("d.m.Y", $date) != date("d.m.Y", time()))
+			$date_text = date($date_format, $date). " " . $date_text;
+					
+		return $date_text;
+	}
 }
 ?>

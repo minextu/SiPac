@@ -50,7 +50,10 @@ class SiPac_Message
 			$command_return = $this->chat->command->check($message) ;
 			if ($command_return !== false)
 			{
-				return $command_return;
+				if ($command_return == false)
+					return array();
+				else
+					return $command_return;
 			}
 			else
 			{
@@ -62,9 +65,11 @@ class SiPac_Message
 				
 				$db_response = $this->chat->db->save_post($post_array['message'], $this->chat->id, $post_array['channel'], $post_array['type'], $post_array['user'], $post_array['style'], $post_array['time']);
 				if ($db_response !== true)
-					return array('info_type' => "error", 'info_text' => $db_response);
+					$this->chat->debug->add("Message saving failed (response: ".$db_response.")", 0);
 				else
-					return array();
+					$this->chat->debug->add("Message successfully send (type:".$post_array['type'].")", 2);
+					
+				return array();
 			}
 		}
 		else
@@ -81,6 +86,9 @@ class SiPac_Message
 		//load all posts
 		$db_response = $this->chat->db->get_posts($this->chat->id, $this->chat->channel->ids, $min_id);
 		
+		if (!is_array($db_response))
+			$this->chat->debug->error("Couldn't get new Messages ($db_response)");
+			
 		$new_posts = array();
 		$new_post_users = array();
 		$new_post_messages = array();
@@ -119,13 +127,7 @@ class SiPac_Message
 				$message_style = explode("|||", $post_array['style']);
 				$color = $message_style[0];
 				
-				if ($this->chat->settings->get('time_24_hours'))
-					$date = date("H:i", $post_array['time']);
-				else
-					$date = date("h:i A", $post_array['time']);
-				
-				if (date("d.m.Y", $post_array['time']) != date("d.m.Y", time()))
-					$date = date($this->chat->settings->get('date_format'), $post_array['time']). " " . $date;
+				$date = $this->chat->layout->theme->get_post_date($post_array['time'], $this->chat->settings->get('time_format'), $this->chat->settings->get('date_format'));
 				
 				$post_html = $this->chat->layout->theme->get_message_entry($post_array['message'], $post_user, $post_type, $color, $date);
 
@@ -137,7 +139,12 @@ class SiPac_Message
 			//save the highest id
 			$updated_last_id = $post['id'];
 		}
-		
+		foreach ($this->chat->channel->ids as $channel)
+		{
+			if (isset($new_posts[$channel]) AND count($new_posts[$channel]) > 0)
+				$this->chat->debug->add(count($new_posts[$channel])." new messages added (id:".$updated_last_id.")", 3, $channel);
+		}
+			
 		$last_id = $updated_last_id;
 		//return all new posts and the highest id
 		return array('posts' => $new_posts, 'post_users' => $new_post_users, 'post_messages' => $new_post_messages, 'last_id' => $last_id, 'username' => $this->chat->nickname);

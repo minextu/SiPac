@@ -43,7 +43,7 @@ class SiPac_Language
 		if (is_file($language_path.$language.".php"))
 			include_once ($language_path.$language.".php");
 		else
-			die("Invalid Language");
+			$this->chat->debug->error("Invalid Language");
 		
 		return $chat_text;
 	}

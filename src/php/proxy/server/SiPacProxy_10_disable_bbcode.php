@@ -15,6 +15,8 @@ class SiPacProxy_disable_bbcode implements SiPacProxy
 			$this->post['message'] = preg_replace('=\[b\](.*)\[/b\]=Uis','$1', $this->post['message']);
 			$this->post['message'] = preg_replace('=\[u\](.*)\[/u\]=Uis','$1', $this->post['message']);
 			$this->post['message'] = preg_replace('=\[i\](.*)\[/i\]=Uis','$1', $this->post['message']);
+			$this->post['message'] = preg_replace('=\[s\](.*)\[/s\]=Uis','$1', $this->post['message']);
+			$this->post['message'] = preg_replace('=\[img\](.*)\[/img\]=Uis','$1', $this->post['message']);
 			$this->post['message'] = preg_replace('#\[color=(.*)\](.*)\[/color\]#isU','$2', $this->post['message']);
 		}
 		return $this->post;

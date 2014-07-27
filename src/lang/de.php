@@ -51,8 +51,8 @@ $chat_text = array(
 "no-channel-entered" =>"Es muss ein Channel angegeben werden!",
 "arguments-missing-text" => "Fehlendes Argument! Schreib /help für den Syntax.",
 "no-user-entered-text" => "Es muss ein Benutzer angegeben werden!",
-
 "user-invited-successfully-text" => "%1 wurde erfolgreich eingeladen diesem Channel beizutreten!",
+"debug-changed-text" => "Debug wurde erfolgreich geändert!",
 
 "me-random-text-1" => "hat etwas besseres zu tun",
 "me-random-text-2" => "Hat sich in %1 verliebt",

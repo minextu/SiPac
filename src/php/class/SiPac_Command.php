@@ -54,7 +54,7 @@ class SiPac_Command
 						return $this->execute($command, $command_parameters);
 					}
 					else
-						return array("info_type"=>"error", "info_text" => 'Classname is not "'.$command_class.'"');
+						$this->chat->debug->add("Command found, but the classname is not '$command_class'", 1);
 				}
 				else
 					return array("info_type"=>"warn", "info_text" => $this->chat->language->translate("<||command-not-found-text|".$command_name."||>"));
@@ -72,11 +72,22 @@ class SiPac_Command
 			if (file_exists($command_path))
 			{
 				include_once($command_path);
-				$command = new $command_class;
-				return $this->execute($command, $command_parameters);
+				if (class_exists($command_class))
+				{
+					$command = new $command_class;
+					return $this->execute($command, $command_parameters);
+				}
+				else
+				{
+					$this->chat->debug->add("Command found, but the classname is not '$command_class'", 1);
+					return false;
+				}
 			}
 			else
-				die($command_class." doesn't exist!");
+			{
+				$this->chat->debug->add($command_class.".php doesn't exist in 'conf/command/'!", 1);
+				return false;
+			}
 		}
 		else
 			return false;

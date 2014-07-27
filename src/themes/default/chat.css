@@ -50,15 +50,16 @@
 	float: left;
 	height: calc(100% - 40px);
 	width: calc(30% - 81px);
+	overflow: auto;
 }
 ##CHAT_MAIN## .chat_userlist
 {
-	height: 50%;
+	height: 45%;
 	overflow: auto;
 }
 ##CHAT_MAIN## .chat_element
 {
-	width: 100%;
+	width: calc(100% - 2px);
 	background: #f8f9f8;
 	margin-bottom: 20px;
 	border-radius: 10px;
@@ -98,6 +99,15 @@
 	overflow: hidden;
 	transition: max-height 0.5s;
 	max-height: 500px;
+}
+##CHAT_MAIN## .chat_debug .chat_element_text
+{
+	height: 20%;
+}
+##CHAT_MAIN## .chat_debug .chat_element_text
+{
+	overflow: auto;
+	text-align: left;
 }
 ##CHAT_MAIN## .chat_conversation
 {

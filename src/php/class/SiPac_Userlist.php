@@ -35,6 +35,12 @@ class SiPac_Userlist
 			//try to get user information
 			$user_info = $this->chat->db->get_user($this->chat->nickname, $channel, $this->chat->id);
       
+      if (!is_array($user_info) AND !empty($user_info))
+			{
+				$this->chat->debug->add("Failed to get a user (response: ".$user_info.";user: ".$this->chat->nickname.";channel: ".$channel.";id:".$this->chat->id.")", 0);
+				break;
+			}
+      
 			//if no infomation by this user are available
 			if (empty($user_info))
 			{
@@ -45,6 +51,7 @@ class SiPac_Userlist
 				$user = new SiPac_User($user_array, $this->chat);
 		
 				$user->save_user(true);
+				$this->chat->debug->add("added yourself to the db (name: '".$user_array['name']."'; id: ".$user_array['id'].")", 2, $user_array['channel']);
 			}
 			else //if the user is already in the db, just update the information
 			{
@@ -66,6 +73,12 @@ class SiPac_Userlist
 		{
 			//get all users
 			$users = $this->chat->db->get_all_users($channel, $this->chat->id);
+			if (!is_array($users))
+			{
+				$this->chat->debug->add("Failed to get all users (response: ".$users.";channel: ".$channel.";chat_id:".$this->chat->id.")", 0);
+				break;
+			}
+			
 			foreach($users as $user)
 			{
 				//if the last connection is too long ago
@@ -75,9 +88,16 @@ class SiPac_Userlist
 					if ($this->chat->proxy->check_custom_functions($values, "user_left") == true)
 					{
 						//delete the user
-						$this->chat->db->delete_user($user['name'], $user['channel'], $this->chat->id);
+						$db_response = $this->chat->db->delete_user($user['name'], $user['channel'], $this->chat->id);
+						if ($db_response !== true)
+						{
+							$this->chat->debug->add("Failed to delete a user (response: ".$db_response.";user: ".$user['name'].";channel: ".$user['channel'].";chat_id:".$this->chat->id.")", 0);
+							break;
+						}
+						
 						//save a message, that the user has left
 						$this->chat->message->send("<||user-left-notification|".$user['name']. "||>", $user['channel'], 1, 0, $user['online']);
+						$this->chat->debug->add("deleted user '".$user['name']."' from db (id: ".$user['id'].")", 2, $user['channel']);
 					}
 				}
 			}
@@ -89,16 +109,18 @@ class SiPac_Userlist
 		$user_array = array();
 		
 		$user_class = array();
-		
-		//if the userlist array is not already there, create it
-		if (!isset($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num]))
-			$_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num] = array();
     
 		//search for users in every channel the user is online
 		foreach ($this->chat->channel->ids as $channel)
 		{
 			//get all users
 			$users = $this->chat->db->get_all_users($channel, $this->chat->id);
+			if (!is_array($users))
+			{
+				$this->chat->debug->add("Failed to get all users (response: ".$users.";channel: ".$channel.";id:".$this->chat->id.")", 0);
+				break;
+			}
+			
 			foreach($users as $user)
 			{
 				$user_class[$user['id']] = new SiPac_User($user, $this->chat);
@@ -121,6 +143,7 @@ class SiPac_Userlist
 					$user_array[$channel]['add_user_id'][] = $user['id']; 
 					//save the user to the session user array 
 					$_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$user['id']] = $user_html;
+					$this->chat->debug->add("Add user '".$user['name']."' to userlist (id: ".$user['id'].")", 3, $user['channel']);
 				}
 				//if the the html code has changed
 				else if ($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$user['id']] != $user_html)
@@ -129,16 +152,21 @@ class SiPac_Userlist
 					$user_array[$channel]['change_user'][] = $user_html;
 					$user_array[$channel]['change_user_id'][] = $user['id'];
 					$_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$user['id']] = $user_html;
+					$this->chat->debug->add("Changed user '".$user['name']."' in userlist (id: ".$user['id'].")", 3, $user['channel']);
 				}
 			}
-			foreach ($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel] as $id => $user)
+			if (isset($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel]))
 			{
-				//if a user isn't in the db anymore but on the client
-				if (!isset($user_class[$id]))
-				{	
-					//delete him with javascript
-					$user_array[$channel]['delete_user'][] = $id;
-					unset($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$id]);
+				foreach ($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel] as $id => $user)
+				{
+					//if a user isn't in the db anymore but on the client
+					if (!isset($user_class[$id]))
+					{	
+						//delete him with javascript
+						$user_array[$channel]['delete_user'][] = $id;
+						unset($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$id]);
+						$this->chat->debug->add("Deleted user in userlist (id: ".$id.")", 3, $channel);
+					}
 				}
 			}
 		}

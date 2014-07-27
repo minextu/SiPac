@@ -93,9 +93,12 @@ class SiPac_Layout
 			require(dirname(__FILE__)."/Compatibility/SiPac_Old_Theme_Wrapper.php");
 			$this->theme = new SiPac_Old_Theme_Wrapper();
 			$this->theme->prepare($layout_php_path, $this->chat->settings->get('theme'), $this->chat->chat_num);
+			
+			if ($this->chat->is_new == true)
+				$this->chat->debug->add("You are using a deprecated theme. Consider updating the theme to the new format (see conf/themes/example/ for an example)", 1);
 		}
 		else
-			die($layout_php_path."/$theme_class.php not found!");
+			$this->chat->debug->error($layout_php_path."/$theme_class.php not found!");
 		
 		$js_chat = "chat_objects[".$this->chat->chat_num."]";
 		$this->theme->set_variables($layout_path, $js_chat);
@@ -212,10 +215,7 @@ class SiPac_Layout
 	
 		/* generate js function arguments, to start the chat*/
 		$js_chat =$js_chat. "add_chat('".$this->chat->html_path."','" . $this->settings['html_path'] . "','".$this->chat->id."', '".$this->chat->client_num."', chat_channels, chat_channel_titles, chat_text, chat_layout";
-	
-
-	
-		$js_chat = $js_chat.");";
+		$js_chat = $js_chat.",".$this->chat->settings->get('ajax_timeout').");";
 		
 		
 		//load all javascript functions of the layout

@@ -152,7 +152,7 @@ class SiPac_MySQL
 		$posts = array();
 
 		if ($chat_mysql == false)
-			echo $this->error();
+			return $this->error();
 		else
 		{
 			while ($post = $this->fetch_assoc($chat_mysql))
@@ -180,7 +180,7 @@ class SiPac_MySQL
 		$users = array();
 
 		if ($users_mysql == false)
-			echo $this->error();
+			return $this->error();
 		else
 		{
 			while ($user = $this->fetch_assoc($users_mysql))
@@ -194,9 +194,9 @@ class SiPac_MySQL
 	public function get_user($nickname, $channel, $chat_id)
 	{
 		//get all values of the user with the given nickname
-		$user_info = $this->query("SELECT * FROM sipac_users WHERE name LIKE '".$this->escape_string($nickname)."' AND channel LIKE '".$this->escape_string($channel)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
+		$user_info = $this->query("SELECT * FROM sipac_users WHERE name LIKE '".$this->escape_string(addslashes($nickname))."' AND channel LIKE '".$this->escape_string($channel)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
 		if ($user_info == false)
-			echo $this->error();
+			return $this->error();
 		else
 			return $this->fetch_assoc($user_info);
 	}
@@ -206,22 +206,29 @@ class SiPac_MySQL
 		$is_writing =  $is_writing == "true" ? 1 : 0;
 		//update the user entry with all new values
 		$update_user_mysql = $this->query("UPDATE sipac_users SET online = '" . $time . "', afk = '" . $is_afk ."', writing = '$is_writing', style = '" . $user_style . "', info = '". $this->escape_string($user_info)."' WHERE name = '" . $this->escape_string($nickname) . "' AND channel = '" . $this->escape_string($channel) . "' AND chat_id = '" . $this->escape_string($chat_id) . "'");
-
-		return $update_user_mysql;
+		if ($update_user_mysql == false)
+			return $this->error();
+		else
+			return $update_user_mysql;
 	}
 
-	public function save_user($nickname, $channel, $user_info, $user_style, $user_ip, $chat_id)
+	public function save_user($nickname, $channel, $is_afk, $user_info, $user_style, $user_ip, $chat_id)
 	{
-		//variables to add later
-		$is_afk = "";
-
 		//save the user with all given values
-		$add_user_mysql = $this->query("INSERT INTO sipac_users (name, info, style, afk, writing, ip, online, channel, chat_id) VALUES ('" . $this->escape_string($nickname) . "', '" . $this->escape_string($user_info) . "', '" . $user_style . "', '" . $is_afk . "', 'false', '" . $user_ip . "', '" . time() . "', '" . $this->escape_string($channel) . "', '$chat_id')");
+		$add_user_mysql = $this->query("INSERT INTO sipac_users (name, info, style, afk, writing, ip, online, channel, chat_id) VALUES ('" . $this->escape_string($nickname) . "', '" . $this->escape_string($user_info) . "', '" . $user_style . "', '" . $is_afk . "', 'false', '" . $user_ip . "', '" . time() . "', '" . $this->escape_string($channel) . "', '".$this->escape_string($chat_id)."')");
+		if ($add_user_mysql == false)
+			return $this->error();
+		else
+			return $add_user_mysql;
 	}
 
 	public function delete_user($nickname, $channel, $chat_id)
 	{
-		$delete_user = $this->query("DELETE FROM sipac_users WHERE name LIKE '" . $this->escape_string($nickname) . "' AND channel LIKE '".$this->escape_string($channel)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
+		$delete_user = $this->query("DELETE FROM sipac_users WHERE name LIKE '" . $this->escape_string(addslashes($nickname)) . "' AND channel LIKE '".$this->escape_string($channel)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
+		if ($delete_user == false)
+			return $this->error();
+		else
+			return $delete_user;
 	}
 
 	public function add_task($task, $user, $channel, $chat_id)
@@ -229,14 +236,17 @@ class SiPac_MySQL
 		if ($user === false)
 			$user = $this->nickname;
 			
-			$count = $this->query("SELECT * from sipac_users WHERE  name LIKE '".$this->escape_string($user)."' AND channel LIKE '".$this->escape_string($channel)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
-			if ($this->num_rows($count) > 0)
-			{
-				$add_task = $this->query("UPDATE sipac_users SET task = '".$this->escape_string($task)."' WHERE name LIKE '".$this->escape_string($user)."' AND channel LIKE '".$this->escape_string($channel)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
-				return true;
-			}
+		$count = $this->query("SELECT * from sipac_users WHERE  name LIKE '".$this->escape_string(addslashes($user))."' AND channel LIKE '".$this->escape_string($channel)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
+		if ($this->num_rows($count) > 0)
+		{
+			$add_task = $this->query("UPDATE sipac_users SET task = '".$this->escape_string($task)."' WHERE name LIKE '".$this->escape_string(addslashes($user))."' AND channel LIKE '".$this->escape_string($channel)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
+			if ($add_task == false)
+				echo $this->error();
 			else
-				return false;
+				return $add_task;
+		}
+		else
+			return false;
 	}
 
 	public function clean_up($channels, $max_messages, $chat_id)
@@ -251,9 +261,8 @@ class SiPac_MySQL
 				
 			if ($remove_old_posts == false)
 			{
-				echo $this->error();
+				return $this->error();
 				break;
-				return false;
 			}
 		}
 		return true;

@@ -23,9 +23,10 @@
 	private $settings;
 	private $id;
 	
-	public function __construct($id)
+	public function __construct($id,$debug)
 	{
 		$this->id = $id;
+		$this->debug = $debug;
 	}
 	
 	public function set($setting, $value)
@@ -51,7 +52,7 @@
 		else if (isset($_SESSION['SiPac'][$this->id]['settings'])) //else load them from the php session (if set)
 			$this->settings = $_SESSION['SiPac'][$this->id]['settings'];
 		else
-			die("No settings found!");
+			$this->debug->error("No settings found!");
     
  
     

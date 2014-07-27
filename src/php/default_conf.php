@@ -48,7 +48,7 @@ function return_default_settings()
 		":/" => "worried.png",
 		"*?*" => "question.png"
 	),
-	"time_24_hours" => true,
+	"time_format" => "H:i", //h:i A
 	"date_format" => "d.m.y",
 	"channels" => array(
 		"Main"
@@ -76,6 +76,8 @@ function return_default_settings()
 	"can_rename_others" => true,
 	"can_invite" => true,
 	"can_force_invite" => true,
+	"can_change_debug_level" => true,
+	"debug_level" => 1,
 	"disable_bbcode" => false,
 	
 	"spam_max_count" => 6,
@@ -91,10 +93,9 @@ function return_default_settings()
 	"max_messages" => "50",
 	
 	
-	"debug" => false,
+	"development" => false,
 	"user_color" => false,
-	"user_afk_class" => "!!AUTO!!",
-	"user_online_class" => "!!AUTO!!"
+	"ajax_timeout" => 1000
 	);
 	
 	return  $chat_default_settings;
