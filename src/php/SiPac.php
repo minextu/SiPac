@@ -18,7 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-$SiPac_version = "0.0.4-git (alpha9)";
+$SiPac_version = "0.0.4-git (alpha10)";
 
 //initiate the session, if not already started
 if (strlen(session_id()) < 1)
@@ -96,6 +96,12 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 					//create the Chat class
 					$SiPac = new SiPac_Chat(false, false, $chat_variables, $chat_channels, $chat_num);
 					
+					if ($SiPac->debug->get_error() !== false)
+					{
+						$json_answer[] = array("error" => $SiPac->debug->get_error());
+						continue;
+					}
+					
 					//if the chat is started for the first time, delete the old cached userlist
 					if (isset($chat_variables['first_start']) AND $chat_variables['first_start'] == "true")
 						unset($_SESSION['SiPac'][$SiPac->id]['userlist'][$SiPac->client_num]);
@@ -103,9 +109,6 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 					//active channel has to be a valid channel
 					if (array_search($chat_variables['active_channel'], $SiPac->channel->ids) === false)
 						DIE("You haven't joined this channel!");
-						
-					//obtain a nickname or load the old
-					$SiPac->check_name();
 	  
 					//save the writing status
 					$SiPac->is_writing = $chat_variables['writing'];
@@ -137,7 +140,9 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 					}
 	  
 					//get all new posts since the last request and save them in the var tmp json_answer
-					$tmp_json_answer['get'] = array_merge($tmp_json_answer['get'], $SiPac->message->get($chat_variables['last_id']));
+					$new_messages = $SiPac->message->get($chat_variables['last_id']);
+					if (is_array($new_messages))
+						$tmp_json_answer['get'] = array_merge($tmp_json_answer['get'], $new_messages);
 	  
 					$check_changes['get'] = $SiPac->check_changes();
 	  
@@ -152,6 +157,8 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 					//if (!empty($tmp_json_answer['debug'][0]))
 						$tmp_json_answer['debug'][0] = $SiPac->debug->get($SiPac->settings->get('debug_level'), 0);
 					
+					if ($SiPac->debug->get_error() !== false)
+						$tmp_json_answer = array("error" => $SiPac->debug->get_error());
 					//save the tmp json array in the real one
 					$json_answer[] = $tmp_json_answer;
 				}

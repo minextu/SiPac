@@ -98,7 +98,10 @@ class SiPac_Layout
 				$this->chat->debug->add("You are using a deprecated theme. Consider updating the theme to the new format (see conf/themes/example/ for an example)", 1);
 		}
 		else
+		{
 			$this->chat->debug->error($layout_php_path."/$theme_class.php not found!");
+			return false;
+		}
 		
 		$js_chat = "chat_objects[".$this->chat->chat_num."]";
 		$this->theme->set_variables($layout_path, $js_chat);
@@ -139,10 +142,11 @@ class SiPac_Layout
 	{
 		$user_num = "<span class='chat_user_num'>?</span>";
 		$smileys = $this->generate_smileys();
+		$settings = $this->theme->get_js_settings();
 		
 		
 		//save the html code of the layout
-		$html_code = $this->theme->get_layout($user_num, $smileys);
+		$html_code = $this->theme->get_layout($user_num, $smileys, $settings);
 	
 		//add the chat id to the div with the class 'chat_main'
 		$html_code =str_replace('"chat_main"', '"chat_main" id="' . $this->chat->id . '"', str_replace("'chat_main'", "'chat_main' id='".$this->chat->id."'", $html_code));

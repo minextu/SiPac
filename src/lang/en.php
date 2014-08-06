@@ -35,6 +35,8 @@ $chat_text = array(
 "user-join-notification" => "[user]%1[/user] has joined",
 "user-kicked-user-notification" => "[user]%1[/user] was kicked by [user]%2[/user] (%3)",
 "user-kicked-notification" => "[user]%1[/user] was kicked (%2)",
+"user-banned-user-notification" => "[user]%1[/user] was banned by [user]%2[/user] (%3)",
+"user-banned-notification" => "[user]%1[/user] was banned (%2)",
 "user-now-afk-no-reason-notification" => "[user]%1[/user] is now away",
 "user-now-afk-notification" => "[user]%1[/user] is now away (%2)",
 "user-now-not-afk-notification" => "[user]%1[/user] is back again",
@@ -66,6 +68,13 @@ $chat_text = array(
 "you-were-kicked-text" => "You were kicked! (%1)",
 "you-were-kicked-by-user-text" => "You were kicked by %1! (%2)",
 
+/* Ban */
+"reason-for-ban-text" => "Reason for the ban:",
+"ban-no-reason-text" => "no reason",
+"you-were-banned-text" => "You were banned! (%1)",
+"you-were-banned-by-user-text" => "You were banned by %1! (%2)",
+"user-no-longer-banned-text" => "%1 is no longer banned!",
+
 /* Notice Popup */
 "info-head" => "Info:",
 "error-head" => "Error:",
@@ -94,6 +103,7 @@ $chat_text = array(
 "enter-channel-name-text" => "Please enter a channel name",
 "enable-desktop-notifications-text" => "Enable Desktop Notifications",
 "enable-sound-text" => "Enable Sound",
+"enable-autoscroll-text" => "Enable Automatic Scrolling",
 "enable-invite-text" => "Enable Invitations"
 );
 ?>

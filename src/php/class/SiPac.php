@@ -42,7 +42,7 @@ class SiPac_Chat
 	public function init($settings, $is_new, $chat_variables, $channels, $chat_num)
 	{
 		if ($chat_variables == false)
-			$this->id = $settings['chat_id'];
+			$this->id = $this->encode_id($settings['chat_id']);
 		else
 			$this->id = $chat_variables['chat_id'];
 			
@@ -52,7 +52,9 @@ class SiPac_Chat
 		
 		//load all settings for this chat
 		$this->settings = new SiPac_Settings($this->id, $this->debug);
-		$this->settings->load($settings);
+		$settings_return = $this->settings->load($settings);
+		if ($settings_return === false)
+			return false;
 		
 
 		$this->channel = new SiPac_Channel($this->id, $this->settings);
@@ -80,7 +82,10 @@ class SiPac_Chat
 		
 		//check, if all mysql settings are given
 		if ($this->settings->get('mysql_hostname') == false OR $this->settings->get('mysql_username') == false OR $this->settings->get('mysql_password') === false OR $this->settings->get('mysql_database') == false)
+		{
 			$this->debug->error("Missing MySQL Settings!");
+			return false;
+		}
 		else
 		{
 			//start mysql connection
@@ -89,17 +94,27 @@ class SiPac_Chat
 			else if ($this->settings->get('database_type') == "mysql")
 				$this->db = new SiPac_MySQL($this->settings->get('mysql_hostname'), $this->settings->get('mysql_username'), $this->settings->get('mysql_password'), $this->settings->get('mysql_database'), "mysql");
 			else
+			{
 				$this->debug->error("Unknown database type!");
+				return false;
+			}
 			//check the connection
 			$this->db_error = $this->db->check();
 			if ($this->db_error !==  true)
+			{
 				$this->debug->error($this->db_error);
+				return false;
+			}
 		}
 		
 		if ($channels == false)
 			$this->channel->add($this->settings->get('channels'));
 		else
 			$this->channel->add($channels, true);
+		
+		//obtain a nickname or load the old
+		$this->check_name();
+		
 		if ($is_new == true)
 		{
 			//check for the update.php
@@ -145,7 +160,7 @@ class SiPac_Chat
 		
 		$this->afk = new SiPac_Afk($this);
 		
-		$this->language = new SiPac_Language($this->settings);
+		$this->language = new SiPac_Language($this->settings, $this->debug);
 		$this->language->load();
 		
 		$this->message= new SiPac_Message($this);
@@ -155,10 +170,26 @@ class SiPac_Chat
 
 		$this->layout = new SiPac_Layout($this);
 		$this->layout->load();
-		
-		$this->check_kick();
+			
+		if ($this->check_kick() == true)
+			return false;
+		else 	if (	$is_new == false AND $this->check_ban() == true)
+			return false;
 	}
 
+	public function encode_id($id=false)
+	{
+		if ($id === false)
+			$id = $this->id;
+		return "SiPac_".rtrim(strtr(base64_encode($id), '+/', '-_'), '=');
+	}
+	public function decode_id($id=false)
+	{
+		if ($id === false)
+			$id = $this->id;
+		 return base64_decode(str_replace("SiPac_", "", $id));
+	}
+	
 	public function draw()
 	{
 		return $this->layout->draw();
@@ -226,8 +257,23 @@ class SiPac_Chat
 					}
 					$this->kick($client_text, $notification_text);
 				}
+				else if ($task_parts[0] == "ban")
+				{
+					$array['tasks'][] = $user_info['task'];
+					if (!empty($task_parts[1]))
+					{
+						$notification_text = "<||user-banned-user-notification|".$user_info['name']."|".$task_parts[1]."|".$task_parts[3]."||>";
+						$client_text = "<||you-were-banned-by-user-text|".$task_parts[1]."|".$task_parts[3]."||>";
+					}
+					else
+					{
+						$notification_text = "<||user-banned-notification|".$user_info['name']."|".$task_parts[3]."||>";
+						$client_text = "<||you-were-banned-text|".$task_parts[3]."||>";
+					}
+					$this->ban($user_info['name'], $task_parts[2], $client_text, $notification_text);
+				}
 				else
-					$this->debug->add("Task '". $task_parts[1] . "' is not defined!", 1);
+					$this->debug->add("Task '". $task_parts[0] . "' is not defined!", 1);
 			
 				$this->db->add_task("", $this->nickname, $channel, $this->id);
 			}
@@ -235,25 +281,55 @@ class SiPac_Chat
 		return $array;
 	}
 	
-	public function kick($client_text, $notification_text)
+	public function kick($client_text, $notification_text, $delete_user=true)
 	{
 		$_SESSION['SiPac'][$this->id]['kick'] = $client_text;
 		foreach ($this->channel->ids as $channel)
 		{
 				$this->message->send($notification_text, $channel, 1);
-				$db_response = $this->db->delete_user($this->nickname, $channel, $this->id);
-				if ($db_response !== true)
+				
+				if ($delete_user == true)
 				{
-					$this->debug->add("Failed to delete a user (response: ".$db_response.";name: ".$this->nickname.";channel: ".$channel.";chat_id:".$this->id.")", 0);
-					break;
+					$db_response = $this->db->delete_user($this->nickname, $channel, $this->id);
+					if ($db_response !== true)
+					{
+						$this->debug->add("Failed to delete a user (response: ".$db_response.";name: ".$this->nickname.";channel: ".$channel.";chat_id:".$this->id.")", 0);
+						break;
+					}
 				}
 		}
+	}
+	
+	public function ban($user, $time, $client_text, $notification_text)
+	{
+		$time = time() + ((int)$time * 60 * 60);
+		
+		$db_response = $this->db->ban_user($user, $time, $this->id);
+		if ($db_response !== true)
+			$this->debug->add("Failed to ban the user (response: ".$db_response.";)", 0);
+			
+		$this->kick($client_text, $notification_text, false);
 	}
 	
 	private function check_kick()
 	{
 		if (!empty($_SESSION['SiPac'][$this->id]['kick']))
+		{
 			$this->debug->error($this->language->translate($_SESSION['SiPac'][$this->id]['kick']));
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	private function check_ban()
+	{
+		$check_ban = $this->db->check_ban($this->nickname, $this->id);
+		if ($check_ban == true)
+		{
+			$this->debug->error($this->language->translate("<||you-were-banned-text|unknown||>"));
+			return true;
+		}
 		else
 			return false;
 	}
@@ -271,33 +347,33 @@ class SiPac_Chat
 	{
 		if (!empty($this->new_nickname))
 		{
-		$this->nickname =$this->new_nickname;
-		unset($this->new_nickname);
+			$this->nickname =$this->new_nickname;
+			unset($this->new_nickname);
 		}
 		else if (!empty($_SESSION['SiPac'][$this->id]['nickname']) AND $this->settings->get('username_var') == $_SESSION['SiPac'][$this->id]['username_var'] )
-		$this->nickname = $_SESSION['SiPac'][$this->id]['nickname'];
+			$this->nickname = $_SESSION['SiPac'][$this->id]['nickname'];
 		else if ($this->settings->get('username_var') == "!!AUTO!!")
-		$this->nickname = "Guest" . mt_rand(1, 1000);
+			$this->nickname = "Guest" . mt_rand(1, 1000);
 		else
-		$this->nickname = htmlspecialchars($this->settings->get('username_var'));
+			$this->nickname = htmlspecialchars($this->settings->get('username_var'));
 
 		if (!empty($_SESSION['SiPac'][$this->id]['nickname'] ) AND $_SESSION['SiPac'][$this->id]['nickname']  != $this->nickname)
 		{
 			foreach($this->channel->ids as $channel)
 			{
-					$db_response = $this->db->delete_user($_SESSION['SiPac'][$this->id]['nickname'], $channel, $this->id);
-					if ($db_response !== true)
-					{
-						$this->debug->add("Failed to delete a user (response: ".$db_response.";name: ".$this->nickname.";channel: ".$channel.";chat_id:".$this->id.")", 0);
-						break;
-					}
-					$this->message->send("<||rename-notification|".$_SESSION['SiPac'][$this->id]['nickname']." |".$this->nickname."||>", $channel, 1, 0);
-										
-					//add new user
-					$ip = $_SERVER['REMOTE_ADDR'];
-					$user_array = array("id" => "user", "name" => $this->nickname, "writing" => false, "afk" => false, "info" => $this->settings->get('user_infos'), "ip" => $ip, "channel" => $channel, "style" => $this->settings->get('user_color')."|||" );
-					$user = new SiPac_User($user_array, $this);
-					$user->save_user( false);
+				$db_response = $this->db->delete_user($_SESSION['SiPac'][$this->id]['nickname'], $channel, $this->id);
+				if ($db_response !== true)
+				{
+					$this->debug->add("Failed to delete a user (response: ".$db_response.";name: ".$this->nickname.";channel: ".$channel.";chat_id:".$this->id.")", 0);
+					break;
+				}
+				$this->message->send("<||rename-notification|".$_SESSION['SiPac'][$this->id]['nickname']." |".$this->nickname."||>", $channel, 1, 0);
+									
+				//add new user
+				$ip = $_SERVER['REMOTE_ADDR'];
+				$user_array = array("id" => "user", "name" => $this->nickname, "writing" => false, "afk" => false, "info" => $this->settings->get('user_infos'), "ip" => $ip, "channel" => $channel, "style" => $this->settings->get('user_color')."|||" );
+				$user = new SiPac_User($user_array, $this);
+				$user->save_user( false);
 			}
 		}
 	

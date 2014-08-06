@@ -23,11 +23,13 @@ class SiPac_Language
 	public $text;
 	public $default_language;
 	private $settings;
+	private $debug;
 	
-	public function __construct($settings)
+	public function __construct($settings, $debug)
 	{
 		$this->settings = $settings;
 		$this->default_language = $this->settings->get('language');
+		$this->debug = $debug;
 	}
 	
 	public function load()
@@ -43,7 +45,10 @@ class SiPac_Language
 		if (is_file($language_path.$language.".php"))
 			include_once ($language_path.$language.".php");
 		else
-			$this->chat->debug->error("Invalid Language");
+		{
+			$this->debug->error("Invalid Language ('src/lang/".$language.".php' does not exist!)");
+			return false;
+		}
 		
 		return $chat_text;
 	}

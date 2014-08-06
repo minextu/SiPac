@@ -154,14 +154,14 @@
 	margin: 0px;
 	padding: 0px;
 }
-##CHAT_MAIN## .chat_channels_ul li, .chat_add_channel
+##CHAT_MAIN## .chat_channels_ul li, ##CHAT_MAIN## .chat_add_channel
 {
 	float: left;
 	text-align: center;
 	padding-right: 10px;
 	height: 25px;
 }
-##CHAT_MAIN## .chat_channels_ul li .chat_channel_span, .chat_add_channel a
+##CHAT_MAIN## .chat_channels_ul li .chat_channel_span, ##CHAT_MAIN## .chat_add_channel a
 {
 	height: 24px;
 	line-height: 24px;
@@ -198,11 +198,11 @@
 {
 	outline: none;
 }
-##CHAT_MAIN## .chat_channels_ul li .chat_channel_span:hover, .chat_add_channel a:hover
+##CHAT_MAIN## .chat_channels_ul li .chat_channel_span:hover, ##CHAT_MAIN##  .chat_add_channel a:hover
 {
 	box-shadow: inset -2px 4px 21px #f0f0f0;
 }
-##CHAT_MAIN## .chat_channels_ul li a, .chat_add_channel a
+##CHAT_MAIN## .chat_channels_ul li a, ##CHAT_MAIN## .chat_add_channel a
 {
 	color: black;
 	text-decoration: none;
@@ -270,7 +270,7 @@ to { background: #e4e8ad; }
 	font-size: 15px;
 }
 /* Chat-Entries */
-##CHAT_MAIN## .chat_entry_own, .chat_entry_others
+##CHAT_MAIN## .chat_entry_own, ##CHAT_MAIN## .chat_entry_others
 {	
 	padding: 3px;
 	background: #f5faff;

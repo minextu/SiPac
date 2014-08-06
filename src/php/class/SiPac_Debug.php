@@ -43,7 +43,17 @@ class SiPac_Debug
 	
 	public function error($message)
 	{
-		die($message);
+		$this->debug['error'] = $message;
+		if ($this->is_new == true)
+			die($message);
+	}
+	
+	public function get_error()
+	{
+		if (isset($this->debug['error']))
+			return $this->debug['error'];
+		else
+			return false;
 	}
 	
 	public function get($type, $channel)

@@ -53,7 +53,7 @@
 {
 	float: right;
 	width: 30%;
-	height: 90%;
+	height: 80%;
 	overflow: auto;
 	background: red;
 }
@@ -62,6 +62,14 @@
 	background: gray;
 	padding: 5px;
 	margin-bottom: 5px;
+}
+##CHAT_MAIN## .chat_settings
+{
+	float: right;
+	width: 30%;
+	height: 10%;
+	overflow: auto;
+	background: green;
 }
 ##CHAT_MAIN## .chat_user_input
 {

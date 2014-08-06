@@ -1,5 +1,10 @@
 <?php
 
+function encode_id($id)
+{
+	return "SiPac_".rtrim(strtr(base64_encode($id), '+/', '-_'), '=');
+}
+
 echo "
 <html>
 <head>
@@ -44,7 +49,7 @@ if (isset($_POST['mysql_send']))
 				while ($entry = $db->fetch_object($entries_mysql))
 				{
 					$new_channel_name = $channel->encode($entry->channel);
-					$new_chat_id  = preg_replace('/chat_/', "", $entry->chat_id, 1); 
+					$new_chat_id  = encode_id(preg_replace('/chat_/', "", $entry->chat_id, 1)); 
 					$update_entry = $db->query("UPDATE chat_entries SET channel='".$db->escape_string($new_channel_name)."', chat_id='".$new_chat_id."' WHERE id= '".$entry->id."'");
 					echo $update_entry;
 				}
@@ -52,7 +57,7 @@ if (isset($_POST['mysql_send']))
 				while ($user = $db->fetch_object($users_mysql))
 				{
 					$new_channel_name = $channel->encode($user->channel);
-					$new_chat_id  = preg_replace('/chat_/', "", $user->chat_id, 1); 
+					$new_chat_id  = encode_id(preg_replace('/chat_/', "", $user->chat_id, 1)); 
 					$update_user = $db->query("UPDATE chat_users SET channel='".$db->escape_string($new_channel_name)."', chat_id='".$new_chat_id."' WHERE id= '".$user->id."'");
 					echo $update_user;
 				}

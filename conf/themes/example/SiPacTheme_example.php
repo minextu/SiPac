@@ -2,12 +2,6 @@
 
 class SiPacTheme_example extends SiPacTheme
 {
-	public function set_variables($path, $js_chat)
-	{
-		$this->path = $path;
-		$this->js_chat = $js_chat;
-	}
-	
 	public function get_settings()
 	{
 		$settings['smiley_height'] = 30;
@@ -16,7 +10,7 @@ class SiPacTheme_example extends SiPacTheme
 		return $settings;
 	}
 	
-	public function get_layout($user_num, $smileys)
+	public function get_layout($user_num, $smileys, $settings)
 	{
 		$js = $this->js_chat;
 		
@@ -28,6 +22,7 @@ class SiPacTheme_example extends SiPacTheme
 					</nav>
 						<div class='chat_conversation'></div>
 						<div class='chat_userlist'></div>
+						<div class='chat_settings'>$settings</div>
 						
 						<div class='chat_user_input'>
 							<div class='chat_notice_msg'></div>
@@ -149,6 +144,15 @@ class SiPacTheme_example extends SiPacTheme
 			$date_text = date($date_format, $date). " " . $date_text;
 					
 		return $date_text;
+	}
+	public function get_js_settings()
+	{
+		return "
+		<input checked='checked' class='chat_notification_checkbox' type ='checkbox' onclick='if ($js.notifications_enabled == true) { $js.disable_notifications(); } else { $js.enable_notifications();} '><||enable-desktop-notifications-text||>
+		<br><input type ='checkbox' class='chat_autoscroll_checkbox' checked='checked' onclick='if ($js.autoscroll_enabled == true) { $js.disable_autoscroll() } else { $js.enable_autoscroll() } '><||enable-autoscroll-text||>
+		<br><input type ='checkbox' class='chat_sound_checkbox' checked='checked' onclick='if ($js.sound_enabled == true) { $js.disable_sound() } else { $js.enable_sound() } '><||enable-sound-text||>
+		<br><input type ='checkbox' class='chat_invite_checkbox' checked='checked' onclick='if ($js.invite_enabled == true) { $js.disable_invite() } else { $js.enable_invite() } '><||enable-invite-text||>
+		";
 	}
 	*/
 }

@@ -19,8 +19,12 @@
  */
 abstract class SiPacTheme
 {
-	abstract public function set_variables($path, $js_chat);
-	abstract public function get_layout($user_num, $smileys);
+	public final function set_variables($path, $js_chat)
+	{
+		$this->path = $path;
+		$this->js_chat = $js_chat;
+	}
+	abstract public function get_layout($user_num, $smileys, $settings);
 	abstract public function get_js_functions();
 	abstract public function get_settings();
   
@@ -103,6 +107,18 @@ abstract class SiPacTheme
 			$date_text = date($date_format, $date). " " . $date_text;
 					
 		return $date_text;
+	}
+	
+	public function get_js_settings()
+	{
+		$js = $this->js_chat;
+		
+		return "
+		<input checked='checked' class='chat_notification_checkbox' type ='checkbox' onclick='if ($js.notifications_enabled == true) { $js.disable_notifications(); } else { $js.enable_notifications();} '><||enable-desktop-notifications-text||>
+		<br><input type ='checkbox' class='chat_autoscroll_checkbox' checked='checked' onclick='if ($js.autoscroll_enabled == true) { $js.disable_autoscroll() } else { $js.enable_autoscroll() } '><||enable-autoscroll-text||>
+		<br><input type ='checkbox' class='chat_sound_checkbox' checked='checked' onclick='if ($js.sound_enabled == true) { $js.disable_sound() } else { $js.enable_sound() } '><||enable-sound-text||>
+		<br><input type ='checkbox' class='chat_invite_checkbox' checked='checked' onclick='if ($js.invite_enabled == true) { $js.disable_invite() } else { $js.enable_invite() } '><||enable-invite-text||>
+		";
 	}
 }
 ?>

@@ -18,7 +18,7 @@ class SiPacCommand_debug implements SiPacCommand
 	{
 		if (!empty($this->parameters) OR $this->parameters == 0)
 		{
-			if ($this->parameters == "off" OR $this->parameters % 1 == 0 AND $this->parameters >= 0 AND $this->parameters <= 3)
+			if ($this->parameters == "off" OR is_numeric($this->parameters) AND $this->parameters % 1 == 0 AND $this->parameters >= 0 AND $this->parameters <= 3)
 			{
 				$this->chat->settings->set("debug_level", $this->parameters);
 				return array("info_type" => "success","info_text" => "<||debug-changed-text||>");

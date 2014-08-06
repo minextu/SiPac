@@ -52,7 +52,10 @@
 		else if (isset($_SESSION['SiPac'][$this->id]['settings'])) //else load them from the php session (if set)
 			$this->settings = $_SESSION['SiPac'][$this->id]['settings'];
 		else
+		{
 			$this->debug->error("No settings found!");
+			return false;
+		}
     
  
     

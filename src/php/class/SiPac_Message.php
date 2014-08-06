@@ -87,7 +87,10 @@ class SiPac_Message
 		$db_response = $this->chat->db->get_posts($this->chat->id, $this->chat->channel->ids, $min_id);
 		
 		if (!is_array($db_response))
+		{
 			$this->chat->debug->error("Couldn't get new Messages ($db_response)");
+			return false;
+		}
 			
 		$new_posts = array();
 		$new_post_users = array();

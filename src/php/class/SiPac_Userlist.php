@@ -35,7 +35,7 @@ class SiPac_Userlist
 			//try to get user information
 			$user_info = $this->chat->db->get_user($this->chat->nickname, $channel, $this->chat->id);
       
-      if (!is_array($user_info) AND !empty($user_info))
+			if (!is_array($user_info) AND !empty($user_info))
 			{
 				$this->chat->debug->add("Failed to get a user (response: ".$user_info.";user: ".$this->chat->nickname.";channel: ".$channel.";id:".$this->chat->id.")", 0);
 				break;
@@ -55,8 +55,13 @@ class SiPac_Userlist
 			}
 			else //if the user is already in the db, just update the information
 			{
+				if ($channel == $this->chat->channel->active)
+					$is_writing = $this->chat->is_writing;
+				else
+					$is_writing = false;
+					
 				$ip = $_SERVER['REMOTE_ADDR'];
-				$user_array = array("id" => "user", "name" => $this->chat->nickname, "writing" => $this->chat->is_writing, "afk" => $this->chat->afk->status, "info" => $this->chat->settings->get('user_infos'), "ip" => $ip, "channel" => $channel,
+				$user_array = array("id" => "user", "name" => $this->chat->nickname, "writing" => $is_writing, "afk" => $this->chat->afk->status, "info" => $this->chat->settings->get('user_infos'), "ip" => $ip, "channel" => $channel,
 												"style" => $this->chat->settings->get('user_color')."|||");
 				$user = new SiPac_User($user_array, $this->chat);
 	
@@ -96,7 +101,9 @@ class SiPac_Userlist
 						}
 						
 						//save a message, that the user has left
-						$this->chat->message->send("<||user-left-notification|".$user['name']. "||>", $user['channel'], 1, 0, $user['online']);
+						if ($user['info'] != "banned")
+							$this->chat->message->send("<||user-left-notification|".$user['name']. "||>", $user['channel'], 1, 0, $user['online']);
+						
 						$this->chat->debug->add("deleted user '".$user['name']."' from db (id: ".$user['id'].")", 2, $user['channel']);
 					}
 				}
@@ -123,38 +130,42 @@ class SiPac_Userlist
 			
 			foreach($users as $user)
 			{
-				$user_class[$user['id']] = new SiPac_User($user, $this->chat);
-				$this->users[$channel][] = $user_class[$user['id']];
-				$this->users_info[$user['id']] = array("name" => $user['name'], "afk" => $user['afk']); 
-				//add the status, if a user is writing
-				$user_array[$channel]['user_writing']['id'][] = $user['id'];
-				$user_array[$channel]['user_writing']['status'][] = $user_class[$user['id']]->is_writing;
-	
-				$user_array[$channel]['users'][$user['id']] = $user['name'];
-	
-				//generate the html code of the user
-				$user_html = $this->chat->language->translate($user_class[$user['id']]->generate_html());
-	
-				//if this user isn't in the user array session, he also isn't on the client's window
-				if (!isset($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$user['id']]))
+				if ($user['info'] != "banned")
 				{
-					//javascript should add the user
-					$user_array[$channel]['add_user'][] = $user_html;
-					$user_array[$channel]['add_user_id'][] = $user['id']; 
-					//save the user to the session user array 
-					$_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$user['id']] = $user_html;
-					$this->chat->debug->add("Add user '".$user['name']."' to userlist (id: ".$user['id'].")", 3, $user['channel']);
-				}
-				//if the the html code has changed
-				else if ($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$user['id']] != $user_html)
-				{
-					//also change it with javascript
-					$user_array[$channel]['change_user'][] = $user_html;
-					$user_array[$channel]['change_user_id'][] = $user['id'];
-					$_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$user['id']] = $user_html;
-					$this->chat->debug->add("Changed user '".$user['name']."' in userlist (id: ".$user['id'].")", 3, $user['channel']);
+					$user_class[$user['id']] = new SiPac_User($user, $this->chat);
+					$this->users[$channel][] = $user_class[$user['id']];
+					$this->users_info[$user['id']] = array("name" => $user['name'], "afk" => $user['afk']); 
+					//add the status, if a user is writing
+					$user_array[$channel]['user_writing']['id'][] = $user['id'];
+					$user_array[$channel]['user_writing']['status'][] = $user_class[$user['id']]->is_writing;
+		
+					$user_array[$channel]['users'][$user['id']] = $user['name'];
+		
+					//generate the html code of the user
+					$user_html = $this->chat->language->translate($user_class[$user['id']]->generate_html());
+		
+					//if this user isn't in the user array session, he also isn't on the client's window
+					if (!isset($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$user['id']]))
+					{
+						//javascript should add the user
+						$user_array[$channel]['add_user'][] = $user_html;
+						$user_array[$channel]['add_user_id'][] = $user['id']; 
+						//save the user to the session user array 
+						$_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$user['id']] = $user_html;
+						$this->chat->debug->add("Add user '".$user['name']."' to userlist (id: ".$user['id'].")", 3, $user['channel']);
+					}
+					//if the the html code has changed
+					else if ($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$user['id']] != $user_html)
+					{
+						//also change it with javascript
+						$user_array[$channel]['change_user'][] = $user_html;
+						$user_array[$channel]['change_user_id'][] = $user['id'];
+						$_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel][$user['id']] = $user_html;
+						$this->chat->debug->add("Changed user '".$user['name']."' in userlist (id: ".$user['id'].")", 3, $user['channel']);
+					}
 				}
 			}
+			
 			if (isset($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel]))
 			{
 				foreach ($_SESSION['SiPac'][$this->chat->id]['userlist'][$this->chat->client_num][$channel] as $id => $user)

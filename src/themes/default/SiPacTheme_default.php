@@ -2,12 +2,6 @@
 
 class SiPacTheme_default extends SiPacTheme
 {
-	public function set_variables($path, $js_chat)
-	{
-		$this->path = $path;
-		$this->js_chat = $js_chat;
-	}
-	
 	public function get_settings()
 	{
 		$settings['smiley_height'] = 30;
@@ -16,7 +10,7 @@ class SiPacTheme_default extends SiPacTheme
 		return $settings;
 	}
 	
-	public function get_layout($user_num, $smileys)
+	public function get_layout($user_num, $smileys,$settings)
 	{
 		$js = $this->js_chat;
 		
@@ -47,11 +41,7 @@ class SiPacTheme_default extends SiPacTheme
 						</div>
 						<div class='chat_element'>
 							<div class='chat_element_head'><img src='".$this->path."/icons/cog.png' alt=''><||settings-head||><span class='chat_element_arrow'></span></div>
-							<div class='chat_element_text'>
-								<input checked='checked' class='chat_notification_checkbox' type ='checkbox' onclick='if ($js.notifications_enabled == true) { $js.disable_notifications(); } else { $js.enable_notifications();} '><||enable-desktop-notifications-text||>
-								<br><input type ='checkbox' class='chat_sound_checkbox' checked='checked' onclick='if ($js.sound_enabled == true) { $js.disable_sound() } else { $js.enable_sound() } '><||enable-sound-text||>
-								<br><input type ='checkbox' class='chat_invite_checkbox' checked='checked' onclick='if ($js.invite_enabled == true) { $js.disable_invite() } else { $js.enable_invite() } '><||enable-invite-text||>
-							</div>
+							<div class='chat_element_text'>$settings</div>
 						</div>
 						<div class='chat_element' style='text-align: center;'>
 							<div class='chat_element_head'><img src='".$this->path."/icons/emoticon_grin.png' alt=''><||smileys-head||><span class='chat_element_arrow'></span></div>
@@ -185,14 +175,17 @@ class SiPacTheme_default extends SiPacTheme
 			icon = '".$this->path."/icons/' + icon;
 			if (class_name == undefined)
 				class_name = 'chat_layout_default_element';
+			var div = document.createElement('div');
 			var chat = this;
-			this.chat.getElementsByClassName('chat_right')[0].innerHTML += 
+			div.innerHTML += 
 					'<div class=\"' + class_name + '\"><div class=\"chat_element\" style=\"text-align: center;\">' +
 							'<div class=\"chat_element_head\" style=\"cursor: pointer;\" onclick=\"$js.show_hide_element(this)\"><img src=\"' + icon + '\" alt=\"\">' + head + '<span class=\"chat_element_arrow\"></span></div>' +
 							'<div class=\"chat_element_text\">' +
 							 text +
 							'</div>' +
 					'</div></div>';
+
+			this.chat.getElementsByClassName('chat_right')[0].appendChild(div);
 		}
 		";
 		$functions['user_options'] = "
@@ -267,7 +260,8 @@ class SiPacTheme_default extends SiPacTheme
 			
 			var debug = this.chat.getElementsByClassName("chat_debug")[0].getElementsByClassName("chat_element_text")[0];
 			debug.innerHTML += "<div style=\'color: " + color + "\' class=\'chat_entry_debug\'>" + channel + ": " + text + "</div>";
-			debug.scrollTop = debug.scrollHeight;
+			if (this.autoscroll_enabled)
+				debug.scrollTop = debug.scrollHeight;
 		}
 		';
 		$functions['layout_notification_status'] ='
@@ -286,6 +280,15 @@ class SiPacTheme_default extends SiPacTheme
 				this.chat.getElementsByClassName("chat_sound_checkbox")[0].checked = false;
 			else
 				this.chat.getElementsByClassName("chat_sound_checkbox")[0].checked = true;
+		}
+		';
+		$functions['layout_autoscroll_status'] ='
+		function (status)
+		{
+			if (status == false)
+				this.chat.getElementsByClassName("chat_autoscroll_checkbox")[0].checked = false;
+			else
+				this.chat.getElementsByClassName("chat_autoscroll_checkbox")[0].checked = true;
 		}
 		';
 		$functions['layout_invite_status'] ='

@@ -111,15 +111,20 @@ function chat_ajax()
 
             for (var i = 0; i < chat_object_answer.length; i++)
             {
-              chat_objects[i].handle_chat_tasks(chat_object_answer[i]);
-              if (chat_objects[i].first_start == true)
-              {
-                console.debug("chat " + i + " ready!");
-                chat_objects[i].first_start = false;
-              }
-            }
-            if (chat_error_num > 0)
-              chat_error(undefined, true);
+			if (chat_object_answer[i]["error"] != undefined)
+				chat_objects[i].information(chat_object_answer[i]["error"], "error", false, false, false);
+			else
+			{
+				chat_objects[i].handle_chat_tasks(chat_object_answer[i]);
+				if (chat_objects[i].first_start == true)
+				{
+					console.debug("chat " + i + " ready!");
+					chat_objects[i].first_start = false;
+				}
+			}
+			if (chat_error_num > 0)
+				chat_error(undefined, true);
+		}
           }
 
           for (var i = 0; i < chat_extra_send_objects.length; i++)
@@ -216,6 +221,7 @@ function Chat(theme_path, id, client_num, channels, channel_titles, texts, layou
   this.notifications_enabled = false;
   this.invite_enabled = true;
   this.sound_enabled = true;
+  this.autoscroll_enabled = true;
 
   this.add_channel(undefined, undefined, true);
   this.change_channel(this.channels[0]);
@@ -260,7 +266,8 @@ Chat.prototype.init = function()
 	
   this.chat.addEventListener("mousemove", new_messages_status, false);
   
-  scroll(this.chat, "chat_conversation", 0, true);
+  if (this.autoscroll_enabled)
+	scroll(this.chat, "chat_conversation", 0, true);
   
   this.restore_settings();
   
@@ -273,6 +280,11 @@ Chat.prototype.init = function()
 	  this.enable_sound();
   else
 	  this.disable_sound();
+  
+  if (this.autoscroll_enabled == true)
+	  this.enable_autoscroll();
+  else
+	  this.disable_autoscroll();
   
   if (this.invite_enabled == true)
 	  this.enable_invite();
@@ -356,6 +368,7 @@ Chat.prototype.handle_chat_tasks = function (answer)
       if (this.new_channels[this.channels[i]] == true)
       {
         this.new_channels[this.channels[i]] = false;
+	  if (this.autoscroll_enabled)
 		scroll(this.chat, "chat_conversation", 0, true);
       }
     }
@@ -391,9 +404,6 @@ Chat.prototype.handle_chat_tasks = function (answer)
   }
   catch (e)
   {}
-  
-	//if (typeof this.layout_user_writing_status != "undefined")
-		//this.layout_user_writing_status(this.is_writing, this.username, this.id + "_" + this.active_channel + "_user_" + this.username_key);
 
 	if (typeof this.layout_tasks != "undefined")
 		this.layout_tasks();
@@ -463,11 +473,13 @@ Chat.prototype.add_entries = function (channel, entries, users, messages)
 	if (users[i] != this.username && this.notifications_enabled == true && !this.first_start)
 		  this.show_notification(users[i] + " (" + this.channel_titles[this.channels.indexOf(channel)] + ")", messages[i]);
     }
-    if (this.first_start)
-      scroll(this.chat, "chat_conversation", 0, true);
-    else
-      scroll(this.chat, "chat_conversation", 20, true);
-
+    if (this.autoscroll_enabled)
+    {
+	if (this.first_start)
+		scroll(this.chat, "chat_conversation", 0, true);
+	else
+		scroll(this.chat, "chat_conversation", 20, true);
+    }
 	if (channel != this.active_channel && !this.first_start)
 		this.channel_new_messages(channel, this.channel_titles[this.channels.indexOf(channel)]);
 	
@@ -562,8 +574,8 @@ Chat.prototype.change_channel = function (channel)
 	this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0].style.display = "block";
 	this.chat.getElementsByClassName("chat_userlist_channel_" + channel)[0].style.display = "block";
 	this.active_channel = channel;
- 
-  scroll(this.chat, "chat_conversation", 0, true);
+	if (this.autoscroll_enabled)
+		scroll(this.chat, "chat_conversation", 0, true);
 };
 Chat.prototype.close_channel = function (channel)
 {
@@ -594,6 +606,13 @@ Chat.prototype.handle_server_tasks = function (tasks)
 		alert(this.texts['you-were-kicked-text'].replace("%1", task_parts[2]));
 	    else
 		    alert(this.texts['you-were-kicked-by-user-text'].replace("%1", task_parts[1]).replace("%2", task_parts[2]));
+    }
+    else if (task_parts[0] == "ban")
+    {
+	    if (task_parts[1] == "")
+		    alert(this.texts['you-were-banned-text'].replace("%1", task_parts[3]));
+	    else
+		    alert(this.texts['you-were-banned-by-user-text'].replace("%1", task_parts[1]).replace("%2", task_parts[3]));
     }
     else if (task_parts[0] == "message")
       this.alert(task_parts[1]);
@@ -686,7 +705,7 @@ Chat.prototype.save_settings = function()
 	var today = new Date();
 	var expires = new Date(today.getTime() + 365 * 24 * 60 * 60 * 1000);
 	expires = expires.toGMTString();
-	document.cookie="SiPac_settings_" + this.id + "=" + this.notifications_enabled + "|" + this.sound_enabled + "|" + this.invite_enabled + "; expires=" + expires + ";";
+	document.cookie="SiPac_settings_" + this.id + "=" + this.notifications_enabled + "|" + this.sound_enabled + "|"  + this.autoscroll_enabled + "|" + this.invite_enabled + "; expires=" + expires + ";";
 }
 Chat.prototype.restore_settings = function()
 {
@@ -698,9 +717,13 @@ Chat.prototype.restore_settings = function()
 		if (cookie_info[0].replace(" ", "") == "SiPac_settings_" + this.id)
 		{
 			var settings = cookie_info[1].split("|");
-			this.notifications_enabled = (settings[0] === "true");
-			this.sound_enabled = (settings[1] === "true");
-			this.invite_enabled = (settings[2] === "true");
+			if (settings[3] != undefined)
+			{
+				this.notifications_enabled = (settings[0] === "true");
+				this.sound_enabled = (settings[1] === "true");
+				this.autoscroll_enabled = (settings[2] === "true");
+				this.invite_enabled = (settings[3] === "true");
+			}
 		}
 	}
 }
@@ -709,6 +732,8 @@ Chat.prototype.disable_sound = function()
 	this.sound_enabled = false;
 	if (typeof this.layout_sound_status != "undefined")
 		this.layout_sound_status(false);
+	else
+		try{this.chat.getElementsByClassName("chat_sound_checkbox")[0].checked = false;}catch(e){}
 	
 	this.save_settings();
 };
@@ -717,6 +742,28 @@ Chat.prototype.enable_sound = function()
 	this.sound_enabled = true;
 	if (typeof this.layout_sound_status != "undefined")
 		this.layout_sound_status(true);
+	else
+		try{this.chat.getElementsByClassName("chat_sound_checkbox")[0].checked = true;}catch(e){}
+	
+	this.save_settings();
+};
+Chat.prototype.disable_autoscroll = function()
+{
+	this.autoscroll_enabled = false;
+	if (typeof this.layout_autoscroll_status != "undefined")
+		this.layout_autoscroll_status(false);
+	else
+		try{this.chat.getElementsByClassName("chat_autoscroll_checkbox")[0].checked = false;}catch(e){}
+	
+	this.save_settings();
+};
+Chat.prototype.enable_autoscroll = function()
+{
+	this.autoscroll_enabled = true;
+	if (typeof this.layout_autoscroll_status != "undefined")
+		this.layout_autoscroll_status(true);
+	else
+		try{this.chat.getElementsByClassName("chat_autoscroll_checkbox")[0].checked = true;}catch(e){}
 	
 	this.save_settings();
 };
@@ -725,6 +772,8 @@ Chat.prototype.disable_invite= function()
 	this.invite_enabled = false;
 	if (typeof this.layout_invite_status != "undefined")
 		this.layout_invite_status(false);
+	else
+		try{this.chat.getElementsByClassName("chat_invite_checkbox")[0].checked = false;}catch(e){}
 	
 	this.save_settings();
 };
@@ -733,6 +782,8 @@ Chat.prototype.enable_invite = function()
 	this.invite_enabled = true;
 	if (typeof this.layout_invite_status != "undefined")
 		this.layout_invite_status(true);
+	else
+		try{this.chat.getElementsByClassName("chat_invite_checkbox")[0].checked = true;}catch(e){}
 	
 	this.save_settings();
 };
@@ -741,7 +792,9 @@ Chat.prototype.disable_notifications = function()
 	this.notifications_enabled = false;
 	if (typeof this.layout_notification_status != "undefined")
 		this.layout_notification_status(false);
-	
+	else
+		try{this.chat.getElementsByClassName("chat_notification_checkbox")[0].checked = false;}catch(e){}
+		
 	this.save_settings();
 };
 Chat.prototype.enable_notifications = function()
@@ -752,6 +805,9 @@ Chat.prototype.enable_notifications = function()
 		this.notifications_enabled = false;
 		if (typeof this.layout_notification_status != "undefined")
 			this.layout_notification_status(false);
+		else
+			try{this.chat.getElementsByClassName("chat_notification_checkbox")[0].checked = false;}catch(e){}
+			
 		this.save_settings();
 		var chat = this;
 		Notification.requestPermission(function (permission) 
@@ -761,6 +817,9 @@ Chat.prototype.enable_notifications = function()
 				chat.notifications_enabled = true;
 				if (typeof chat.layout_notification_status != "undefined")
 					chat.layout_notification_status(true);
+				else
+					try{chat.chat.getElementsByClassName("chat_notification_checkbox")[0].checked = true;}catch(e){}
+				
 				chat.show_notification(chat.texts['desktop-notifications-enabled-head'],chat.texts['desktop-notifications-enabled-text']);
 				
 				chat.save_settings();
@@ -770,6 +829,8 @@ Chat.prototype.enable_notifications = function()
 				chat.notifications_enabled = false;
 				if (typeof chat.layout_notification_status != "undefined")
 					chat.layout_notification_status(false);
+				else
+					try{chat.chat.getElementsByClassName("chat_notification_checkbox")[0].checked = false;}catch(e){}
 				
 				chat.save_settings();
 			}
@@ -862,7 +923,8 @@ Chat.prototype.add_debug_entry = function (type, text, channel, timeout)
 	{
 		this.chat.getElementsByClassName('chat_conversation_channel_' + channel)[0].innerHTML += "<div class='chat_entry_debug'><span class='chat_entry_message'>" + text + "</span></div>";	
 	}
-  scroll(this.chat, "chat_conversation", 20, true);
+  if (this.autoscroll_enabled)
+	scroll(this.chat, "chat_conversation", 20, true);
 };
 Chat.prototype.insert_command = function(command, auto_send)
 {

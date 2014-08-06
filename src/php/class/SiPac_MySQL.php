@@ -100,6 +100,15 @@ class SiPac_MySQL
 		else
 			return mysqli_fetch_assoc($mysql);
 	}
+	
+	public function fetch_array($mysql)
+	{
+		if ($this->plugin == "mysql")
+			return mysql_fetch_array($mysql);
+		else
+			return mysqli_fetch_array($mysql);
+	}
+	
 	public function fetch_object($mysql)
 	{
 		if ($this->plugin == "mysql")
@@ -211,7 +220,61 @@ class SiPac_MySQL
 		else
 			return $update_user_mysql;
 	}
-
+	
+	public function ban_user($nickname,  $time, $chat_id)
+	{
+		$update_user_mysql = $this->query("UPDATE sipac_users SET online = '" . $time . "', info = 'banned' WHERE name = '" . $this->escape_string($nickname) . "' AND chat_id = '" . $this->escape_string($chat_id) . "'");
+		if ($update_user_mysql == false)
+			return $this->error();
+		else
+			return $update_user_mysql;
+	}
+	
+	public function unban_user($nickname, $chat_id)
+	{
+		$count = $this->query("SELECT * from sipac_users WHERE  info ='banned' AND name LIKE '".$this->escape_string($nickname)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
+		if ($this->num_rows($count) > 0)
+		{
+			$unban_user_mysql = $this->query("DELETE from sipac_users WHERE info ='banned' AND name = '" . $this->escape_string($nickname) . "' AND chat_id = '" . $this->escape_string($chat_id) . "'");
+			if ($unban_user_mysql == false)
+				return $this->error();
+			else
+				return $unban_user_mysql;
+		}
+		else
+			return false;
+	}
+	
+	public function check_ban($nickname, $chat_id)
+	{
+		$user_info_mysql = $this->query("SELECT info,name,chat_id FROM sipac_users WHERE name LIKE '".$this->escape_string(addslashes($nickname))."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
+		if ($user_info_mysql == false)
+			return $this->error();
+		else
+		{
+			$user_info = $this->fetch_array($user_info_mysql);
+			if ($user_info['info'] == "banned")
+				return true;
+			else
+				return false;
+		}
+	}
+	
+	public function get_banned_users($chat_id)
+	{
+		$users_mysql = $this->query("SELECT * FROM sipac_users WHERE  info LIKE 'banned' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
+		if ($users_mysql == false)
+			return $this->error();
+		else
+		{
+			$users = array();
+			while ($user = $this->fetch_assoc($users_mysql))
+			{
+				$users[] = $user;
+			}
+			return $users;
+		}
+	}
 	public function save_user($nickname, $channel, $is_afk, $user_info, $user_style, $user_ip, $chat_id)
 	{
 		//save the user with all given values

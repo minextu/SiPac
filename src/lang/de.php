@@ -35,6 +35,8 @@ $chat_text = array(
 "user-join-notification" => "[user]%1[/user] ist beigetreten",
 "user-kicked-user-notification" => "[user]%1[/user] wurde von [user]%2[/user] gekickt (%3)",
 "user-kicked-notification" => "[user]%1[/user] wurde gekickt (%2)",
+"user-banned-user-notification" => "[user]%2[/user] hat [user]%1[/user]  gebannt (%3)",
+"user-banned-notification" => "[user]%1[/user] wurde gebannt (%2)",
 "user-now-afk-no-reason-notification" => "[user]%1[/user] ist jetzt abwesend",
 "user-now-afk-notification" => "[user]%1[/user] ist jetzt abwesend (%2)",
 "user-now-not-afk-notification" => "[user]%1[/user] ist wieder zurück",
@@ -66,6 +68,13 @@ $chat_text = array(
 "you-were-kicked-text" => "Du wurdest gekickt! (%1)",
 "you-were-kicked-by-user-text" => "Du wurdest von %1 gekickt! (%2)",
 
+/* Ban */
+"reason-for-ban-text" => "Grund für den Ban:",
+"ban-no-reason-text" => "Kein Grund",
+"you-were-banned-text" => "Du wurdest gebannt! (%1)",
+"you-were-banned-by-user-text" => "%1 hat dich gebannt! (%2)",
+"user-no-longer-banned-text" => "%1 ist jetzt  nicht mehr gebannt!",
+
 /* Notice Popup */
 "info-head" => "Info:",
 "error-head" => "Fehler:",
@@ -93,7 +102,8 @@ $chat_text = array(
 "smileys-head" => "Smileys",
 "enter-channel-name-text" => "Bitte gib einen Channel Namen ein",
 "enable-desktop-notifications-text" => "Desktop Benachrichtigungen aktivieren",
-"enable-sound-text" => "Sound Aktivieren",
+"enable-sound-text" => "Sound aktivieren",
+"enable-autoscroll-text" => "Automatisches Scrollen aktivieren",
 "enable-invite-text" => "Einladungen aktivieren"
 );
 ?>

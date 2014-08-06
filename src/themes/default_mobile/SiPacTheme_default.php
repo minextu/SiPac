@@ -2,12 +2,6 @@
 
 class SiPacTheme_default extends SiPacTheme
 {
-	public function set_variables($path, $js_chat)
-	{
-		$this->path = $path;
-		$this->js_chat = $js_chat;
-	}
-	
 	public function get_settings()
 	{
 		$settings['smiley_height'] = 30;
@@ -16,9 +10,10 @@ class SiPacTheme_default extends SiPacTheme
 		return $settings;
 	}
 	
-	public function get_layout($user_num, $smileys)
+	public function get_layout($user_num, $smileys, $settings)
 	{
 		$js = $this->js_chat;
+		$path = $this->path;
 		
 		return "
 		<meta name='viewport' content='width=device-width, height=device-height, user-scalable=no'>
@@ -27,10 +22,12 @@ class SiPacTheme_default extends SiPacTheme
 				<span class='chat_header'>SiPac</span>
 				<ul class='chat_channels_ul'>
 				</ul>
-				<span class='chat_add_channel'><a href='javascript:void(0);' onclick='var channel_name = prompt(\"<||enter-channel-name-text||>\"); if (channel_name != null) { $js.insert_command(\"join \" + channel_name, true); }'>+</a></span>
-				<span class='chat_userlist_closed'  onclick='$js.layout_show_userlist(this)'><||userlist-head|$user_num||></span>
+				<span class='chat_add_channel'><a href='javascript:void(0);' onclick='var channel_name = prompt(\"<||enter-channel-name-text||>\"); if (channel_name != null) { $js.insert_command(\"join \" + channel_name, true); }'><img src='".$this->path."/icons/comment_add.png' alt='+'></a></span>
+				<span class='chat_userlist_closed'  onclick='$js.layout_show_userlist(this)'><img src='$path/icons/user.png' alt='User'> ($user_num)</span>
+				<span class='chat_settings_closed'  onclick='$js.layout_show_settings(this)'><img src='$path/icons/cog.png' alt='Settings'></span>
 			</nav>
 			<div class='chat_userlist'></div>
+			<div class='chat_settings'>$settings</div>
 			<div class='chat_container'>
 				<div class='chat_left'>
 					<div class='chat_conversation'></div>
@@ -69,11 +66,6 @@ class SiPacTheme_default extends SiPacTheme
 			</div>
 		";
 	}
-	public function get_channel_tab($channel, $id, $change_function, $close_function)
-	{
-		return "<li id='$id'><a href='javascript:void(0);' onclick='$change_function'>$channel</a></li>";
-	}
-	
 	public function get_js_functions()
 	{
 		$functions['layout_init'] = '
@@ -157,12 +149,31 @@ class SiPacTheme_default extends SiPacTheme
 				userlist_button.className = "chat_userlist_opened";
 				this.chat.getElementsByClassName("chat_userlist")[0].style.width = "50%";
 				this.chat.getElementsByClassName("chat_userlist")[0].style.display = "block";
+				try{this.layout_show_settings(this.chat.getElementsByClassName("chat_settings_opened")[0]);}catch(e){}
 			}
 			else if(userlist_button.className == "chat_userlist_opened")
 			{
 				userlist_button.className = "chat_userlist_closed";
 				this.chat.getElementsByClassName("chat_userlist")[0].style.width = "0%";
 				this.chat.getElementsByClassName("chat_userlist")[0].style.display = "none";
+			}
+		}
+		';
+		$functions['layout_show_settings'] = '
+		function (settings_button)
+		{
+			if(settings_button.className == "chat_settings_closed")
+			{
+				settings_button.className = "chat_settings_opened";
+				this.chat.getElementsByClassName("chat_settings")[0].style.width = "50%";
+				this.chat.getElementsByClassName("chat_settings")[0].style.display = "block";
+				try{this.layout_show_userlist(this.chat.getElementsByClassName("chat_userlist_opened")[0]);}catch(e){}
+			}
+			else if(settings_button.className == "chat_settings_opened")
+			{
+				settings_button.className = "chat_settings_closed";
+				this.chat.getElementsByClassName("chat_settings")[0].style.width = "0%";
+				this.chat.getElementsByClassName("chat_settings")[0].style.display = "none";
 			}
 		}
 		';

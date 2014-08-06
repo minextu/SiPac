@@ -2,12 +2,6 @@
 
 class SiPac_Old_Theme_Wrapper extends SiPacTheme
 {
-	public function set_variables($path, $js_chat)
-	{
-		$this->path = $path;
-		$this->js_chat = $js_chat;
-	}
-	
 	public function prepare($php_path, $theme,  $num)
 	{
 		$this->php_path = $php_path;

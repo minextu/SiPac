@@ -25,7 +25,7 @@ class SiPacProxy_log implements SiPacProxy
 		
 		if (substr(decoct(fileperms($log_folder)), -3) == 777)
 		{
-			$log_folder = $log_folder . $this->chat->id . "/";
+			$log_folder = $log_folder . $this->chat->decode_id() . "/";
 				
 			if (is_dir($log_folder) == false)
 				mkdir($log_folder, 0777);
