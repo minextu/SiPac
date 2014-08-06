@@ -2,7 +2,7 @@
 
 class SiPacCommand_unban implements SiPacCommand
 {
-  public $usage = "/ban <user>]";
+  public $usage = "/unban <user>]";
   public $description = "Removes a user from the banlist";
   public function set_variables($chat, $parameters)
   {
