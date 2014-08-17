@@ -1,14 +1,10 @@
 <?php
 
-class SiPacCommand_ban implements SiPacCommand
+class SiPacCommand_ban extends SiPacCommand
 {
 	public $usage = "/ban <user> <time> [<reason>]";
 	public $description = "Bans the given user from the chat for the given time (in hours) with an optional reason.";
-	public function set_variables($chat, $parameters)
-	{
-		$this->chat= $chat;
-		$this->parameters = $parameters;
-	}
+
 	public function check_permission()
 	{
 		if ($this->chat->settings->get('can_ban') == true)
@@ -22,7 +18,7 @@ class SiPacCommand_ban implements SiPacCommand
 		if (!empty($this->parameters))
 		{
 			$parameter_parts = explode(" ", $this->parameters);
-			if (!empty($parameter_parts[1]) AND is_numeric($parameter_parts[1]) AND $parameter_parts[1] % 1 == 0)
+			if (!empty($parameter_parts[1]) AND is_numeric($parameter_parts[1]))
 			{
 				$user = $parameter_parts[0];
 				if (substr($user, 0, 1) == "@")

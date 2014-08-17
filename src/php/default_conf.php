@@ -78,6 +78,7 @@ function return_default_settings()
 	"can_force_invite" => true,
 	"can_change_debug_level" => true,
 	"debug_level" => 1,
+	"can_debug_conf" => true,
 	"disable_bbcode" => false,
 	
 	"spam_max_count" => 6,
@@ -90,7 +91,7 @@ function return_default_settings()
 	"use_cache" => true,
 	"can_clear_cache" => true,
 	
-	"max_messages" => "50",
+	"max_messages" => 50,
 	
 	
 	"development" => false,

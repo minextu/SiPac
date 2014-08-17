@@ -1,14 +1,10 @@
 <?php
 
-class SiPacCommand_example implements SiPacCommand
+class SiPacCommand_example extends SiPacCommand
 {
 	public $usage = "/example";
-  
-	public function set_variables($chat, $parameters)
-	{
-		$this->chat = $chat;
-		$this->parameters = $parameters;
-	}
+	public $description = "An example command";
+	
 	public function check_permission()
 	{
 		return true;

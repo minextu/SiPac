@@ -33,10 +33,9 @@ require_once("class/SiPac_Layout.php");
 require_once("class/SiPac_Settings.php");
 require_once("class/SiPac_Debug.php");
 
-require_once("class/Interface/SiPacCommand.php");
-require_once("class/Interface/SiPacProxy.php");
-require_once("class/Interface/SiPacFunction.php");
-require_once("class/Interface/SiPacTheme.php");
+require_once("class/Abstract/SiPacCommand.php");
+require_once("class/Abstract/SiPacProxy.php");
+require_once("class/Abstract/SiPacTheme.php");
 
 ?>
 

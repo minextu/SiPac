@@ -1,15 +1,10 @@
 <?php
 
-class SiPacCommand_msg implements SiPacCommand
+class SiPacCommand_msg extends SiPacCommand
 {
 	public $usage = "/msg <user> [<message>]";
 	public $description = "Starts  a private chat with a specific user. Optionally the chat will start with a given message.";
   
-	public function set_variables($chat, $parameters)
-	{
-		$this->chat = $chat;
-		$this->parameters = $parameters;
-	}
 	public function check_permission()
 	{
 		return $this->chat->settings->get('can_join_channels');

@@ -84,7 +84,7 @@ class SiPac_Channel
 		else
 			return array("title" => $channel, "id" => $this->encode($channel));
 	}
-	public function check()
+	public function check($chat)
 	{
 		if (isset($_SESSION['SiPac'][$this->id]['old_channels']))
 		{
@@ -97,6 +97,10 @@ class SiPac_Channel
 						DIE("You are not allowed to join this channel!");
 					}
 					$this->new[] = $channel['id'];
+					
+					$db_response = $chat->db->clean_up(array($channel['id']), $chat->settings->get('max_messages'), $chat->id);
+					if ($db_response !== true)
+						$chat->debug->add("Failed to clean up the db (response: ".$db_response.";)", 0);
 				}
 			}
 		}

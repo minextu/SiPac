@@ -1,15 +1,10 @@
 <?php
 
-class SiPacCommand_join implements SiPacCommand
+class SiPacCommand_join extends SiPacCommand
 {
 	public $usage = "/join <channel>";
 	public $description = "Makes the client to join the given channel.";
   
-	public function set_variables($chat, $parameters)
-	{
-		$this->chat = $chat;
-		$this->parameters = $parameters;
-	}
 	public function check_permission()
 	{
 		return $this->chat->settings->get('can_join_channels');

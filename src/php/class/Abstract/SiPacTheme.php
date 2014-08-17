@@ -19,7 +19,7 @@
  */
 abstract class SiPacTheme
 {
-	public final function set_variables($path, $js_chat)
+	final public function set_variables($path, $js_chat)
 	{
 		$this->path = $path;
 		$this->js_chat = $js_chat;

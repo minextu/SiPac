@@ -56,6 +56,10 @@ $chat_text = array(
 "user-invited-successfully-text" => "%1 wurde erfolgreich eingeladen diesem Channel beizutreten!",
 "debug-changed-text" => "Debug wurde erfolgreich geändert!",
 
+"banlist-head" => "Banliste:",
+"banlist-user-entry" => "%1 (Grund: \"%2\", gebannt bis: %3)",
+"banlist-no-banned-users-text" => "Keine gebannten Nutzer!",
+
 "me-random-text-1" => "hat etwas besseres zu tun",
 "me-random-text-2" => "Hat sich in %1 verliebt",
 "me-random-text-3" => "wünscht sich er/sie hätte den Text nicht vergessen",

@@ -1,14 +1,10 @@
 <?php
 
-class SiPacCommand_kick implements SiPacCommand
+class SiPacCommand_kick extends SiPacCommand
 {
   public $usage = "/kick <user> [<reason>]";
   public $description = "Forcibly kick the given user out of the chat with an optional reason.";
-  public function set_variables($chat, $parameters)
-  {
-    $this->chat= $chat;
-    $this->parameters = $parameters;
-  }
+
   public function check_permission()
   {
     if ($this->chat->settings->get('can_kick') == true)

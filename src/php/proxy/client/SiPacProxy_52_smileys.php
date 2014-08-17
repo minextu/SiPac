@@ -1,13 +1,7 @@
 <?php
 
-class SiPacProxy_smileys implements SiPacProxy
+class SiPacProxy_smileys extends SiPacProxy
 {
-  
-	public function set_variables($chat, $post)
-	{
-		$this->chat = $chat;
-		$this->post = $post;
-	}
 	public function execute()
 	{  
 		foreach ($this->chat->settings->get('smileys') as $smiley_code => $smiley_url)

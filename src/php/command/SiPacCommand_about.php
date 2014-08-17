@@ -1,15 +1,10 @@
 <?php
 
-class SiPacCommand_about implements SiPacCommand
+class SiPacCommand_about extends SiPacCommand
 {
 	public $usage = "/about";
 	public $description = "Shows the script's version and other information";
   
-	public function set_variables($chat, $parameters)
-	{
-		$this->chat = $chat;
-		$this->parameters = $parameters;
-	}
 	public function check_permission()
 	{
 		return true;

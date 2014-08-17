@@ -1,13 +1,7 @@
 <?php
 
-class SiPacProxy_test implements SiPacProxy
+class SiPacProxy_test extends SiPacProxy
 {
-  
-	public function set_variables($chat, $post)
-	{
-		$this->chat = $chat;
-		$this->post = $post;
-	}
 	public function execute()
 	{
 		$post_type = $this->post['type'];

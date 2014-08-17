@@ -1,13 +1,7 @@
 <?php
 
-class SiPacProxy_bbcode implements SiPacProxy
+class SiPacProxy_bbcode extends SiPacProxy
 {
-  
-	public function set_variables($chat, $post)
-	{
-		$this->chat = $chat;
-		$this->post = $post;
-	}
 	public function execute()
 	{  
 		$this->post['message'] = preg_replace('=\[b\](.*)\[/b\]=Uis','<span style="font-weight:bold;">$1</span>', $this->post['message']);

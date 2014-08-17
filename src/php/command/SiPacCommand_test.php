@@ -1,18 +1,13 @@
 <?php
 
-class SiPacCommand_test implements SiPacCommand
+class SiPacCommand_test extends SiPacCommand
 {
 	public $usage = "/test <type> <name>";
 	public $description = "Executes a custom proxy or function [type]. To test the Proxy \"SiPacProxy_example\" you would enter \"/test proxy example\"";
   
-	public function set_variables($chat, $parameters)
-	{
-		$this->chat = $chat;
-		$this->parameters = $parameters;
-	}
 	public function check_permission()
 	{
-		return true;
+		return $this->chat->settings->get("can_debug_conf");
 	}
 	public function execute()
 	{

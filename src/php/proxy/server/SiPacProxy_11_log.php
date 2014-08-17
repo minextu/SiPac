@@ -1,13 +1,7 @@
 <?php
 
-class SiPacProxy_log implements SiPacProxy
+class SiPacProxy_log extends SiPacProxy
 {
-  
-	public function set_variables($chat, $post)
-	{
-		$this->chat = $chat;
-		$this->post = $post;
-	}
 	public function execute()
 	{
 		$type = $this->post['type'];
@@ -58,10 +52,8 @@ class SiPacProxy_log implements SiPacProxy
 				fclose($chat_log_file);
 				}
 				else
-					echo( "Wrong Permissions in Folder \"$log_folder\". Please change it to 777!");
+					$this->chat->debug->add( "Wrong Permissions in Folder \"$log_folder\". Please change it to 777!", 1);
 			}
-			else
-				echo("Wrong Permissions in Folder \"log\". Please change it to 777!");
 			
 		return $this->post;
 	}

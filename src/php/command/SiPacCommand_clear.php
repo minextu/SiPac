@@ -1,14 +1,9 @@
 <?php
-class SiPacCommand_clear implements SiPacCommand
+class SiPacCommand_clear extends SiPacCommand
 {
 	public $usage = "/clear";
 	public $description = "Deletes the cached themes.";
   
-	public function set_variables($chat, $parameters)
-	{
-		$this->chat = $chat;
-		$this->parameters = $parameters;
-	}
 	public function check_permission()
 	{
 		return $this->chat->settings->get('can_clear_cache');
@@ -16,19 +11,32 @@ class SiPacCommand_clear implements SiPacCommand
 	public function execute()
 	{
 		$cache_folder = dirname(__FILE__) . "/../../../cache/";	
-		if (is_dir($cache_folder))
-			$this->delete_contents($cache_folder);
-			
-		return array(
-			"info_type" => "success",
-			"info_text" => "Successfully deleted the cache. Please reload!",
-			"info_nohide" => true
-		);
+		
+		$delete = $this->delete_contents($cache_folder);
+		
+		if ($delete == true)
+		{
+			return array(
+				"info_type" => "success",
+				"info_text" => "Successfully deleted the cache. Please reload!"
+			);
+		}
+		else
+		{
+			return array(
+				"info_type" => "warn",
+				"info_text" => "Cache already empty!"
+			);
+		}
 	}
 	
 	private function delete_contents($dir, $delete_dir=false)
 	{
-		foreach(glob($dir . '/*') as $file) 
+		$files = glob($dir . '/*');
+		if (empty($files))
+			return false;
+		
+		foreach($files as $file) 
 		{ 
 			if(is_dir($file)) 
 				$this->delete_contents($file, true); 
@@ -37,6 +45,8 @@ class SiPacCommand_clear implements SiPacCommand
 		}
 		if ($delete_dir == true)
 			rmdir($dir);
+		
+		return true;
 	}
 }
 

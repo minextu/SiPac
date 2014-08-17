@@ -1,13 +1,7 @@
 <?php
 
-class SiPacProxy_spam implements SiPacProxy
+class SiPacProxy_spam extends SiPacProxy
 {
-  
-	public function set_variables($chat, $post)
-	{
-		$this->chat = $chat;
-		$this->post = $post;
-	}
 	public function execute()
 	{
 		$max_count = $this->chat->settings->get("spam_max_count");

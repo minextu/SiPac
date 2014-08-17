@@ -1,13 +1,7 @@
 <?php
 
-class SiPacProxy_linker implements SiPacProxy
+class SiPacProxy_linker extends SiPacProxy
 {
-  
-	public function set_variables($chat, $post)
-	{
-		$this->chat = $chat;
-		$this->post = $post;
-	}
 	public function execute()
 	{  
 		if (strpos($this->post['message'], "<a href") === false)

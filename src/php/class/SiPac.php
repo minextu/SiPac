@@ -75,6 +75,8 @@ class SiPac_Chat
 			$this->channel->active = $chat_variables['active_channel'];
 		}
 		
+		$this->ip = $_SERVER['REMOTE_ADDR'];
+		
 		//get the correct html path or load a custom
 		$this->html_path = $this->settings->get("html_path");
 		if ($this->html_path)
@@ -128,16 +130,14 @@ class SiPac_Chat
 			}
 			//check cache folder permissions
 			$cache_folder = "/../../../cache/";	
+			if (!is_dir(dirname(__FILE__).$cache_folder))
+				$this->debug->error("The cache folder is missing!");
 			if (substr(decoct(fileperms(dirname(__FILE__).$cache_folder)), -3) != 777)
-			{
-				$this->debug->add("Wrong Permissions for the cache folder. Please change it to 777", 1);
-			}
+				$this->debug->error("Wrong Permissions for the cache folder. Please change it to 777", 1);
 			//check log folder permissions
 			$log_folder = "/../../../log/";	
 			if (substr(decoct(fileperms(dirname(__FILE__).$log_folder)), -3) != 777)
-			{
 				$this->debug->add("Wrong Permissions for the log folder. Please change it to 777", 1);
-			}
 			
 			//restore old channels
 			$this->channel->restore_old();
@@ -151,7 +151,7 @@ class SiPac_Chat
 			$this->reset();
 		}
 		
-		$this->channel->check();
+		$this->channel->check($this);
 		
 		if ($chat_num ===false)
 			$this->chat_num =  $GLOBALS['global_chat_num'] ;
@@ -270,12 +270,13 @@ class SiPac_Chat
 						$notification_text = "<||user-banned-notification|".$user_info['name']."|".$task_parts[3]."||>";
 						$client_text = "<||you-were-banned-text|".$task_parts[3]."||>";
 					}
-					$this->ban($user_info['name'], $task_parts[2], $client_text, $notification_text);
+					$this->ban($user_info['name'], $task_parts[2], $client_text, $notification_text, $task_parts[3]);
 				}
 				else
 					$this->debug->add("Task '". $task_parts[0] . "' is not defined!", 1);
 			
-				$this->db->add_task("", $this->nickname, $channel, $this->id);
+				if ($task_parts[0] != "ban")
+					$this->db->add_task("", $this->nickname, $channel, $this->id);
 			}
 		}
 		return $array;
@@ -300,11 +301,11 @@ class SiPac_Chat
 		}
 	}
 	
-	public function ban($user, $time, $client_text, $notification_text)
+	public function ban($user, $time, $client_text, $notification_text, $reason)
 	{
 		$time = time() + ((int)$time * 60 * 60);
 		
-		$db_response = $this->db->ban_user($user, $time, $this->id);
+		$db_response = $this->db->ban_user($user, $time, $reason, $this->id);
 		if ($db_response !== true)
 			$this->debug->add("Failed to ban the user (response: ".$db_response.";)", 0);
 			
@@ -324,24 +325,29 @@ class SiPac_Chat
 	
 	private function check_ban()
 	{
-		$check_ban = $this->db->check_ban($this->nickname, $this->id);
-		if ($check_ban == true)
+		$check_ban = $this->db->check_ban($this->nickname, $this->ip, $this->id);
+		if ($check_ban !== false)
 		{
-			$this->debug->error($this->language->translate("<||you-were-banned-text|unknown||>"));
+			if (!is_array($check_ban))
+				$this->debug->error("Failed check ban status (response: ".$check_ban.";)");
+			else
+				$this->debug->error($this->language->translate("<||you-were-banned-text|".$check_ban['reason']."||>"));
+				
 			return true;
 		}
 		else
 			return false;
+
 	}
 	
 	public function check_changes()
 	{
-	//get tasks (kick, ban, etc.)
-	$task_answer = $this->get_tasks();
+		//get tasks (kick, ban, etc.)
+		$task_answer = $this->get_tasks();
 
-	$this->check_name();
+		$this->check_name();
 
-	return $task_answer;
+		return $task_answer;
 	}
 	public function check_name()
 	{
@@ -370,8 +376,7 @@ class SiPac_Chat
 				$this->message->send("<||rename-notification|".$_SESSION['SiPac'][$this->id]['nickname']." |".$this->nickname."||>", $channel, 1, 0);
 									
 				//add new user
-				$ip = $_SERVER['REMOTE_ADDR'];
-				$user_array = array("id" => "user", "name" => $this->nickname, "writing" => false, "afk" => false, "info" => $this->settings->get('user_infos'), "ip" => $ip, "channel" => $channel, "style" => $this->settings->get('user_color')."|||" );
+				$user_array = array("id" => "user", "name" => $this->nickname, "writing" => false, "afk" => false, "info" => $this->settings->get('user_infos'), "ip" => $this->ip, "channel" => $channel, "style" => $this->settings->get('user_color')."|||" );
 				$user = new SiPac_User($user_array, $this);
 				$user->save_user( false);
 			}

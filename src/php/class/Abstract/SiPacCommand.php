@@ -17,9 +17,23 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-interface SiPacFunction
+abstract class SiPacCommand
 {
-	public function set_variables($chat, $values);
-	public function execute();
+	final public function set_variables($chat, $parameters)
+	{
+		$this->chat = $chat;
+		$this->parameters = $parameters;
+	}
+	
+	public final function __construct()
+	{
+		if (!isset($this->usage))
+			$this->debug->add('public $usage missing!', 1);
+		else if (!isset($this->description))
+			$this->debug->add('public public $description missing!', 1);
+	}
+	
+	abstract public function check_permission();
+	abstract public function execute();
 }
 ?>

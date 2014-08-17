@@ -1,13 +1,7 @@
 <?php
 
-class SiPacProxy_disable_bbcode implements SiPacProxy
+class SiPacProxy_disable_bbcode extends SiPacProxy
 {
-  
-	public function set_variables($chat, $post)
-	{
-		$this->chat = $chat;
-		$this->post = $post;
-	}
 	public function execute()
 	{  
 		if ($this->chat->settings->get('disable_bbcode') == true)

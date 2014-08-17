@@ -221,9 +221,9 @@ class SiPac_MySQL
 			return $update_user_mysql;
 	}
 	
-	public function ban_user($nickname,  $time, $chat_id)
+	public function ban_user($nickname,  $time, $reason, $chat_id)
 	{
-		$update_user_mysql = $this->query("UPDATE sipac_users SET online = '" . $time . "', info = 'banned' WHERE name = '" . $this->escape_string($nickname) . "' AND chat_id = '" . $this->escape_string($chat_id) . "'");
+		$update_user_mysql = $this->query("UPDATE sipac_users SET online = '" . $time . "', task = 'banned', info = '".$this->escape_string($reason)."' WHERE name = '" . $this->escape_string($nickname) . "' AND chat_id = '" . $this->escape_string($chat_id) . "'");
 		if ($update_user_mysql == false)
 			return $this->error();
 		else
@@ -232,10 +232,10 @@ class SiPac_MySQL
 	
 	public function unban_user($nickname, $chat_id)
 	{
-		$count = $this->query("SELECT * from sipac_users WHERE  info ='banned' AND name LIKE '".$this->escape_string($nickname)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
+		$count = $this->query("SELECT * from sipac_users WHERE  task = 'banned' AND name LIKE '".$this->escape_string($nickname)."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
 		if ($this->num_rows($count) > 0)
 		{
-			$unban_user_mysql = $this->query("DELETE from sipac_users WHERE info ='banned' AND name = '" . $this->escape_string($nickname) . "' AND chat_id = '" . $this->escape_string($chat_id) . "'");
+			$unban_user_mysql = $this->query("DELETE from sipac_users WHERE task ='banned' AND name = '" . $this->escape_string($nickname) . "' AND chat_id = '" . $this->escape_string($chat_id) . "'");
 			if ($unban_user_mysql == false)
 				return $this->error();
 			else
@@ -245,16 +245,16 @@ class SiPac_MySQL
 			return false;
 	}
 	
-	public function check_ban($nickname, $chat_id)
+	public function check_ban($nickname, $ip, $chat_id)
 	{
-		$user_info_mysql = $this->query("SELECT info,name,chat_id FROM sipac_users WHERE name LIKE '".$this->escape_string(addslashes($nickname))."' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
+		$user_info_mysql = $this->query("SELECT info,task,name,ip,chat_id FROM sipac_users WHERE (name LIKE '".$this->escape_string(addslashes($nickname))."' OR ip LIKE '".$this->escape_string($ip)."') AND chat_id LIKE '".$this->escape_string($chat_id)."'");
 		if ($user_info_mysql == false)
 			return $this->error();
 		else
 		{
 			$user_info = $this->fetch_array($user_info_mysql);
-			if ($user_info['info'] == "banned")
-				return true;
+			if ($user_info['task'] == "banned")
+				return array("banned" => true, "reason" => $user_info['info']);
 			else
 				return false;
 		}
@@ -262,7 +262,7 @@ class SiPac_MySQL
 	
 	public function get_banned_users($chat_id)
 	{
-		$users_mysql = $this->query("SELECT * FROM sipac_users WHERE  info LIKE 'banned' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
+		$users_mysql = $this->query("SELECT * FROM sipac_users WHERE  task LIKE 'banned' AND chat_id LIKE '".$this->escape_string($chat_id)."'");
 		if ($users_mysql == false)
 			return $this->error();
 		else

@@ -1,15 +1,10 @@
 <?php
 
-class SiPacCommand_debug implements SiPacCommand
+class SiPacCommand_debug extends SiPacCommand
 {
 	public $usage = "/debug <type>";
 	public $description = "Changes the type of debug messages to show. [type] can be 'off' or a number between 0 and 3";
   
-	public function set_variables($chat, $parameters)
-	{
-		$this->chat = $chat;
-		$this->parameters = $parameters;
-	}
 	public function check_permission()
 	{
 		return $this->chat->settings->get("can_change_debug_level");
@@ -18,7 +13,7 @@ class SiPacCommand_debug implements SiPacCommand
 	{
 		if (!empty($this->parameters) OR $this->parameters == 0)
 		{
-			if ($this->parameters == "off" OR is_numeric($this->parameters) AND $this->parameters % 1 == 0 AND $this->parameters >= 0 AND $this->parameters <= 3)
+			if ($this->parameters == "off" OR is_numeric($this->parameters) AND round($this->parameters,0) == $this->parameters AND $this->parameters >= 0 AND $this->parameters <= 3)
 			{
 				$this->chat->settings->set("debug_level", $this->parameters);
 				return array("info_type" => "success","info_text" => "<||debug-changed-text||>");

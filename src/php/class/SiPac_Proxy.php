@@ -95,7 +95,7 @@ class SiPac_Proxy
 	
 	public function check_custom_functions($values, $function)
 	{
-		$function_folder = dirname(__FILE__)."/../../../conf/functions";
+		/*$function_folder = dirname(__FILE__)."/../../../conf/functions";
 		if ($this->chat->settings->get($function."_function") != false)
 		{
 			$function_name = $this->chat->settings->get($function."_function");
@@ -113,7 +113,7 @@ class SiPac_Proxy
 			else
 				$this->chat->debug->add('Classname is not "'.$function_name.'"', 0);
 		}
-		else
+		else*/
 			return true;
 	}
 } 

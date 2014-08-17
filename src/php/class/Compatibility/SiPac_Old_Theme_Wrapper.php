@@ -12,9 +12,39 @@ class SiPac_Old_Theme_Wrapper extends SiPacTheme
 		
 		$layout_array['path'] = $php_path;
 		$layout_array['html'] = $chat_layout;
-		$layout_array['user_html'] = $chat_layout_user_entry;
+		
+		if (isset($chat_layout_user_entry))
+			$layout_array['user_html'] = $chat_layout_user_entry;
+		else
+		{
+			$layout_array['user_html'] = "
+			<div class='chat_user' id='!!USER_ID!!' onmouseover='chat_objects[!!NUM!!].user_options(\"!!USER_ID!!\", \"show\");' onmouseout='chat_objects[!!NUM!!].user_options(\"!!USER_ID!!\", \"hide\");'>
+			<div class='chat_user_top'>
+			<div class='chat_user_name'>!!USER!!<span class='chat_user_status'>[!!USER_STATUS!!]</span></div>
+			</div><!-- end: chat_user_top-class -->
+			<div class='chat_user_bottom' style='display: none;'>
+			<ul>
+			!!USER_INFO!!
+			</ul>
+			</div><!-- end: chat_user_bottom-class -->
+			</div><!-- end: chat_user-class -->
+			";
+		}
+			
 		$layout_array['default_smiley_height'] = $default_smiley_height;
-		$layout_array['post_html'] = $chat_layout_post_entry;
+		
+		if (isset($chat_layout_post_entry))
+			$layout_array['post_html'] = $chat_layout_post_entry;
+		else
+		{
+			$layout_array['post_html'] =  "
+			<div class='chat_entry_!!TYPE!!'>
+			<span class='chat_entry_user'>!!USER!!</span>
+			<span class='chat_entry_message'>!!MESSAGE!!</span>
+			<span class='chat_entry_date'>!!TIME!!</span>
+			</div>
+			";
+		}
 		
 		if (isset($chat_layout_user_info_entry))
 			$layout_array['user_info_entry'] = $chat_layout_user_info_entry;
@@ -29,8 +59,57 @@ class SiPac_Old_Theme_Wrapper extends SiPacTheme
 		else
 			$layout_array['channel_tab'] = "<li id='!!ID!!'><a href='javascript:void(0);' onclick='!!CHANNEL_CHANGE_FUNCTION!!'>!!CHANNEL!!</a></li>";
 		
-		$layout_array['notify_html'] = $chat_layout_notify_entry;
-		$layout_array['javascript_functions'] = $chat_layout_functions;
+		if (isset($chat_layout_notify_entry))
+			$layout_array['notify_html'] = $chat_layout_notify_entry;
+		else
+		{
+			$layout_array['notify_html'] = "
+			<div class='chat_entry_notify'>
+			<span class='chat_entry_message'>!!MESSAGE!!</span>
+			<span class='chat_entry_date'>!!TIME!!</span>
+			</div>
+			";
+		}
+		
+		if (isset($chat_layout_functions))
+			$layout_array['javascript_functions'] = $chat_layout_functions;
+		else
+		{
+			$chat_layout_functions['layout_init'] = '
+			function layout_init()
+			{
+			this.old_user_status = new Array();
+			}
+			';
+			$chat_layout_functions['user_options'] = "
+			function user_options(user_id, action)
+			{
+			if(action == 'show')
+			{
+			document.getElementById(user_id).getElementsByClassName('chat_user_bottom')[0].style.display = 'block';
+			}
+			else if(action == 'hide')
+			{
+			document.getElementById(user_id).getElementsByClassName('chat_user_bottom')[0].style.display = 'none';
+			}
+			}
+			";
+			$chat_layout_functions['layout_user_writing_status'] = '
+			function layout_user_writing_status (status, username, user_id)
+			{
+			if (document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML != "[" + this.texts["writing-status"] + "]")
+				this.old_user_status[username] = document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML;
+			
+			if (status == 1)
+				document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML = "[" + this.texts["writing-status"] + "]";
+			else if (this.old_user_status[username] != undefined)
+			{
+			document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML =  this.old_user_status[username];
+			}
+			}
+			';
+			$layout_array['javascript_functions'] = $chat_layout_functions;
+		}
 		$this->arr = $layout_array;
 	}
 	public function get_settings()
@@ -41,7 +120,7 @@ class SiPac_Old_Theme_Wrapper extends SiPacTheme
 		return $settings;
 	}
 	
-	public function get_layout($user_num, $smileys)
+	public function get_layout($user_num, $smileys, $settings)
 	{
 		$js = $this->js_chat;
 		

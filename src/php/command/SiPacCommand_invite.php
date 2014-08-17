@@ -1,15 +1,10 @@
 <?php
 
-class SiPacCommand_invite implements SiPacCommand
+class SiPacCommand_invite extends SiPacCommand
 {
 	public $usage = "/invite <user> [<force>]";
 	public $description = "Invites a user  to the current selected channel. When <force> is set to true, the user will join the channel, without beeing asked for permisson.";
   
-	public function set_variables($chat, $parameters)
-	{
-		$this->chat = $chat;
-		$this->parameters = $parameters;
-	}
 	public function check_permission()
 	{
 		return $this->chat->settings->get('can_invite');

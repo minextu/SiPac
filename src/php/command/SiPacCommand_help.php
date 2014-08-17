@@ -1,14 +1,10 @@
 <?php
 
-class SiPacCommand_help implements SiPacCommand
+class SiPacCommand_help extends SiPacCommand
 {
 	public $usage = "/help [<command>]";
 	public $description = "Returns all commands available, or the syntax and description of a given command.";
-	public function set_variables($chat, $parameters)
-	{
-		$this->chat = $chat;
-		$this->parameters = $parameters;
-	}
+
 	public function check_permission()
 	{
 		return true;

@@ -1,14 +1,10 @@
 <?php
 
-class SiPacCommand_afk implements SiPacCommand
+class SiPacCommand_afk extends  SiPacCommand
 {
 	public $usage = "/afk [<reason>]";
 	public $description = "Notifies everyone that you are away from your keyboard (AFK). Can also combined with a message.";
-	public function set_variables($chat, $parameters)
-	{
-		$this->chat= $chat;
-		$this->parameters = $parameters;
-	}
+
 	public function check_permission()
 	{
 		if ($this->chat->settings->get('deactivate_afk') == false)
