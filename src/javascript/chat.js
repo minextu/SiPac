@@ -17,11 +17,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 //AJAX//
-httpobject = new XMLHttpRequest();
+var SiPac_httpobject = new XMLHttpRequest();
 chat_ajax_timeout = 1000;
-
-chat_extra_send = "";
-chat_extra_send_objects = new Array();
 
 function chat_init()
 {
@@ -90,21 +87,21 @@ function chat_ajax()
     }
 
 
-    httpobject.open("POST", chat_html_path + "src/php/SiPac.php?task=get_chat", true);
-    httpobject.onreadystatechange = function ()
+    SiPac_httpobject.open("POST", chat_html_path + "src/php/SiPac.php?task=get_chat", true);
+    SiPac_httpobject.onreadystatechange = function ()
     {
-      if (httpobject.readyState == 4 && httpobject.status == 200)
+      if (SiPac_httpobject.readyState == 4 && SiPac_httpobject.status == 200)
       {
      //   try
        // {
           try
           {
-            var answer = JSON.parse(httpobject.responseText);
+            var answer = JSON.parse(SiPac_httpobject.responseText);
 			var chat_object_answer = answer['SiPac'];
           }
           catch (e)
           {
-            chat_error("Wrong answer: " + httpobject.responseText);
+            chat_error("Wrong answer: " + SiPac_httpobject.responseText);
           }
           if (chat_object_answer != undefined)
           {
@@ -126,13 +123,6 @@ function chat_ajax()
 				chat_error(undefined, true);
 		}
           }
-
-          for (var i = 0; i < chat_extra_send_objects.length; i++)
-		  {
-			chat_extra_send_objects[i].responseText = answer['SiPac_custom_request_answer'][i];
-			chat_extra_send_objects[i].onreadystatechange();
-		  }
-          chat_extra_send_objects = new Array();
           
           window.clearTimeout(chat_error_timeout);
           chat_timeout = window.setTimeout(chat_ajax, chat_ajax_timeout);
@@ -144,15 +134,11 @@ function chat_ajax()
         //}
       }
     }
-    httpobject.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    SiPac_httpobject.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
     var chat_ajax_text_comp = "chat_string=" + encodeURIComponent(chat_ajax_text);
-    if (chat_extra_send != "")
-      chat_ajax_text_comp += "&" + chat_extra_send;
-    
-	chat_extra_send = "";
 	
-    httpobject.send(chat_ajax_text_comp);
+    SiPac_httpobject.send(chat_ajax_text_comp);
 
   }
   else if (chat_objects.length == 0)
@@ -592,7 +578,7 @@ Chat.prototype.close_channel = function (channel)
 		  this.change_channel(this.channels[0]);
 	}
 	else
-		alert("You can't close the last channel left!");
+		alert(this.texts['cant-close-last-channel-text']);
 };
 Chat.prototype.handle_server_tasks = function (tasks)
 {
@@ -1050,26 +1036,11 @@ function addslashes(str)
 
 window.SiPacHttpRequest = function ()
 {
-	this.readyState = 4;
-	this.status = 200;
-	this.file = false;
-	this.responseText = "";
-	this.location = location.pathname;
-	this.location = this.location.substring(0, this.location.lastIndexOf('/'));
+
 }
 SiPacHttpRequest.prototype.open = function(type, file, async)
 {
-	if (async != true)
-		alert("only async ajax supported");
-	else
-	{
-		if (file.search("http://") != -1)
-			alert("Only internal links supported")
-		if (file.charAt(0) == "/")
-			this.file = file;
-		else
-			this.file = this.location + "/" + file;
-	}
+	alert("SiPacHttpRequest was removed due to possible exploits. A simpler way will be probably included in SiPac 0.2.") 
 };
 SiPacHttpRequest.prototype.onreadystatechange = function()
 {
@@ -1081,18 +1052,5 @@ SiPacHttpRequest.prototype.setRequestHeader = function(x, y)
 };
 SiPacHttpRequest.prototype.send = function(post)
 {
-	if (chat_is_ajax == false)
-	{
-		this.post = post;
-		if (chat_extra_send != "")
-			chat_extra_send += "&";
-		chat_extra_send += post + "&SiPacHttpFile=" + encodeURIComponent(this.file);
-		
-		chat_extra_send_objects[chat_extra_send_objects.length] = this;
-	}
-	else
-	{
-		var httpobject = this;
-		window.setTimeout(function() { httpobject.send(post) }, 10);
-	}
+
 };

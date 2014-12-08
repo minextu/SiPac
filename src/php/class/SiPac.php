@@ -173,7 +173,7 @@ class SiPac_Chat
 			
 		if ($this->check_kick() == true)
 			return false;
-		else 	if (	$is_new == false AND $this->check_ban() == true)
+		else if ($is_new == false AND $this->check_ban() == true)
 			return false;
 	}
 
