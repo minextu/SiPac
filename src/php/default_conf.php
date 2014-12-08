@@ -57,6 +57,7 @@ function return_default_settings()
 	
 	"disabled_client_proxies" => array(),
 	"disabled_server_proxies" => array(),
+	"disabled_commands" => array(),
 	
 	"custom_commands" => array(),
 	"custom_client_proxies" => array(),
