@@ -52,11 +52,13 @@ SiPac.prototype.information = function(text, type, no_hide, close)
 		window.clearTimeout(this.info_hide_timeout);
 	
 	var info_msg_element = this.chat.getElementsByClassName("chat_notice_msg")[0];
+	
+	//try to close any old information popup 
+	try{info_msg_element.removeChild(info_msg_element.firstChild);}catch(e){}
+	//if the only use was to close the popup, there is no need to continue
 	if (close === true)
-	{
-		info_msg_element.removeChild(info_msg_element.firstChild);
 		return false;
-	}
+	
 	var information_popup = document.createElement("span");
 	information_popup.innerHTML = this.layout['information_popup'].replace(
 		/!!TEXT!!/g, text).replace(
@@ -65,6 +67,7 @@ SiPac.prototype.information = function(text, type, no_hide, close)
 		/!!CLOSE_FUNCTION!!/g, "sipac_objects[" + this.num + "].information(undefined, undefined, undefined, true)");
 	info_msg_element.appendChild(information_popup);
 	
+	//Set a timeout to close the popup, if no_hide is undefined or false
 	if (no_hide != true)
 	{
 		var chat = this;

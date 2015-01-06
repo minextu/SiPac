@@ -21,7 +21,7 @@ class SiPacCommand_help extends SiPacCommand
 			if (class_exists($class_name) AND empty($this->parameters) OR class_exists($class_name) AND str_replace("SiPacCommand_", "", $class_name)  == $this->parameters)
 			{
 				$check_command = new $class_name;
-				$check_command->set_variables($this->chat, false);
+				$check_command->set_variables($this->chat, false, false);
 				if ($check_command->check_permission() === true)
 				{
 					if (!empty($command_syntax))

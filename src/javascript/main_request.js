@@ -36,7 +36,10 @@ function sipac_main_request(single)
 			try
 				{var answer = JSON.parse(httpobject.responseText);}
 			catch(e)
-				{sipac_objects[i].information(httpobject.responseText, "error");}
+			{
+					sipac_objects[0].information(httpobject.responseText, "error");
+					sipac_objects[0].add_debug_entry(0, httpobject.responseText);
+			}
 				
 			var chat_object_answer = answer['SiPac'];
 			for (var i = 0; i < chat_object_answer.length; i++)
