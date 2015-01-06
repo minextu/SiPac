@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
 $SiPac_version = "0.1.90-git";
+
 
 //initiate the session, if not already started
 if (strlen(session_id()) < 1)
@@ -152,27 +152,6 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
     
 	}
 	$json_answer_fin['SiPac'] = $json_answer;
-	
-	if (isset($_POST['SiPacHttpFile']))
-	{
-		ob_start();
-		$http_url = $_SERVER['DOCUMENT_ROOT'].urldecode($_POST['SiPacHttpFile']);
-		$http_url_parts = explode("?", $http_url);
-		
-		if (!empty($http_url_parts[1]))
-		{
-			$http_get = explode("&", $http_url_parts[1]);
-			foreach ($http_get as $get_var)
-			{
-				$get_parts = explode("=", $get_var);
-				$_GET[$get_parts[0]] = $get_parts[1];
-			}
-		}
-		chdir(dirname($http_url_parts[0]));
-		include($http_url_parts[0]);
-		$json_answer_fin['SiPac_custom_request_answer'][] = ob_get_clean();
-	}
-	
 	echo json_encode($json_answer_fin);
 }
 ?>

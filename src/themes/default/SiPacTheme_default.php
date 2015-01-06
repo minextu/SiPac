@@ -34,7 +34,7 @@ class SiPacTheme_default extends SiPacTheme
 					</div>
 					<div class='chat_vr'></div>
 					<div class='chat_right'>
-						<div class='chat_element'>
+						<div class='chat_userlist_element'>
 							<div class='chat_element_head'><img src='".$this->path."/icons/user.png' alt=''><||userlist-head|$user_num||><span class='chat_element_arrow'></span></div>
 							<div class='chat_element_text'>
 								<div class='chat_userlist'></div>

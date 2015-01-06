@@ -52,12 +52,15 @@
 	width: calc(30% - 81px);
 	overflow: auto;
 }
-##CHAT_MAIN## .chat_userlist
+##CHAT_MAIN## .chat_userlist_element
 {
 	height: 45%;
+}
+##CHAT_MAIN## .chat_userlist
+{
 	overflow: auto;
 }
-##CHAT_MAIN## .chat_element
+##CHAT_MAIN## .chat_element, ##CHAT_MAIN## .chat_userlist_element
 {
 	width: calc(100% - 2px);
 	background: #f8f9f8;
@@ -125,18 +128,17 @@
 }
 ##CHAT_MAIN## .chat_message
 {
-	width: calc(100% - 20px); 
-	/*padding:10px 90px 10px 10px;*/
+	width: calc(100% - 105px); 
 	padding-left: 5px; 
 	padding-right: 80px;
-	margin-left: 5px;
+	margin-left: 8px;
 	background:#fff; 
 	border:1px solid #bbb;
 	height: 35px;
 }
 ##CHAT_MAIN## .chat_send_button
 {
-	height: 35px;
+	height: 40px;
 	width:80px; 
 	margin-left:-87px; 
 	padding:8px; 

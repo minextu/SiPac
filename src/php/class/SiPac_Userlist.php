@@ -130,7 +130,7 @@ class SiPac_Userlist
 			
 			foreach($users as $user)
 			{
-				if ($user['info'] != "banned")
+				if ($user['task'] != "banned")
 				{
 					$user_class[$user['id']] = new SiPac_User($user, $this->chat);
 					$this->users[$channel][] = $user_class[$user['id']];

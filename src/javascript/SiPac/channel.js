@@ -90,7 +90,7 @@ SiPac.prototype.close_channel = function (channel)
 			this.change_channel(this.channels[0]['id']);
 	}
 	else
-		alert("You can't close the last channel left!");
+		alert(this.text['cant-close-last-channel-text']);
 };
 
 SiPac.prototype.generate_channel_html = function(channel, channel_title)

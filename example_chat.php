@@ -26,11 +26,12 @@ $chat = new SiPac_Chat($chat_settings);
 
 ?>
 
-<html>
+<!DOCTYPE html>
+<html style='width: 100%; height: 100%;'>
 <head>
 <title>SiPac (minimal config)</title>
 </head>
-<body>
+<body style='width: 100%; height: 100%; margin: 0px;'>
 
 <?php 
 

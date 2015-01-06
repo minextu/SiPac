@@ -111,6 +111,7 @@ $chat_text = array(
 "enable-desktop-notifications-text" => "Desktop Benachrichtigungen aktivieren",
 "enable-sound-text" => "Sound aktivieren",
 "enable-autoscroll-text" => "Automatisches Scrollen aktivieren",
-"enable-invite-text" => "Einladungen aktivieren"
+"enable-invite-text" => "Einladungen aktivieren",
+"cant-close-last-channel-text" => "Der letzte übrige Channel kann nicht geschlossen werden!"
 );
 ?>

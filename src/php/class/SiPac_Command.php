@@ -21,12 +21,31 @@ class SiPac_Command
 {
 	private $chat;
 	private $channel;
+	private $command_list = array();
 	
 	public function __construct($chat)
 	{
 		$this->chat= $chat;
+		$this->get_available_commands();
 	}
 	
+	public function get_available_commands()
+	{
+		$command_folder = dirname(__FILE__) ."/../command";
+		$files = scandir($command_folder);
+		foreach ($files as $file)
+		{
+			if ($file != "." && $file != "..") 
+			{
+				$command_name = str_replace(".php", "", $file);
+					
+				if (in_array($command_name, $this->chat->settings->get("disabled_commands")) == false)
+				{
+					$this->command_list[] = $command_name;
+				}
+			}
+		}
+	}
 	public function check($message, $channel)
 	{
 		$this->channel = $channel;
@@ -35,6 +54,7 @@ class SiPac_Command
 		{ //message is a command
 			$command_parts = explode(" ", $message, 2);
 			$command_name = str_replace("/", "", $command_parts[0]);
+			$command_class = "SiPacCommand_".$command_name;
 	
 			if (isset($command_parts[1]))
 				$command_parameters =  $command_parts[1];
@@ -44,24 +64,21 @@ class SiPac_Command
 			$command_return = $this->check_custom_command($command_name, $command_parameters);
 			if ($command_return !== false)
 				return $command_return;
-			else
+			else if (in_array($command_class, $this->command_list) === true)
 			{
-				$command_class = "SiPacCommand_".$command_name;
 				$command_path = dirname(__FILE__) ."/../command/".$command_class.".php";
-				if (file_exists($command_path))
+				include_once($command_path);
+				if (class_exists($command_class))
 				{
-					include_once($command_path);
-					if (class_exists($command_class))
-					{
-						$command = new $command_class;
-						return $this->execute($command, $command_parameters);
-					}
-					else
-						$this->chat->debug->add("Command found, but the classname is not '$command_class'", 1);
+					$command = new $command_class;
+					return $this->execute($command, $command_parameters);
 				}
 				else
-					return array("info_type"=>"warn", "info_text" => $this->chat->language->translate("<||command-not-found-text|".$command_name."||>"));
+					$this->chat->debug->add("Command found, but the classname is not '$command_class'", 1);
+				
 			}
+			else
+				return array("info_type"=>"warn", "info_text" => $this->chat->language->translate("<||command-not-found-text|".$command_name."||>"));
 		}
 		else
 			return false;
