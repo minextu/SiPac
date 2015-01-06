@@ -29,7 +29,7 @@ class SiPacTheme_example extends SiPacTheme
 							<div>$smileys</div>
 							<input type='text' class='chat_message' placeholder='<||message-input-placeholder||>'>
 							<button class='chat_send_button'><||send-button-text||></button>
-							<button onclick='$js.layout_test();'>layout function test</button>
+							<button onclick='$js.layout_test('blubb');'>layout function test</button>
 						</div>
 							
 			</div><!-- end: chat_main-class -->
@@ -57,9 +57,9 @@ class SiPacTheme_example extends SiPacTheme
 		}
 		';
 		$functions['layout_test'] = '
-		function (status, username, user_id)
+		function (var1)
 		{
-			alert("test");
+			alert(var1);
 		}
 		';
 		return $functions;

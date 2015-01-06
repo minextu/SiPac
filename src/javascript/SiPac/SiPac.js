@@ -1,4 +1,3 @@
-<?php
 /*
     SiPac is highly customizable PHP and AJAX chat
     Copyright (C) 2013-2014 Jan Houben
@@ -17,13 +16,28 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-abstract class SiPacProxy
+
+SiPac.prototype.check_writing_status = function()
 {
-	final public function set_variables($chat, $post)
+	var value = this.chat.getElementsByClassName('chat_message')[0].value;
+	if (value != undefined && value != "" && value[0] != "/")
 	{
-		$this->chat = $chat;
-		$this->post = $post;
+		if (typeof this.old_value == "undefined" || value != this.old_value)
+		{
+			this.is_writing = true;
+		}
+		else
+			this.is_writing = false;
 	}
-	abstract public function execute();
+	else
+		this.is_writing = false;
+	
+	var chat = this;
+	window.setTimeout(function() { chat.old_value = value }, 5000);	
 }
-?>
+
+SiPac.prototype.play_sound = function()
+{
+	if (this.sound_enabled)
+		this.new_post_audio.play();
+}

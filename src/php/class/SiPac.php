@@ -1,22 +1,22 @@
 <?php
 /*
-SiPac is highly customizable PHP and AJAX chat
-Copyright (C) 2013 Jan Houben
+    SiPac is highly customizable PHP and AJAX chat
+    Copyright (C) 2013-2014 Jan Houben
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with this program; if not, write to the Free Software Foundation, Inc.,
-51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 $GLOBALS['global_chat_num'] = 0;
 class SiPac_Chat
 {
@@ -28,52 +28,37 @@ class SiPac_Chat
 	public $nickname;
 	public $afk;
 	public $is_writing = false;
+	public $is_kicked = false;
 	public $new_nickname;
 	public $is_new = false;
 	
 	private $db_error;
 	
-	public function __construct($settings=false, $is_new=true, $chat_variables=false, $channels=false, $chat_num=false)
+	public function __construct($settings=false, $chat_variables=false, $chat_num=false)
 	{
-		$this->init($settings, $is_new, $chat_variables, $channels, $chat_num);
+		$this->init($settings, $chat_variables, $chat_num);
 	}
 	
 	//initiate the chat: load settings, check all variables
-	public function init($settings, $is_new, $chat_variables, $channels, $chat_num)
+	public function init($settings, $chat_variables, $chat_num)
 	{
-		if ($chat_variables == false)
-			$this->id = $this->encode_id($settings['chat_id']);
+		$this->channel = new SiPac_Channel();
+		$this->debug = new SiPac_Debug();
+		$this->settings = new SiPac_Settings();
+		
+		if ($chat_variables !== false)
+		{
+			$this->is_new = false;
+			$chat_variables = $this->get_parameters($chat_variables);
+		}
 		else
-			$this->id = $chat_variables['chat_id'];
+		{
+			$this->is_new = true;
+			$this->set_default_parameters($settings);
+		}
 			
-		$this->is_new = $is_new;
-		
-		$this->debug = new SiPac_Debug($this->id, $this->is_new);
-		
-		//load all settings for this chat
-		$this->settings = new SiPac_Settings($this->id, $this->debug);
-		$settings_return = $this->settings->load($settings);
-		if ($settings_return === false)
-			return false;
-		
 
-		$this->channel = new SiPac_Channel($this->id, $this->settings);
-
-		/*
-		if not already set,
-		generate random id for this tab/window of the client
-		(so the chat can be opened more than once in different tabs, but same with the same session)
-		*/
-		if ($chat_variables == false)
-		{
-			$this->client_num = "n" . time() . mt_rand(0, 10000);
-			$this->channel->active = false;
-		}
-		else
-		{
-			$this->client_num = $chat_variables['client_num'];
-			$this->channel->active = $chat_variables['active_channel'];
-		}
+			
 		
 		$this->ip = $_SERVER['REMOTE_ADDR'];
 		
@@ -109,15 +94,10 @@ class SiPac_Chat
 			}
 		}
 		
-		if ($channels == false)
-			$this->channel->add($this->settings->get('channels'));
-		else
-			$this->channel->add($channels, true);
-		
 		//obtain a nickname or load the old
 		$this->check_name();
 		
-		if ($is_new == true)
+		if ($this->is_new == true)
 		{
 			//check for the update.php
 			if ($this->settings->get('development') == false)
@@ -173,8 +153,61 @@ class SiPac_Chat
 			
 		if ($this->check_kick() == true)
 			return false;
-		else 	if (	$is_new == false AND $this->check_ban() == true)
+		else 	if ($this->is_new == false AND $this->check_ban() == true)
 			return false;
+	}
+
+	private function get_parameters($parameters)
+	{
+		$this->id = $parameters['id'];
+		
+		$this->init_important_classes(false);
+		
+		//get unchanged parameters
+		if (!empty($this->settings->get('last_parameters')))
+		{
+			foreach ($this->settings->get('last_parameters') as $name => $value)
+			{
+				if (!isset($parameters[$name]))
+				{
+					$parameters[$name] = $value;
+				}
+			}
+		}
+		
+		$this->channel->add_list($parameters['channels']);
+		$this->client_num = $parameters['client'];
+		$this->channel->active = $parameters['active_channel'];
+		$this->is_writing = $parameters['writing'];
+		
+		$this->settings->set('last_parameters', $parameters);
+		
+		return $parameters;
+	}
+	private function set_default_parameters($settings)
+	{
+		$this->id = $this->encode_id($settings['chat_id']);
+		
+		$this->init_important_classes($settings);
+		
+		$this->channel->add($this->settings->get('channels'));
+		//generate a random id for this tab/window of the client (so the chat can be opened more than once in different tabs, but with the same session)
+		$this->client_num = "n" . time() . mt_rand(0, 10000);
+		$this->channel->active = false;
+		$this->is_writing = false;
+	}
+	
+	private function init_important_classes($settings)
+	{
+		$this->debug->init($this->id, $this->is_new);
+		$this->settings->init($this->id, $this->debug);
+		
+		//load all settings for this chat
+		$settings_return = $this->settings->load($settings);
+		if ($settings_return === false)
+			return false;
+	
+		$this->channel->init($this->id, $this->settings);
 	}
 
 	public function encode_id($id=false)
@@ -285,6 +318,8 @@ class SiPac_Chat
 	public function kick($client_text, $notification_text, $delete_user=true)
 	{
 		$_SESSION['SiPac'][$this->id]['kick'] = $client_text;
+		$this->is_kicked = true;
+		
 		foreach ($this->channel->ids as $channel)
 		{
 				$this->message->send($notification_text, $channel, 1);
@@ -312,10 +347,11 @@ class SiPac_Chat
 		$this->kick($client_text, $notification_text, false);
 	}
 	
-	private function check_kick()
+	private  function check_kick()
 	{
 		if (!empty($_SESSION['SiPac'][$this->id]['kick']))
 		{
+			$this->is_kicked = true;
 			$this->debug->error($this->language->translate($_SESSION['SiPac'][$this->id]['kick']));
 			return true;
 		}
@@ -328,6 +364,7 @@ class SiPac_Chat
 		$check_ban = $this->db->check_ban($this->nickname, $this->ip, $this->id);
 		if ($check_ban !== false)
 		{
+			$this->is_kicked = true;
 			if (!is_array($check_ban))
 				$this->debug->error("Failed check ban status (response: ".$check_ban.";)");
 			else

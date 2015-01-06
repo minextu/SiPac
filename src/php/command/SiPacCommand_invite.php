@@ -19,7 +19,7 @@ class SiPacCommand_invite extends SiPacCommand
 			if (substr($user, 0, 1) == "@")
 				$user = substr($user, 1);
 				
-			$channel = $this->chat->channel->active;
+			$channel = $this->channel;
 			
 			if (isset($parameters[1]) AND $parameters[1] == "true")
 			{

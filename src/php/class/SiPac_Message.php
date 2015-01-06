@@ -1,21 +1,21 @@
 <?php
 /*
- *   SiPac is highly customizable PHP and AJAX chat
- *   Copyright (C) 2013 Jan Houben
- * 
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 2 of the License, or
- *   (at your option) any later version.
- * 
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- * 
- *   You should have received a copy of the GNU General Public License along
- *   with this program; if not, write to the Free Software Foundation, Inc.,
- *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+    SiPac is highly customizable PHP and AJAX chat
+    Copyright (C) 2013-2014 Jan Houben
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 class SiPac_Message
 {
@@ -47,7 +47,7 @@ class SiPac_Message
 		
 		if (!empty($message))
 		{
-			$command_return = $this->chat->command->check($message) ;
+			$command_return = $this->chat->command->check($message, $channel) ;
 			if ($command_return !== false)
 			{
 				if ($command_return == false)
@@ -63,12 +63,15 @@ class SiPac_Message
 				
 				$post_array = $this->chat->proxy->check($post_array, "server", $check_spam);
 				
-				$db_response = $this->chat->db->save_post($post_array['message'], $this->chat->id, $post_array['channel'], $post_array['type'], $post_array['user'], $post_array['style'], $post_array['time']);
-				if ($db_response !== true)
-					$this->chat->debug->add("Message saving failed (response: ".$db_response.")", 0);
-				else
-					$this->chat->debug->add("Message successfully send (type:".$post_array['type'].")", 2);
-					
+				//if the return of a proxy is false, the message won't be saved
+				if ($post_array !== false)
+				{
+					$db_response = $this->chat->db->save_post($post_array['message'], $this->chat->id, $post_array['channel'], $post_array['type'], $post_array['user'], $post_array['style'], $post_array['time']);
+					if ($db_response !== true)
+						$this->chat->debug->add("Message saving failed (response: ".$db_response.")", 0);
+					else
+						$this->chat->debug->add("Message successfully send (type:".$post_array['type'].")", 2);
+				}
 				return array();
 			}
 		}

@@ -2,3 +2,5 @@ log/*
 cache/*
 .directory
 *~
+.kateproject
+.kateproject.d/

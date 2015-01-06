@@ -1,7 +1,7 @@
 <?php
 /*
     SiPac is highly customizable PHP and AJAX chat
-    Copyright (C) 2013 Jan Houben
+    Copyright (C) 2013-2014 Jan Houben
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,9 +19,10 @@
  */
 abstract class SiPacCommand
 {
-	final public function set_variables($chat, $parameters)
+	final public function set_variables($chat, $channel, $parameters)
 	{
 		$this->chat = $chat;
+		$this->channel = $channel;
 		$this->parameters = $parameters;
 	}
 	

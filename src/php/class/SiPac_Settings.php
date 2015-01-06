@@ -1,7 +1,7 @@
 <?php
 /*
     SiPac is highly customizable PHP and AJAX chat
-    Copyright (C) 2013 Jan Houben
+    Copyright (C) 2013-2014 Jan Houben
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,13 +17,18 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
- class SiPac_Settings
+class SiPac_Settings
 {
 	private $settings;
 	private $id;
 	
-	public function __construct($id,$debug)
+	public function __construct($id=false, $debug=false)
+	{
+		if ($id !== false AND $debug !== false)
+			$this->init($id, $debug);
+	}
+	
+	public function init($id, $debug)
 	{
 		$this->id = $id;
 		$this->debug = $debug;

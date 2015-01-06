@@ -1,7 +1,7 @@
 <?php
 /*
     SiPac is highly customizable PHP and AJAX chat
-    Copyright (C) 2013 Jan Houben
+    Copyright (C) 2013-2014 Jan Houben
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,8 +23,9 @@ abstract class SiPacTheme
 	{
 		$this->path = $path;
 		$this->js_chat = $js_chat;
+		$this->theme_js = $js_chat.".theme_functions";
 	}
-	abstract public function get_layout($user_num, $smileys, $settings);
+	abstract public function get_layout($nickname, $user_num, $smileys, $settings);
 	abstract public function get_js_functions();
 	abstract public function get_settings();
   
@@ -118,6 +119,20 @@ abstract class SiPacTheme
 		<br><input type ='checkbox' class='chat_autoscroll_checkbox' checked='checked' onclick='if ($js.autoscroll_enabled == true) { $js.disable_autoscroll() } else { $js.enable_autoscroll() } '><||enable-autoscroll-text||>
 		<br><input type ='checkbox' class='chat_sound_checkbox' checked='checked' onclick='if ($js.sound_enabled == true) { $js.disable_sound() } else { $js.enable_sound() } '><||enable-sound-text||>
 		<br><input type ='checkbox' class='chat_invite_checkbox' checked='checked' onclick='if ($js.invite_enabled == true) { $js.disable_invite() } else { $js.enable_invite() } '><||enable-invite-text||>
+		";
+	}
+	
+	public function get_information_popup($text, $head, $type, $close_function)
+	{
+		return
+		"
+			<div class='chat_notice_$type'>
+				<span class='close_chat_information'>
+					<a href='javascript:void(0)' onclick='$close_function'>X</a>
+				</span>
+				$head<br>
+				$text
+			</div>
 		";
 	}
 }

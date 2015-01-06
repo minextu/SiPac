@@ -1,4 +1,3 @@
-<?php
 /*
     SiPac is highly customizable PHP and AJAX chat
     Copyright (C) 2013-2014 Jan Houben
@@ -17,13 +16,19 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-abstract class SiPacProxy
+function sipac_set_vars()
 {
-	final public function set_variables($chat, $post)
-	{
-		$this->chat = $chat;
-		$this->post = $post;
-	}
-	abstract public function execute();
+  sipac_new_id = 0;
+  sipac_objects = new Array();
+  sipac_objects_id = {};
+  sipac_theme_functions = new Array();
+  sipac_ajax_timeout = 1000;
+  sipac_html_path = false;
+  
+  sipac_main_request();
 }
-?>
+
+if (typeof sipac_objects == 'undefined')
+{
+  sipac_set_vars();
+}

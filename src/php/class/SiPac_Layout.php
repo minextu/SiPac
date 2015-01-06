@@ -1,7 +1,7 @@
 <?php
 /*
     SiPac is highly customizable PHP and AJAX chat
-    Copyright (C) 2013 Jan Houben
+    Copyright (C) 2013-2014 Jan Houben
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@ class SiPac_Layout
 	public $is_mobile = false;
 	public $theme;
 	public $cache_folder;
+	
+	private $js_files = array("SiPac/init.js", "SiPac/SiPac.js", "SiPac/channel.js", "SiPac/ajax.js", "SiPac/userlist.js", "SiPac/message.js", "SiPac/settings.js", "SiPac/notification.js", "SiPac/layout.js", "SiPac/debug.js", "main_request.js", "global_variables.js");
 	
 	public function __construct($chat)
 	{
@@ -76,34 +78,13 @@ class SiPac_Layout
 			require("$layout_php_path/$theme_class.php");
 			$this->theme = new $theme_class();
 		}
-		//Check for a deprecated theme
-		else if (dirname(__FILE__) . "/../../../themes/".$this->chat->settings->get('theme')."/layout.php")
-		{
-			$layout_php_path = dirname(__FILE__) . "/../../../themes/".$this->chat->settings->get('theme')."_mobile";
-			$layout_path = $this->chat->html_path."themes/".$this->chat->settings->get("theme")."_mobile";
-			$is_mobile = check_mobile();
-			if ($is_mobile && is_dir($layout_php_path))
-				$this->is_mobile = true;
-			else
-			{
-				$layout_php_path = dirname(__FILE__) . "/../../../themes/".$this->chat->settings->get('theme');
-				$layout_path = $this->chat->html_path."themes/".$this->chat->settings->get("theme");
-			}
-			
-			require(dirname(__FILE__)."/Compatibility/SiPac_Old_Theme_Wrapper.php");
-			$this->theme = new SiPac_Old_Theme_Wrapper();
-			$this->theme->prepare($layout_php_path, $this->chat->settings->get('theme'), $this->chat->chat_num);
-			
-			if ($this->chat->is_new == true)
-				$this->chat->debug->add("You are using a deprecated theme. Consider updating the theme to the new format (see conf/themes/example/ for an example)", 1);
-		}
 		else
 		{
 			$this->chat->debug->error($layout_php_path."/$theme_class.php not found!");
 			return false;
 		}
 		
-		$js_chat = "chat_objects[".$this->chat->chat_num."]";
+		$js_chat = "sipac_objects[".$this->chat->chat_num."]";
 		$this->theme->set_variables($layout_path, $js_chat);
 		
 		$this->settings = $this->theme->get_settings();
@@ -111,64 +92,88 @@ class SiPac_Layout
 		$this->settings['html_path'] = $layout_path;
 	}
 	
+	//generate the layout files for cache, if needed
+	public function create_theme_cache()
+	{
+		$this->cache_id = md5($this->chat->id.$this->chat->html_path.$this->chat->settings->get('theme').$this->is_mobile.$this->chat->settings->get("language"));
+		$this->cache_folder = dirname(__FILE__) . "/../../../cache/".$this->cache_id."/";
+		$this->cache_folder_html = $this->chat->html_path."cache/".$this->cache_id."/";
+				
+		if (is_dir($this->cache_folder) == false)
+		{
+			//create the cache directory and create all cached files, content will be added at the end of this function
+			mkdir($this->cache_folder, 0777);
+			touch($this->cache_folder."layout.html");
+			touch($this->cache_folder."layout.css");
+			touch($this->cache_folder."layout.js");
+		}
+			
+		$html_code = utf8_decode($this->chat->language->translate($this->generate_layout_html()));
+		$css_code = $this->generate_layout_css();
+		
+		//setup custom javascript functions
+		$js_function_string = "sipac_theme_functions[sipac_new_id] = new Array();\n";
+		$js_functions = $this->theme->get_js_functions();
+		foreach ($js_functions as $name => $function)
+		{
+			$js_function_string = $js_function_string.preg_replace('/function\s*\((.*)\)/','sipac_theme_functions[sipac_new_id]["'.$name.'"] = function ($1)', $function);
+		}
+		
+		//update all cached files, if changed
+		if (file_get_contents($this->cache_folder."layout.html") !== $html_code)
+		{
+			$this->chat->debug->add("layout.html updated", 2);
+			file_put_contents($this->cache_folder."layout.html", $html_code);
+		}
+			
+		if (file_get_contents($this->cache_folder."layout.css") !== $css_code)
+		{
+			$this->chat->debug->add("layout.css updated", 2);
+			file_put_contents($this->cache_folder."layout.css", $css_code);
+		}
+		
+		if (file_get_contents($this->cache_folder."layout.js") !== $js_function_string)
+		{
+			$this->chat->debug->add("layout.js updated", 2);
+			file_put_contents($this->cache_folder."layout.js", $js_function_string);
+		}
+		
+	}
+	
 	//generate and return the html code for the chat
 	public function draw()
 	{   
-		$this->cache_folder = md5($this->chat->id.$this->chat->html_path.$this->chat->settings->get('theme').$this->is_mobile.$this->chat->settings->get("language"));
+		$this->create_theme_cache();
 		
 		$GLOBALS['global_chat_num']  = $GLOBALS['global_chat_num'] + 1;
-		if ($this->chat->settings->get('use_cache'))
-		{
-			$cache_folder = dirname(__FILE__) . "/../../../cache/".$this->cache_folder."/";
-				
-			if (is_dir($cache_folder) == false)
-			{
-				mkdir($cache_folder, 0777);
-				
-				$html_code = utf8_decode($this->chat->language->translate($this->generate_layout_html()));
-				file_put_contents($cache_folder."layout.html", $html_code);
-				file_put_contents($cache_folder."layout.css", $this->generate_layout_css());
-			}
-			
-			return file_get_contents($cache_folder."layout.html").$this->generate_js();
-		}
-		else
-		{
-			$css = $this->generate_layout_css();
-			return  $this->chat->language->translate($this->generate_layout_html($css)).$this->generate_js();
-		}
+
+		return file_get_contents($this->cache_folder."layout.html").$this->generate_js();
 	}
-	private function generate_layout_html($css_code=false)
+	private function generate_layout_html()
 	{
 		$user_num = "<span class='chat_user_num'>?</span>";
+		$nickname = "<span class='chat_username'>".$this->chat->nickname."</span>";
 		$smileys = $this->generate_smileys();
 		$settings = $this->theme->get_js_settings();
 		
 		
 		//save the html code of the layout
-		$html_code = $this->theme->get_layout($user_num, $smileys, $settings);
+		$html_code = $this->theme->get_layout($nickname, $user_num, $smileys, $settings);
 	
 		//add the chat id to the div with the class 'chat_main'
 		$html_code =str_replace('"chat_main"', '"chat_main" id="' . $this->chat->id . '"', str_replace("'chat_main'", "'chat_main' id='".$this->chat->id."'", $html_code));
-	
-		//load the chat.js
-		$html_code = $html_code."<script class='sipac_script' type='text/javascript' src='".$this->chat->html_path."src/javascript/chat.js'></script>";
-		if (empty($css_code))
+
+		
+		//load all js files
+		foreach ($this->js_files as $file)
 		{
-			$cache_folder = $this->chat->html_path."cache/".$this->cache_folder."/";
-			$html_code = "<link rel='stylesheet' type='text/css' href='".$cache_folder."layout.css'>".$html_code;
+			$html_code = $html_code."<script class='sipac_script' type='text/javascript' src='".$this->chat->html_path."src/javascript/$file'></script>";
 		}
-		else
-		{
-			//load the layout css file via javascript
-			$html_code = $html_code."
-			<script class='sipac_script' type='text/javascript'>
-			var style_obj = document.createElement('style');
-			var text_obj = document.createTextNode('".trim($css_code)."');
-			style_obj.appendChild(text_obj);
-			document.getElementById('".$this->chat->id."').appendChild(style_obj);
-			</script>";
-		}
+		//load custom layout functions
+		$html_code = $html_code."<script class='sipac_script' type='text/javascript' src='".$this->cache_folder_html."layout.js'></script>";
+		
+		//load layout css file
+		$html_code = "<link rel='stylesheet' type='text/css' href='".$this->cache_folder_html."layout.css'>".$html_code;
 		
 		return $html_code;
 	}
@@ -187,53 +192,29 @@ class SiPac_Layout
   
 	private function generate_js()
 	{
-		$js_chat = "<script class='sipac_script' type='text/javascript'>
-		var chat_text = new Array();";
-		foreach ($this->chat->language->text as $key => $text)
-		{
-			$js_chat = $js_chat."chat_text['$key'] = '".addslashes(utf8_decode($text))."';";
-		}
-	
-		$channel_tab = $this->theme->get_channel_tab("!!CHANNEL!!", "!!ID!!", "!!CHANNEL_CHANGE_FUNCTION!!", "!!CHANNEL_CLOSE_FUNCTION!!");
+		/* generate the needed parameters for add_chat(), to start the chat */
+		$layout = array(
+			"channel_tab" => $this->theme->get_channel_tab("!!CHANNEL!!", "!!ID!!", "!!CHANNEL_CHANGE_FUNCTION!!", "!!CHANNEL_CLOSE_FUNCTION!!"),
+			"information_popup" => $this->theme->get_information_popup("!!TEXT!!", "!!HEAD!!", "!!TYPE!!", "!!CLOSE_FUNCTION!!"));
+
+		$parameter_array = array(
+			"chat_html_path" => $this->chat->html_path, 
+			"theme_html_path" => $this->settings['html_path'], 
+			"id" => $this->chat->id, 
+			"client_num" => $this->chat->client_num, 
+			"text" => $this->chat->language->text, 
+			"layout" => $layout, 
+			"channels" => $this->chat->channel->list,
+			"ajax_timeout" => $this->chat->settings->get('ajax_timeout'));
 		
-		$js_chat = $js_chat."var chat_layout = new Array();";
-		$js_chat = $js_chat."chat_layout['channel_tab'] = '".addslashes(trim(str_replace("	", " ", str_replace("\n", " ", $channel_tab))))."';";
+		$json_parameters = addslashes(json_encode($parameter_array));
 	
-		$js_chat = $js_chat."var chat_channels = new Array(";
-		foreach ($this->chat->channel->list as $key => $channel)
-		{
-			if ($key != 0)
-				$js_chat = $js_chat.",";
-			$js_chat = $js_chat."\"".$channel['id']."\"";  
-		}
-		$js_chat = $js_chat.");";
 	
-		$js_chat = $js_chat."var chat_channel_titles = new Array(";
-		foreach ($this->chat->channel->list as $key => $channel)
-		{
-			if ($key != 0)
-				$js_chat = $js_chat.",";
-			$js_chat = $js_chat."\"".$channel['title']."\"";  
-		}
-		$js_chat = $js_chat.");";
-	
-		/* generate js function arguments, to start the chat*/
-		$js_chat =$js_chat. "add_chat('".$this->chat->html_path."','" . $this->settings['html_path'] . "','".$this->chat->id."', '".$this->chat->client_num."', chat_channels, chat_channel_titles, chat_text, chat_layout";
-		$js_chat = $js_chat.",".$this->chat->settings->get('ajax_timeout').");";
+		/* call the add_chat() with the generated parameters */
+		$js_chat ="<script type='text/javascript'> add_chat('".$json_parameters."');";
 		
-		
-		//load all javascript functions of the layout
-		$javascript_functions = $this->theme->get_js_functions();
-		if (!empty($javascript_functions))
-		{
-			foreach ($javascript_functions as $name => $function)
-			{
-				$js_chat = $js_chat."chat_objects[chat_objects.length-1].$name = $function;";
-					if ($name == "layout_init")
-						$js_chat = $js_chat."chat_objects[chat_objects.length-1].$name();";
-			}
-		}
-		$js_chat = $js_chat."chat_objects[chat_objects.length-1].init();</script>";
+		//initiate the chat, by calling the init function.
+		$js_chat = $js_chat."sipac_objects[sipac_objects.length-1].init();</script>";#
 	
 		return $js_chat;
 	}
@@ -254,7 +235,7 @@ class SiPac_Layout
 			if (strpos($smiley_url, "http://") === false)
 				$smiley_url = $this->settings['html_path']."/smileys/" . $smiley_url;
 			$smiley_code  = htmlentities($smiley_code, ENT_QUOTES);
-			$chat_smileys = $chat_smileys . "<span style='margin-right: 3px; cursor: pointer;' onclick='chat_objects[chat_objects_id[\"".$this->chat->id."\"]].add_smiley(\" " . $smiley_code . "\");'><img$width$height src='" . $smiley_url . "' title='" . $smiley_code . "' alt='" . $smiley_code . "'></span>";
+			$chat_smileys = $chat_smileys . "<span style='margin-right: 3px; cursor: pointer;' onclick='sipac_objects[sipac_objects_id[\"".$this->chat->id."\"]].add_smiley(\" " . $smiley_code . "\");'><img$width$height src='" . $smiley_url . "' title='" . $smiley_code . "' alt='" . $smiley_code . "'></span>";
 		}
 		return $chat_smileys;
 	}

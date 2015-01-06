@@ -1,7 +1,7 @@
 <?php
 /*
     SiPac is highly customizable PHP and AJAX chat
-    Copyright (C) 2013 Jan Houben
+    Copyright (C) 2013-2014 Jan Houben
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,14 +48,19 @@ class SiPac_Proxy
 						$proxy->set_variables($this->chat, $post_array);
 						
 						$post_array = $proxy->execute();
-						}
+						
+						//if a proxy has returned false, the message shouldn't be saved. All other proxys are useless at this point.
+						if ($post_array === false)
+							break;
+					}
 					else
 						$this->chat->debug->add("Proxy found, but the classname is not '$class_name'", 1);
 				}
 			}
 		}
 		
-		$post_array = $this->check_custom_proxy($post_array, $type);
+		if ($post_array !== false)
+			$post_array = $this->check_custom_proxy($post_array, $type);
 		
 		return $post_array;
 	}
@@ -83,6 +88,9 @@ class SiPac_Proxy
 					$proxy->set_variables($this->chat, $post_array);
 						
 					$post_array = $proxy->execute();
+					//if a proxy has returned false, the message shouldn't be saved. All other proxys are useless at this point.
+					if ($post_array === false)
+						break;
 				}
 				else
 					$this->chat->debug->add("Proxy found, but the classname is not '$class_name'", 1);

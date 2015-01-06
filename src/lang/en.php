@@ -1,7 +1,7 @@
 <?php
 /*
     SiPac is highly customizable PHP and AJAX chat
-    Copyright (C) 2013 Jan Houben
+    Copyright (C) 2013-2014 Jan Houben
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ $chat_text = array(
 "writing-status" => "Writing...",
 "kick-head" => "Kick",
 "kick-user"=>"Kick %1",
+"ban-head" => "Ban",
+"ban-user"=>"Ban %1",
 "private-message-head" => "Message",
 "send-private-message-text" => "Send a private message",
 "private-message-prompt-text" => "Private message",
@@ -82,7 +84,7 @@ $chat_text = array(
 /* Notice Popup */
 "info-head" => "Info:",
 "error-head" => "Error:",
-"warning-head" => "Warning:",
+"warn-head" => "Warning:",
 "success-head" => "Success:",	
 
 "message-empty-text" => "Nothing entered",
@@ -98,6 +100,7 @@ $chat_text = array(
 "log-info"=>"Info",
 
 /* theme translations */
+"noscript-text" => "JavaScript must be enabled to use the Chat!",
 "message-input-placeholder" => "Please enter a message...",
 "send-button-text" => "send",
 "room-loading-text" => "Loading the Room. Please wait...",

@@ -36,7 +36,9 @@ class SiPacProxy_spam extends SiPacProxy
 				$kick_user = "Spam Bot";
 				$reason = "Spam";
 				
+				$this->chat->is_kicked = true;
 				$kick_return = $this->chat->db->add_task("kick|".$kick_user."|".$reason, $this->chat->nickname, $this->chat->channel->active, $this->chat->id);
+				return false;
 			}
 		}
 		else

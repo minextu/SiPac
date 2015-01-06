@@ -1,7 +1,7 @@
 <?php
 /*
     SiPac is highly customizable PHP and AJAX chat
-    Copyright (C) 2013 Jan Houben
+    Copyright (C) 2013-2014 Jan Houben
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 class SiPac_User
 {
 	public function __construct($array, $chat)
@@ -62,9 +61,11 @@ class SiPac_User
 	{
 		$user_info_tmp = array();
 		if ($this->settings->get('can_kick'))
-			$user_info_tmp['<||kick-head||>'] = "<a href='javascript:void(null);' onclick='chat_objects[".$this->chat_num."].kick_user(\"".addslashes($this->nickname) . "\");'><||kick-user|" . $this->nickname . "||></a>";
+			$user_info_tmp['<||kick-head||>'] = "<a href='javascript:void(null);' onclick='sipac_objects[".$this->chat_num."].kick_user(\"".addslashes($this->nickname) . "\");'><||kick-user|" . $this->nickname . "||></a>";
+		//if ($this->settings->get('can_ban'))
+			//$user_info_tmp['<||ban-head||>'] = "<a href='javascript:void(null);' onclick='chat_objects[".$this->chat_num."].ban_user(\"".addslashes($this->nickname) . "\");'><||ban-user|" . $this->nickname . "||></a>";
 		if ($this->settings->get('show_private_message_link'))
-			$user_info_tmp['<||private-message-head||>'] = "<a href='javascript:void(null);' onclick='chat_objects[".$this->chat_num."].msg_user(\"".addslashes($this->nickname) . "\");'><||send-private-message-text||></a>";
+			$user_info_tmp['<||private-message-head||>'] = "<a href='javascript:void(null);' onclick='sipac_objects[".$this->chat_num."].msg_user(\"".addslashes($this->nickname) . "\");'><||send-private-message-text||></a>";
 		if ($this->settings->get('can_see_ip'))
 			$user_info_tmp['IP'] = $this->ip;
 		

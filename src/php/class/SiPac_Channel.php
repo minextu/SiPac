@@ -1,7 +1,7 @@
 <?php
 /*
     SiPac is highly customizable PHP and AJAX chat
-    Copyright (C) 2013 Jan Houben
+    Copyright (C) 2013-2014 Jan Houben
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,17 +23,22 @@ class SiPac_Channel
 	private $settings;
 	
 	
-	public $list;
+	public $list = array();
 	public $ids;
 	public $new = array();
 	public $active;
 	
-	public function __construct($id, $settings)
+	public function __construct($id=false, $settings=false)
+	{
+		if ($settings !== false AND $id !== false)
+			$this->init($id, $settings);
+	}
+	
+	public function init($id, $settings)
 	{
 		$this->id = $id;
 		$this->settings = $settings;
 	}
-	
 	public function add($channels, $is_id=false)
 	{
 		foreach ($channels as $channel)
@@ -48,6 +53,14 @@ class SiPac_Channel
 				$this->list[] = $this->create_array($channel);
 				$this->ids[] = $this->encode($channel);
 			}
+		}
+	}
+	public function add_list($channel_list)
+	{
+		foreach ($channel_list as $channel)
+		{
+			$this->list[] = $channel;
+			$this->ids[] = $channel['id'];
 		}
 	}
 	public function encode($channel)

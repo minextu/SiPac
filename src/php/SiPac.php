@@ -1,7 +1,7 @@
 <?php
 /*
     SiPac is highly customizable PHP and AJAX chat
-    Copyright (C) 2013 Jan Houben
+    Copyright (C) 2013-2014 Jan Houben
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  
-$SiPac_version = "0.1.0";
+$SiPac_version = "0.1.90-git";
 
 //initiate the session, if not already started
 if (strlen(session_id()) < 1)
@@ -63,38 +63,27 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 	//Tell the Browser, to not use cache
 	Header("Pragma: no-cache");
 	Header("Cache-Control: no-store, no-cache, max-age=0, must-revalidate");
-	Header("Content-Type: text/html");
+	//Header("Content-Type: application/json");
 
 	$json_answer = array();
-	if (isset($_POST['chat_string']))
+	
+	if (!empty($_POST['sipac_string']))
 	{
+		
 		//get the chat string, which contains all started chats
-		$chat_string  = $_POST['chat_string'];
-		//split all chats
-		$chat_objects = explode("&&", $chat_string);
-    
-		$chat_num = -1;
+		$chat_string  = $_POST['sipac_string'];
+		//decode the json code
+		$chat_objects = json_decode($chat_string, true);
+		
 		//proceed every chat
-		foreach ($chat_objects as $chat_object)
+		foreach ($chat_objects as $chat_num => $chat_variables)
 		{
-			if (!empty($chat_object))
+			if (!empty($chat_variables))
 			{
-				$chat_num++;
-				//split all transmitted variables
-				$chat_variable_parts = explode("&", $chat_object);
-				//save them
-				foreach ($chat_variable_parts as $chat_variable_part)
+				if (isset($chat_variables['client']) AND isset($chat_variables['id']))
 				{
-					$chat_variable = explode("=", $chat_variable_part);
-					$chat_variables[$chat_variable[0]] = urldecode($chat_variable[1]);
-				}
-				if (isset($chat_variables) AND isset($chat_variables['writing']) AND isset($chat_variables['client_num']) 
-					AND isset($chat_variables['chat_id']) AND isset($chat_variables['active_channel']) AND isset($chat_variables['channels']))
-				{
-					//split all channels
-					$chat_channels = explode("|||", $chat_variables['channels']);
 					//create the Chat class
-					$SiPac = new SiPac_Chat(false, false, $chat_variables, $chat_channels, $chat_num);
+					$SiPac = new SiPac_Chat(false, $chat_variables, $chat_num);
 					
 					if ($SiPac->debug->get_error() !== false)
 					{
@@ -107,11 +96,8 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 						unset($_SESSION['SiPac'][$SiPac->id]['userlist'][$SiPac->client_num]);
 						
 					//active channel has to be a valid channel
-					if (array_search($chat_variables['active_channel'], $SiPac->channel->ids) === false)
+					if (array_search($SiPac->channel->active, $SiPac->channel->ids) === false)
 						DIE("You haven't joined this channel!");
-	  
-					//save the writing status
-					$SiPac->is_writing = $chat_variables['writing'];
 	  
 					//load afk status
 					$SiPac->afk->load();
@@ -123,24 +109,23 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 					$tmp_json_answer['get']['userlist'] = $SiPac->handle_userlist();
 					
 					//if one or more message were send
-					if (isset($chat_variables['send_message']))
+					if (!empty($chat_variables['send_messages']))
 					{
 						$send_answer = array();
 						//split them
-						$messages_to_save = explode("|||", $chat_variables['send_message']);
+						$messages_to_save = $chat_variables['send_messages'];
 						foreach ($messages_to_save as $message)
 						{
-							//decode the message
-							$message = urldecode($message);
 							// save the message and keep the answer of the save_message function (it could contain notifications)
-							$send_answer = array_merge($send_answer, $SiPac->message->send($message, $chat_variables['active_channel']));
+							if ($SiPac->is_kicked === false)
+								$send_answer = array_merge($send_answer, $SiPac->message->send($message['text'], $message['channel']));
 						}
 						//merge the json array with the send_answer array
 						$tmp_json_answer = array_merge($send_answer, $tmp_json_answer);
 					}
 	  
 					//get all new posts since the last request and save them in the var tmp json_answer
-					$new_messages = $SiPac->message->get($chat_variables['last_id']);
+					$new_messages = $SiPac->message->get($SiPac->settings->get('last_parameters')['last_message_id']);
 					if (is_array($new_messages))
 						$tmp_json_answer['get'] = array_merge($tmp_json_answer['get'], $new_messages);
 	  
@@ -162,7 +147,6 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 					//save the tmp json array in the real one
 					$json_answer[] = $tmp_json_answer;
 				}
-				unset($chat_variables);
 			}
 		}
     

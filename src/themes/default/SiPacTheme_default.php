@@ -10,9 +10,10 @@ class SiPacTheme_default extends SiPacTheme
 		return $settings;
 	}
 	
-	public function get_layout($user_num, $smileys,$settings)
+	public function get_layout($nickname, $user_num, $smileys,$settings)
 	{
 		$js = $this->js_chat;
+		$theme = $this->theme_js;
 		
 		return "
 			<div class='chat_main'>
@@ -24,7 +25,7 @@ class SiPacTheme_default extends SiPacTheme
 				</nav>
 				<div class='chat_container'>
 					<div class='chat_left'>
-						<div class='chat_conversation'></div>
+						<div class='chat_conversation'><noscript><||noscript-text||></noscript></div>
 						<div class='chat_user_input'>
 							<div class='chat_notice_msg'></div>
 							<input type='text' class='chat_message' placeholder='<||message-input-placeholder||>'>
@@ -58,6 +59,7 @@ class SiPacTheme_default extends SiPacTheme
 	public function get_userlist_entry($nickname, $status, $afk, $info, $color, $id)
 	{
 		$js = $this->js_chat;
+		$theme = $this->theme_js;
 		
 		if (!empty($color))
 			$style = "style='color:$color;'";
@@ -67,9 +69,9 @@ class SiPacTheme_default extends SiPacTheme
 		return 
 		"
 			<span class='chat_user_$afk'>
-				<div class='chat_user' id='$id' onmouseover='$js.user_options(\"$id\", \"show\");' onmouseout='$js.user_options(\"$id\", \"hide\");'>
+				<div class='chat_user' id='$id' onmouseover='$theme.user_options(\"$id\", \"show\");' onmouseout='$theme.user_options(\"$id\", \"hide\");'>
 					<div  class='chat_user_name' $style>
-						<span onclick='$js.insert_user(this.innerHTML);' style='cursor: pointer;'>$nickname</span>
+						<span onclick='$theme.insert_user(this.innerHTML);' style='cursor: pointer;'>$nickname</span>
 						<span class='chat_user_status'>[$status]</span>
 					</div>
 					
@@ -84,6 +86,7 @@ class SiPacTheme_default extends SiPacTheme
 	public function get_message_entry($message, $nickname, $type, $color, $time)
 	{
 		$js = $this->js_chat;
+		$theme = $this->theme_js;
 		
 		if (!empty($color))
 			$style = "style='color:$color;'";
@@ -95,7 +98,7 @@ class SiPacTheme_default extends SiPacTheme
 			return
 			"
 			<div class='chat_entry_$type'>
-			<span onclick='$js.insert_user(this.innerHTML);' class='chat_entry_user' $style>$nickname</span>:
+			<span onclick='$theme.insert_user(this.innerHTML);' class='chat_entry_user' $style>$nickname</span>:
 			<span class='chat_entry_message'>$message</span>
 			<span class='chat_entry_date'>$time</span>
 			</div>  
@@ -116,8 +119,9 @@ class SiPacTheme_default extends SiPacTheme
 	public function get_nickname($nickname)
 	{
 		$js = $this->js_chat;
+		$theme = $this->theme_js;
 		
-		return "<span onclick='$js.insert_user(this.innerHTML);' class='chat_entry_user'>$nickname</span>";
+		return "<span onclick='$theme.insert_user(this.innerHTML);' class='chat_entry_user'>$nickname</span>";
 	}
 	
 	public function get_channel_tab($channel, $id, $change_function, $close_function)
@@ -132,19 +136,36 @@ class SiPacTheme_default extends SiPacTheme
 		";
 	}
 	
+	public function get_information_popup($text, $head, $type, $close_function)
+	{
+		return
+		"
+			<div class='chat_notice_$type'>
+				<span class='close_chat_information'>
+					<a href='javascript:void(0)' onclick='$close_function'>
+						<img src='".$this->path."/icons/delete.png' alt='(close)' title='close'>
+					</a>
+				</span>
+				<img src='".$this->path."/icons/$type.png' alt='(close)' title='close'> $head<br>
+				$text
+			</div>
+		";
+	}
+	
 	public function get_js_functions()
 	{
 		$js = $this->js_chat;
+		$theme = $this->theme_js;
 		
-		$functions['layout_init'] = '
+		$functions['init'] = '
 		function ()
 		{
-			var chat = this;
+			this.SiPac = '.$js.';
 			this.old_user_status = new Array();
-			var chat_elements = this.chat.getElementsByClassName("chat_element");
+			var chat_elements = this.SiPac.chat.getElementsByClassName("chat_element");
 			for (var i = 0; i < chat_elements.length; i++)
 			{
-				chat_elements[i].getElementsByClassName("chat_element_head")[0].addEventListener("click", function() { chat.show_hide_element(this) }, false);
+				chat_elements[i].getElementsByClassName("chat_element_head")[0].addEventListener("click", function() { '.$theme.'.show_hide_element(this) }, false);
 				chat_elements[i].getElementsByClassName("chat_element_head")[0].style.cursor = "pointer";
 			}
 			this.debug_open = false;
@@ -179,13 +200,13 @@ class SiPacTheme_default extends SiPacTheme
 			var chat = this;
 			div.innerHTML += 
 					'<div class=\"' + class_name + '\"><div class=\"chat_element\" style=\"text-align: center;\">' +
-							'<div class=\"chat_element_head\" style=\"cursor: pointer;\" onclick=\"$js.show_hide_element(this)\"><img src=\"' + icon + '\" alt=\"\">' + head + '<span class=\"chat_element_arrow\"></span></div>' +
+							'<div class=\"chat_element_head\" style=\"cursor: pointer;\" onclick=\"$theme.show_hide_element(this)\"><img src=\"' + icon + '\" alt=\"\">' + head + '<span class=\"chat_element_arrow\"></span></div>' +
 							'<div class=\"chat_element_text\">' +
 							 text +
 							'</div>' +
 					'</div></div>';
 
-			this.chat.getElementsByClassName('chat_right')[0].appendChild(div);
+			this.SiPac.chat.getElementsByClassName('chat_right')[0].appendChild(div);
 		}
 		";
 		$functions['user_options'] = "
@@ -206,7 +227,7 @@ class SiPacTheme_default extends SiPacTheme
 		{
 
 			user = user.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '\"');
-			var input = this.chat.getElementsByClassName('chat_message')[0]
+			var input = this.SiPac.chat.getElementsByClassName('chat_message')[0]
 			var start_pos = input.selectionStart;
 			var end_pos = input.selectionEnd;
 			
@@ -219,26 +240,26 @@ class SiPacTheme_default extends SiPacTheme
 			input.focus();
 		}
 		";
-		$functions['layout_user_writing_status'] = '
+		$functions['user_writing_status'] = '
 		function (status, username, user_id)
 		{
-			if (document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML != "[" + this.texts["writing-status"] + "]")
+			if (document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML != "[" + this.SiPac.text["writing-status"] + "]")
 				this.old_user_status[username] = document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML;
 		
 			if (status == 1)
-				document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML = "[" + this.texts["writing-status"] + "]";
+				document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML = "[" + this.SiPac.text["writing-status"] + "]";
 			else if (this.old_user_status[username] != undefined)
 				document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML =  this.old_user_status[username];
 		}
 		';
-		$functions['layout_add_debug'] ='
+		$functions['add_debug'] ='
 		function (type, text, channel)
 		{
 			if (this.debug_open == false)
 				this.add_element("debug", "", "page.png", "chat_debug");
 			this.debug_open = true;
 			
-			channel = this.channel_titles[this.channels.indexOf(channel)];
+			channel = this.SiPac.channels[this.SiPac.get_channel_key(channel)]["title"];
 			switch (type)
 			{
 				case 0:
@@ -258,13 +279,13 @@ class SiPacTheme_default extends SiPacTheme
 					break;
 			}
 			
-			var debug = this.chat.getElementsByClassName("chat_debug")[0].getElementsByClassName("chat_element_text")[0];
+			var debug = this.SiPac.chat.getElementsByClassName("chat_debug")[0].getElementsByClassName("chat_element_text")[0];
 			debug.innerHTML += "<div style=\'color: " + color + "\' class=\'chat_entry_debug\'>" + channel + ": " + text + "</div>";
-			if (this.autoscroll_enabled)
+			if (this.SiPac.autoscroll_enabled)
 				debug.scrollTop = debug.scrollHeight;
 		}
 		';
-		$functions['layout_notification_status'] ='
+		$functions['notification_status'] ='
 		function (status)
 		{
 			if (status == false)
@@ -273,7 +294,7 @@ class SiPacTheme_default extends SiPacTheme
 				this.chat.getElementsByClassName("chat_notification_checkbox")[0].checked = true;
 		}
 		';
-		$functions['layout_sound_status'] ='
+		$functions['sound_status'] ='
 		function (status)
 		{
 			if (status == false)
@@ -282,7 +303,7 @@ class SiPacTheme_default extends SiPacTheme
 				this.chat.getElementsByClassName("chat_sound_checkbox")[0].checked = true;
 		}
 		';
-		$functions['layout_autoscroll_status'] ='
+		$functions['autoscroll_status'] ='
 		function (status)
 		{
 			if (status == false)
@@ -291,7 +312,7 @@ class SiPacTheme_default extends SiPacTheme
 				this.chat.getElementsByClassName("chat_autoscroll_checkbox")[0].checked = true;
 		}
 		';
-		$functions['layout_invite_status'] ='
+		$functions['invite_status'] ='
 		function (status)
 		{
 			if (status == false)
