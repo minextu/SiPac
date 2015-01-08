@@ -164,7 +164,7 @@ class SiPac_Chat
 		$this->init_important_classes(false);
 		
 		//get unchanged parameters
-		if (!empty($this->settings->get('last_parameters')))
+		if ($this->settings->get('last_parameters') !== false)
 		{
 			foreach ($this->settings->get('last_parameters') as $name => $value)
 			{
