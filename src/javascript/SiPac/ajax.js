@@ -76,7 +76,7 @@ SiPac.prototype.parse_ajax_answer = function (answer)
 	this.nickname = answer['get']['username']
 	
 	//change userlist number or the nickname text, if changed
-	if (typeof answer['get']['userlist'][this.active_channel]['users'] != "undefined")
+	if (typeof answer['get']['userlist'][this.active_channel] != "undefined" && typeof answer['get']['userlist'][this.active_channel]['users'] != "undefined")
 		this.handle_layout_changes(this.nickname, answer['get']['userlist'][this.active_channel]['users']);
 	
 	//delete all messages, that had been sent
