@@ -56,7 +56,15 @@ SiPac.prototype.send_message = function(text, channel)
 	this.messages_to_send[message_id]['text'] =text;
 	this.messages_to_send[message_id]['channel'] = channel;
 
-	//add_messages for faster response
+	//show the message in the conversation for faster response
+	var users = new Array(this.nickname);
+	var messages = new Array(
+		this.layout['message_entry_own'].replace(
+		/!!MESSAGE!!/g, text).replace(
+		/!!NICKNAME!!/g, this.nickname).replace(
+		/!!TIME!!/g, "...")
+	)
+	this.add_messages(channel, users, messages, message_id);
 };
 
 SiPac.prototype.check_return = function(e)
@@ -65,13 +73,16 @@ SiPac.prototype.check_return = function(e)
 		this.send_message();
 };
 
-SiPac.prototype.add_messages = function (channel, users, messages)
+SiPac.prototype.add_messages = function (channel, users, messages, sending_id)
 {
 	var chat_window = this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0];
 
 	for (var i = 0; i < messages.length; i++)
 	{
 		var message = document.createElement("span");
+		if (sending_id !== undefined)
+			message.className = "chat_entry_sending_" + sending_id;
+		
 		message.innerHTML = messages[i];
 		chat_window.appendChild(message);
 		

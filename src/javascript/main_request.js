@@ -56,6 +56,8 @@ function sipac_main_request(single)
 					}
 				}
 			}
+			if (single != true)
+				window.setTimeout(sipac_main_request, sipac_ajax_timeout);
 		}
 
 
@@ -66,7 +68,6 @@ function sipac_main_request(single)
 
 
 	}
-	
-	if (single != true)
+	else if (single != true)
 		window.setTimeout(sipac_main_request, sipac_ajax_timeout);
 }

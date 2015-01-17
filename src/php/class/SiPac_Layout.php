@@ -195,7 +195,8 @@ class SiPac_Layout
 		/* generate the needed parameters for add_chat(), to start the chat */
 		$layout = array(
 			"channel_tab" => $this->theme->get_channel_tab("!!CHANNEL!!", "!!ID!!", "!!CHANNEL_CHANGE_FUNCTION!!", "!!CHANNEL_CLOSE_FUNCTION!!"),
-			"information_popup" => $this->theme->get_information_popup("!!TEXT!!", "!!HEAD!!", "!!TYPE!!", "!!CLOSE_FUNCTION!!"));
+			"information_popup" => $this->theme->get_information_popup("!!TEXT!!", "!!HEAD!!", "!!TYPE!!", "!!CLOSE_FUNCTION!!"),
+			"message_entry_own" => $this->theme->get_message_entry("!!MESSAGE!!", "!!NICKNAME!!", "own", "!!COLOR!!", "!!TIME!!"));
 
 		$parameter_array = array(
 			"chat_html_path" => $this->chat->html_path, 
