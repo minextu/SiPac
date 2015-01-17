@@ -42,7 +42,7 @@ class SiPacTheme_default extends SiPacTheme
 						</div>
 						<div class='chat_element'>
 							<div class='chat_element_head'><img src='".$this->path."/icons/cog.png' alt=''><||settings-head||><span class='chat_element_arrow'></span></div>
-							<div class='chat_element_text'>$settings</div>
+							<div class='chat_element_text'><span class='chat_settings'>$settings</span></div>
 						</div>
 						<div class='chat_element' style='text-align: center;'>
 							<div class='chat_element_head'><img src='".$this->path."/icons/emoticon_grin.png' alt=''><||smileys-head||><span class='chat_element_arrow'></span></div>
@@ -169,6 +169,9 @@ class SiPacTheme_default extends SiPacTheme
 				chat_elements[i].getElementsByClassName("chat_element_head")[0].style.cursor = "pointer";
 			}
 			this.debug_open = false;
+			
+			//autohide settings
+			this.show_hide_element(this.SiPac.chat.getElementsByClassName("chat_settings")[0].parentNode.parentNode.getElementsByClassName("chat_element_head")[0]);
 		}
 		';
 		$functions['show_hide_element'] = '
