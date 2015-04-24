@@ -42,8 +42,8 @@ SiPac.prototype.handle_layout_changes = function(nickname, users)
 		this.chat.getElementsByClassName('chat_user_num')[0].innerHTML = user_num;
 	}
 	
-	if (typeof this.layout_tasks != "undefined")
-		this.layout_tasks();
+	if (typeof this.theme_functions['layout_tasks'] != "undefined")
+		this.theme_functions['layout_tasks']();
 };
 
 SiPac.prototype.information = function(text, type, no_hide, close)

@@ -83,8 +83,8 @@ SiPac.prototype.update_checkboxes = function()
 SiPac.prototype.disable_sound = function()
 {
 	this.sound_enabled = false;
-	if (typeof this.layout_sound_status != "undefined")
-		this.layout_sound_status(false);
+	if (typeof this.theme_functions['sound_status'] != "undefined")
+		this.theme_functions['sound_status'](false);
 	else
 		try{this.chat.getElementsByClassName("chat_sound_checkbox")[0].checked = false;}catch(e){}
 	
@@ -93,8 +93,8 @@ SiPac.prototype.disable_sound = function()
 SiPac.prototype.enable_sound = function()
 {
 	this.sound_enabled = true;
-	if (typeof this.layout_sound_status != "undefined")
-		this.layout_sound_status(true);
+	if (typeof this.theme_functions['sound_status'] != "undefined")
+		this.theme_functions['sound_status'](true);
 	else
 		try{this.chat.getElementsByClassName("chat_sound_checkbox")[0].checked = true;}catch(e){}
 	
@@ -103,8 +103,8 @@ SiPac.prototype.enable_sound = function()
 SiPac.prototype.disable_autoscroll = function()
 {
 	this.autoscroll_enabled = false;
-	if (typeof this.layout_autoscroll_status != "undefined")
-		this.layout_autoscroll_status(false);
+	if (typeof this.theme_functions['autoscroll_status'] != "undefined")
+		this.theme_functions['autoscroll_status'](false);
 	else
 		try{this.chat.getElementsByClassName("chat_autoscroll_checkbox")[0].checked = false;}catch(e){}
 	
@@ -113,8 +113,8 @@ SiPac.prototype.disable_autoscroll = function()
 SiPac.prototype.enable_autoscroll = function()
 {
 	this.autoscroll_enabled = true;
-	if (typeof this.layout_autoscroll_status != "undefined")
-		this.layout_autoscroll_status(true);
+	if (typeof this.theme_functions['autoscroll_status'] != "undefined")
+		this.theme_functions['autoscroll_status'](true);
 	else
 		try{this.chat.getElementsByClassName("chat_autoscroll_checkbox")[0].checked = true;}catch(e){}
 	
@@ -123,8 +123,8 @@ SiPac.prototype.enable_autoscroll = function()
 SiPac.prototype.disable_invite= function()
 {
 	this.invite_enabled = false;
-	if (typeof this.layout_invite_status != "undefined")
-		this.layout_invite_status(false);
+	if (typeof this.theme_functions['invite_status'] != "undefined")
+		this.theme_functions['invite_status'](false);
 	else
 		try{this.chat.getElementsByClassName("chat_invite_checkbox")[0].checked = false;}catch(e){}
 	
@@ -133,8 +133,8 @@ SiPac.prototype.disable_invite= function()
 SiPac.prototype.enable_invite = function()
 {
 	this.invite_enabled = true;
-	if (typeof this.layout_invite_status != "undefined")
-		this.layout_invite_status(true);
+	if (typeof this.theme_functions['invite_status'] != "undefined")
+		this.theme_functions['invite_status'](true);
 	else
 		try{this.chat.getElementsByClassName("chat_invite_checkbox")[0].checked = true;}catch(e){}
 	
@@ -143,8 +143,8 @@ SiPac.prototype.enable_invite = function()
 SiPac.prototype.disable_notifications = function()
 {
 	this.notifications_enabled = false;
-	if (typeof this.layout_notification_status != "undefined")
-		this.layout_notification_status(false);
+	if (typeof this.theme_functions['notification_status'] != "undefined")
+		this.theme_functions['notification_status'](false);
 	else
 		try{this.chat.getElementsByClassName("chat_notification_checkbox")[0].checked = false;}catch(e){}
 		
@@ -154,8 +154,8 @@ SiPac.prototype.enable_notifications = function()
 {
 	//first uncheck the notification checkbox, until permission is granted
 	this.notifications_enabled = false;
-	if (typeof this.layout_notification_status != "undefined")
-		this.layout_notification_status(false);
+	if (typeof this.theme_functions['notification_status'] != "undefined")
+		this.theme_functions['notification_status'](false);
 	else
 		try{this.chat.getElementsByClassName("chat_notification_checkbox")[0].checked = false;}catch(e){}
 			
@@ -163,8 +163,8 @@ SiPac.prototype.enable_notifications = function()
 	{
 		this.notifications_enabled = true;
 		this.show_notification(this.text['desktop-notifications-enabled-head'],this.text['desktop-notifications-enabled-text']);
-		if (typeof this.layout_notification_status != "undefined")
-			this.layout_notification_status(true);
+	if (typeof this.theme_functions['notification_status'] != "undefined")
+		this.theme_functions['notification_status'](true);
 		else
 			try{this.chat.getElementsByClassName("chat_notification_checkbox")[0].checked = true;}catch(e){}
 	}
