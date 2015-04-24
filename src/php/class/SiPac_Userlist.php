@@ -87,7 +87,8 @@ class SiPac_Userlist
 			foreach($users as $user)
 			{
 				//if the last connection is too long ago
-				if (time() - $user['online'] > $this->chat->settings->get('max_ping_remove'))
+				if (time() - $user['online'] > $this->chat->settings->get('max_ping_remove') OR 
+					$user['task'] == "terminate" AND time() - $user['online'] > $this->chat->settings->get('terminate_timeout'))
 				{
 					$values = array("user" => $user['name'], "channel" => $user['channel'], "last_update" => $user['online']);	
 					if ($this->chat->proxy->check_custom_functions($values, "user_left") == true)
@@ -100,9 +101,14 @@ class SiPac_Userlist
 							break;
 						}
 						
+						if ($user['task'] == "terminate")
+							$left_text = "<||user-left-notification|".$user['name']."||>";
+						else
+							$left_text = "<||user-left-timeout-notification|".$user['name']."||>";
+							
 						//save a message, that the user has left
 						if ($user['info'] != "banned")
-							$this->chat->message->send("<||user-left-notification|".$user['name']. "||>", $user['channel'], 1, 0, $user['online']);
+							$this->chat->message->send($left_text, $user['channel'], 1, 0, $user['online']);
 						
 						$this->chat->debug->add("deleted user '".$user['name']."' from db (id: ".$user['id'].")", 2, $user['channel']);
 					}

@@ -427,6 +427,15 @@ class SiPac_Chat
 		
 		$this->db->update_nickname($this->nickname);
 	}
+	
+	//terminate the chat, when the user closes the chat
+	public function terminate()
+	{
+		foreach ($this->channel->ids as $channel)
+		{
+			$this->db->add_task("terminate", $this->nickname, $channel, $this->id);
+		}
+	}
 }
 
 ?>

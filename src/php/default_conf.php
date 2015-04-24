@@ -97,7 +97,8 @@ function return_default_settings()
 	"development" => false,
 	"user_color" => false,
 	"ajax_timeout" => 1000,
-	"ajax_reconnect_timeout" => "40000"
+	"ajax_reconnect_timeout" => "40000",
+	"terminate_timeout" => "5",
 	);
 	
 	return  $chat_default_settings;

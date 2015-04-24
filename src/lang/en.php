@@ -16,6 +16,7 @@ $chat_text = array(
 /* Notifications */
 "rename-notification" => "[user]%1[/user] is now [user]%2[/user]",
 "user-left-notification" =>"[user]%1[/user] has left",
+"user-left-timeout-notification" => "[user]%1[/user] reached a timeout",
 "user-join-notification" => "[user]%1[/user] has joined",
 "user-kicked-user-notification" => "[user]%1[/user] was kicked by [user]%2[/user] (%3)",
 "user-kicked-notification" => "[user]%1[/user] was kicked (%2)",

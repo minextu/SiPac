@@ -154,4 +154,19 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 	$json_answer_fin['SiPac'] = $json_answer;
 	echo json_encode($json_answer_fin);
 }
+//terminate the chat, when the user closes the chat
+else if (isset($_GET['task']) AND $_GET['task'] == "terminate_chat")
+{
+	if (isset($_POST['ids']))
+	{
+		$chat_objects = $_POST['ids'];
+		
+		foreach ($chat_objects as $id => $client_num)
+		{
+			$chat_variables = array("id" => $id, "client" => $client_num);
+			$SiPac = new SiPac_Chat(false, $chat_variables);
+			$SiPac->terminate();
+		}
+	}
+}
 ?>
