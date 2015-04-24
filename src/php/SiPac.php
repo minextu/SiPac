@@ -17,7 +17,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-$SiPac_version = "0.1.90-git";
+$SiPac_version = "0.1.91-git";
 
 
 //initiate the session, if not already started
