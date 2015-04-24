@@ -63,7 +63,7 @@ SiPac.prototype.parse_ajax_answer = function (answer)
 	if (answer['get']['username'] != undefined && this.nickname != answer['get']['username'] && !this.first_start)
 		this.information(this.text['name-change-text'].replace("%1", answer['get']['username']),  "info");
 	
-	this.handle_messages(answer['get']['posts'], answer['get']['post_users']);
+	this.handle_messages(answer['get']['posts'], answer['get']['post_users'], answer['get']['post_messages']);
 	
 	this.handle_userlist(answer['get']['userlist']);
 	

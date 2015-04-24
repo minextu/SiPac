@@ -16,7 +16,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-SiPac.prototype.handle_messages = function(messages, users)
+SiPac.prototype.handle_messages = function(messages, users, message_texts)
 {
 	if (messages != undefined)
 	{
@@ -28,7 +28,7 @@ SiPac.prototype.handle_messages = function(messages, users)
 				this.chat.getElementsByClassName('chat_conversation_channel_' + channel['id'])[0].innerHTML = "";
 			
 			if (messages[channel['id']] != undefined)
-				this.add_messages(channel['id'], users[channel['id']], messages[channel['id']]);
+				this.add_messages(channel['id'], users[channel['id']], messages[channel['id']], undefined, message_texts[channel['id']]);
 			
 			if (channel['new'] == true)
 			{
@@ -73,7 +73,7 @@ SiPac.prototype.check_return = function(e)
 		this.send_message();
 };
 
-SiPac.prototype.add_messages = function (channel, users, messages, sending_id)
+SiPac.prototype.add_messages = function (channel, users, messages, sending_id, message_texts)
 {
 	var chat_window = this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0];
 
@@ -87,7 +87,7 @@ SiPac.prototype.add_messages = function (channel, users, messages, sending_id)
 		chat_window.appendChild(message);
 		
 		if (users[i] != this.nickname && this.notifications_enabled == true && !this.first_start)
-			this.show_notification(users[i] + " (" + this.channels[this.get_channel_key(channel)]['title'] + ")", messages[i]);
+			this.show_notification(users[i] + " (" + this.channels[this.get_channel_key(channel)]['title'] + ")", message_texts[i]);
 	}
 
 	//if (channel != this.active_channel && !this.first_start)
