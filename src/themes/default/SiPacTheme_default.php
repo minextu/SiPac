@@ -259,7 +259,7 @@ class SiPacTheme_default extends SiPacTheme
 		function (type, text, channel)
 		{
 			if (this.debug_open == false)
-				this.add_element("debug", "", "page.png", "chat_debug");
+				this.add_element("Debug <span class=\"chat_debug_ping\"></span>", "", "page.png", "chat_debug");
 			this.debug_open = true;
 			
 			channel = this.SiPac.channels[this.SiPac.get_channel_key(channel)]["title"];
@@ -291,37 +291,59 @@ class SiPacTheme_default extends SiPacTheme
 		$functions['notification_status'] ='
 		function (status)
 		{
+			console.debug("test");
 			if (status == false)
-				this.chat.getElementsByClassName("chat_notification_checkbox")[0].checked = false;
+				this.SiPac.chat.getElementsByClassName("chat_notification_checkbox")[0].checked = false;
 			else
-				this.chat.getElementsByClassName("chat_notification_checkbox")[0].checked = true;
+				this.SiPac.chat.getElementsByClassName("chat_notification_checkbox")[0].checked = true;
 		}
 		';
 		$functions['sound_status'] ='
 		function (status)
 		{
 			if (status == false)
-				this.chat.getElementsByClassName("chat_sound_checkbox")[0].checked = false;
+				this.SiPac.chat.getElementsByClassName("chat_sound_checkbox")[0].checked = false;
 			else
-				this.chat.getElementsByClassName("chat_sound_checkbox")[0].checked = true;
+				this.SiPac.chat.getElementsByClassName("chat_sound_checkbox")[0].checked = true;
 		}
 		';
 		$functions['autoscroll_status'] ='
 		function (status)
 		{
 			if (status == false)
-				this.chat.getElementsByClassName("chat_autoscroll_checkbox")[0].checked = false;
+				this.SiPac.chat.getElementsByClassName("chat_autoscroll_checkbox")[0].checked = false;
 			else
-				this.chat.getElementsByClassName("chat_autoscroll_checkbox")[0].checked = true;
+				this.SiPac.chat.getElementsByClassName("chat_autoscroll_checkbox")[0].checked = true;
 		}
 		';
 		$functions['invite_status'] ='
 		function (status)
 		{
 			if (status == false)
-				this.chat.getElementsByClassName("chat_invite_checkbox")[0].checked = false;
+				this.SiPac.chat.getElementsByClassName("chat_invite_checkbox")[0].checked = false;
 			else
-				this.chat.getElementsByClassName("chat_invite_checkbox")[0].checked = true;
+				this.SiPac.chat.getElementsByClassName("chat_invite_checkbox")[0].checked = true;
+		}
+		';
+		$functions['layout_tasks'] ='
+		function ()
+		{
+			if (this.debug_open !== false)
+			{
+				var a_ping = 0;
+				for (var i = 0; i < this.SiPac.server_response_time.length; i++)
+				{
+					a_ping += this.SiPac.server_response_time[i];
+				}
+				if (a_ping == 0)
+					a_ping = "?";
+				else
+					a_ping = Math.round(a_ping / this.SiPac.server_response_time.length);
+				
+				var ping_html = this.SiPac.chat.getElementsByClassName("chat_debug")[0].getElementsByClassName("chat_debug_ping")[0];
+				ping_html.innerHTML = "(Ping: " + this.SiPac.current_server_response_time + "ms | " + a_ping + "ms)";
+				
+			}
 		}
 		';
 		return $functions;

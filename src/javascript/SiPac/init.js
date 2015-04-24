@@ -48,6 +48,9 @@ function SiPac(parameters)
 	this.theme_functions = new Array();
 	this.parse_parameters(parameters);
 	
+	this.current_server_response_time = "?";
+	this.server_response_time = []
+	
 	/* audio */
 	this.new_post_audio = new Audio();
 	this.new_post_audio.autobuffer = true;

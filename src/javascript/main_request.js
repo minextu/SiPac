@@ -16,9 +16,13 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
+var response_key = 0;
+
 function sipac_main_request(single)
 {
 	var httpobject = new XMLHttpRequest();
+	var server_start = new Date();
 	
 	if (sipac_objects.length != 0)
 	{
@@ -55,9 +59,23 @@ function sipac_main_request(single)
 						sipac_objects[i].first_start = false;
 					}
 				}
+				
+				//calculate server response time
+				var now = new Date();
+				var current_server_response_time = now.getTime() - server_start.getTime();
+				server_response_time = sipac_objects[i].server_response_time;
+				server_response_time[response_key] = current_server_response_time;
+				if (response_key < 30)
+					response_key++;
+				else
+					response_key = 0;
+			
+				sipac_objects[i].server_response_time = server_response_time;
+				sipac_objects[i].current_server_response_time = current_server_response_time;
 			}
 			if (single != true)
 				window.setTimeout(sipac_main_request, sipac_ajax_timeout);
+			
 		}
 
 
