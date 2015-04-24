@@ -76,19 +76,26 @@ SiPac.prototype.parse_ajax_answer = function (answer)
 	this.nickname = answer['get']['username']
 	
 	//change userlist number or the nickname text, if changed
-	if (typeof answer['get']['userlist'][this.active_channel] != "undefined" && typeof answer['get']['userlist'][this.active_channel]['users'] != "undefined")
-		this.handle_layout_changes(this.nickname, answer['get']['userlist'][this.active_channel]['users']);
-	
-	//delete all messages, that had been sent
-	for (var i = 0; i < this.old_properties_length_array['send_messages']; i++)
+	if (answer['get']['userlist'] != undefined)
 	{
-		var pending_message = this.chat.getElementsByClassName("chat_entry_sending_" + i)[0];
-		try{pending_message.parentNode.removeChild(pending_message);}catch(e){}
-		delete this.messages_to_send[i];
+		if (typeof answer['get']['userlist'][this.active_channel] != "undefined" && typeof answer['get']['userlist'][this.active_channel]['users'] != "undefined")
+			this.handle_layout_changes(this.nickname, answer['get']['userlist'][this.active_channel]['users']);
 	}
-	//if no new message was added, delete all empty messages
-	if (this.old_properties_length_array['send_messages'] == this.messages_to_send.length)
-		this.messages_to_send = new Array();
+
+	if (this.old_properties_length_array != undefined)
+	{	
+		//delete all messages, that had been sent
+		for (var i = 0; i < this.old_properties_length_array['send_messages']; i++)
+		{
+			var pending_message = this.chat.getElementsByClassName("chat_entry_sending_" + i)[0];
+			try{pending_message.parentNode.removeChild(pending_message);}catch(e){}
+			delete this.messages_to_send[i];
+		}
+	
+		//if no new message was added, delete all empty messages
+		if (this.old_properties_length_array['send_messages'] == this.messages_to_send.length)
+			this.messages_to_send = new Array();
+	}
 };
 
 SiPac.prototype.handle_server_tasks = function (tasks)

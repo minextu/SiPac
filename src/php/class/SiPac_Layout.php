@@ -216,8 +216,20 @@ class SiPac_Layout
 		$js_chat ="<script type='text/javascript'> add_chat('".$json_parameters."');";
 		
 		//initiate the chat, by calling the init function.
-		$js_chat = $js_chat."sipac_objects[sipac_objects.length-1].init();</script>";#
+		$js_chat = $js_chat."sipac_objects[sipac_objects.length-1].init();";
+		
+		//get all messages
+		$new_messages['get'] = $this->chat->message->get(0);
+		unset($_SESSION['SiPac'][$this->chat->id]['old_channels']);
+		$js_chat = $js_chat."var first_messages = JSON.parse('".addslashes(json_encode($new_messages))."');";
+		$js_chat = $js_chat."sipac_objects[sipac_objects.length-1].parse_ajax_answer(first_messages);";
 	
+	
+		$js_chat = $js_chat."</script>";
+		
+		
+		
+		
 		return $js_chat;
 	}
 	private function generate_smileys()

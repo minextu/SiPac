@@ -18,16 +18,19 @@
  */
 SiPac.prototype.handle_debug = function(debug)
 {
-	for (key in this.channels)
+	if (debug !== undefined)
 	{
-		var channel = this.channels[key];
-		
-		if (debug[channel['id']] != undefined)
-			this.add_debug_entries(debug[channel['id']], channel['id']);
-	}
+		for (key in this.channels)
+		{
+			var channel = this.channels[key];
 			
-	if (debug[0] != undefined)
-		this.add_debug_entries(debug[0], this.active_channel);	
+			if (debug[channel['id']] != undefined)
+				this.add_debug_entries(debug[channel['id']], channel['id']);
+		}
+				
+		if (debug[0] != undefined)
+			this.add_debug_entries(debug[0], this.active_channel);	
+	}
 };
 SiPac.prototype.add_debug_entries = function (debug_entries, channel)
 {
