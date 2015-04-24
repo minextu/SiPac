@@ -25,6 +25,7 @@ function add_chat(json_parameters)
 	var chat_id = sipac_objects[sipac_new_id].id;
 	sipac_objects_id[chat_id] = sipac_new_id;
 	sipac_ajax_timeout = sipac_objects[sipac_new_id].ajax_timeout;
+	sipac_ajax_reconnect_timeout = sipac_objects[sipac_new_id].ajax_reconnect_timeout;
 	
 	new_sipac_html_path = sipac_objects[sipac_new_id].chat_html_path;
 	if (sipac_html_path !== false && new_sipac_html_path != sipac_html_path)
@@ -107,6 +108,7 @@ SiPac.prototype.parse_parameters = function(parameters)
 	this.default_channels = parameters['channels']
 	
 	this.ajax_timeout = parameters['ajax_timeout'];
+	this.ajax_reconnect_timeout = parameters['ajax_reconnect_timeout'];
 	this.chat_html_path = parameters['chat_html_path'];
 	this.theme_html_path = parameters['theme_html_path'];
 };

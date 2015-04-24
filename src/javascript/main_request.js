@@ -18,10 +18,13 @@
  */
 
 var response_key = 0;
+var SiPac_last_error = false;
 
 function sipac_main_request(single)
 {
 	var httpobject = new XMLHttpRequest();
+	httpobject.timeout = sipac_ajax_reconnect_timeout;
+	
 	var server_start = new Date();
 	
 	if (sipac_objects.length != 0)
@@ -35,17 +38,55 @@ function sipac_main_request(single)
 
 
 		httpobject.open("POST", sipac_html_path + "src/php/SiPac.php?task=get_chat", true);
+		httpobject.ontimeout = function ()
+		{ 
+			var error = "Connection lost (Timeout). Reconnect...";
+			sipac_objects[0].information(error, "error");
+			if (SiPac_last_error !== error)
+			{
+					SiPac_last_error = error;
+					sipac_objects[0].add_debug_entry(0, error);
+			}
+			if (single != true)
+				window.setTimeout(sipac_main_request, sipac_ajax_timeout);
+		}
+		httpobject.onerror = function()
+		{
+			var error = "Connection lost. Reconnect...";
+			sipac_objects[0].information(error, "error");
+			if (SiPac_last_error !== error)
+			{
+					SiPac_last_error = error;
+					sipac_objects[0].add_debug_entry(0, error);
+			}
+			if (single != true)
+				window.setTimeout(sipac_main_request, sipac_ajax_timeout);
+		}
 		httpobject.onload = function ()
 		{
+			var answer = [];
 			try
-				{var answer = JSON.parse(httpobject.responseText);}
+			{
+				answer = JSON.parse(httpobject.responseText);
+				SiPac_last_error = false;
+				
+			}
 			catch(e)
 			{
-					sipac_objects[0].information(httpobject.responseText, "error");
-					sipac_objects[0].add_debug_entry(0, httpobject.responseText);
+				var error = httpobject.responseText;
+				sipac_objects[0].information(error, "error");
+				if (SiPac_last_error !== error)
+				{
+					SiPac_last_error = error;
+					sipac_objects[0].add_debug_entry(0, error);
+				}
 			}
-				
-			var chat_object_answer = answer['SiPac'];
+			
+			if (answer['SiPac'] != undefined) 
+				var chat_object_answer = answer['SiPac'];
+			else
+				var chat_object_answer = [];
+			
 			for (var i = 0; i < chat_object_answer.length; i++)
 			{
 				if (chat_object_answer[i]["error"] != undefined)

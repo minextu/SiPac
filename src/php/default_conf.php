@@ -65,7 +65,7 @@ function return_default_settings()
 	"user_left_function" => false,
 	
 	"can_join_channels" => true,
-	"max_ping_remove" => 30,
+	"max_ping_remove" => 50,
 	"username_var" => "!!AUTO!!",
 	"custom_status" => "!!AUTO!!",
 	"start_as_afk" => false,
@@ -96,7 +96,8 @@ function return_default_settings()
 	
 	"development" => false,
 	"user_color" => false,
-	"ajax_timeout" => 1000
+	"ajax_timeout" => 1000,
+	"ajax_reconnect_timeout" => "40000"
 	);
 	
 	return  $chat_default_settings;

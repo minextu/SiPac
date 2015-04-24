@@ -175,6 +175,9 @@ class SiPac_Chat
 			}
 		}
 		
+		if (!isset($parameters['channels']) OR !isset($parameters['active_channel']) OR !isset($parameters['writing']))
+			$this->debug->error("Parameters missing. Maybe you were offline too long. Please try to reload!", true);
+			
 		$this->channel->add_list($parameters['channels']);
 		$this->client_num = $parameters['client'];
 		$this->channel->active = $parameters['active_channel'];

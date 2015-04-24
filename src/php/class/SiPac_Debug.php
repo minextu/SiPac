@@ -46,10 +46,10 @@ class SiPac_Debug
 			$_SESSION['SiPac'][$this->id]['debug'] = $this->debug;
 	}
 	
-	public function error($message)
+	public function error($message, $die=false)
 	{
 		$this->debug['error'] = $message;
-		if ($this->is_new == true)
+		if ($this->is_new == true OR $die === true)
 			die($message);
 	}
 	

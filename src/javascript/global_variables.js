@@ -23,6 +23,7 @@ function sipac_set_vars()
   sipac_objects_id = {};
   sipac_theme_functions = new Array();
   sipac_ajax_timeout = 1000;
+  sipac_ajax_reconnect_timeout = 40000;
   sipac_html_path = false;
   
   sipac_main_request();
