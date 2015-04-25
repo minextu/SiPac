@@ -155,7 +155,15 @@ class SiPac_MySQL
 	}
 	public function get_posts($chat_id, $channels, $min_id=0)
 	{
-		$chat_mysql = $this->query("SELECT * FROM sipac_entries WHERE chat_id LIKE '".$this->escape_string($chat_id)."' AND id > $min_id ORDER BY id ASC");
+		$channel_mysql = "";
+		foreach ($channels as $key => $channel)
+		{
+			if ($key != 0)
+				$channel_mysql = $channel_mysql." OR";
+			$channel_mysql = $channel_mysql." channel = '".$this->escape_string($channel)."'";
+		}
+		
+		$chat_mysql = $this->query("SELECT * FROM sipac_entries WHERE ($channel_mysql) AND chat_id LIKE '".$this->escape_string($chat_id)."' AND id > $min_id ORDER BY id ASC");
 
 		$posts = array();
 
