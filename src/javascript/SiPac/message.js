@@ -56,15 +56,20 @@ SiPac.prototype.send_message = function(text, channel)
 	this.messages_to_send[message_id]['text'] =text;
 	this.messages_to_send[message_id]['channel'] = channel;
 
-	//show the message in the conversation for faster response
-	var users = new Array(this.nickname);
-	var messages = new Array(
-		this.layout['message_entry_own'].replace(
-		/!!MESSAGE!!/g, text).replace(
-		/!!NICKNAME!!/g, this.nickname).replace(
-		/!!TIME!!/g, "...")
-	)
-	this.add_messages(channel, users, messages, message_id);
+	
+	/*show the message in the conversation for faster response
+	only show the message, when not empty, or the message is a command*/
+	if (text.trim() != "" && text[0] != "/")
+	{
+		var users = new Array(this.nickname);
+		var messages = new Array(
+			this.layout['message_entry_own'].replace(
+			/!!MESSAGE!!/g, text).replace(
+			/!!NICKNAME!!/g, this.nickname).replace(
+			/!!TIME!!/g, "...")
+		)
+		this.add_messages(channel, users, messages, message_id);
+	}
 };
 
 SiPac.prototype.check_return = function(e)
