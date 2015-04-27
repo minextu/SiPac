@@ -95,10 +95,8 @@ class SiPac_Message
 			return false;
 		}
 			
-		$new_posts = array();
-		$new_post_users = array();
-		$new_post_messages = array();
-		
+		//get posts from db
+		$posts = [];
 		$updated_last_id = $last_id;
 		
 		foreach ($db_response as $post)
@@ -106,45 +104,99 @@ class SiPac_Message
 			//check if the post is new
 			if ($post['id'] > $last_id OR in_array($post['channel'], $this->chat->channel->new))
 			{
-				$post_array = array("message"=>$post['message'], "type"=>$post['type'], "channel"=>$post['channel'],"user"=>$post['user'],"time"=>$post['time'], "style" => $post['style']);
-				$post_array = $this->chat->proxy->check($post_array, "client");
-				$message_no_html = $post['message'];
-				
-				if ($post_array['type'] == 0) //normal post
-				{
-					$post_user = $post_array['user'];
-					
-					if ($post_array['user'] == $this->chat->nickname)
-						$post_type = "own";
-					else
-						$post_type = "others";
-				}
-				else if ($post_array['type'] == 1) //notify
-				{
-					$post_user = "";
-					$post_type = "notify";
-					$post_array['message'] = $this->chat->language->translate($post_array['message']);
-					$post_array['message'] =   preg_replace('#\[user\](.*)\[/user\]#isU', $this->chat->layout->theme->get_nickname("$1"), $post_array['message']);
-					$message_no_html = $this->chat->language->translate($message_no_html);
-					$message_no_html =   preg_replace('#\[user\](.*)\[/user\]#isU', "$1", $message_no_html);
-				}
-				
-				
-				$message_style = explode("|||", $post_array['style']);
-				$color = $message_style[0];
-				
-				$date = $this->chat->layout->theme->get_post_date($post_array['time'], $this->chat->settings->get('time_format'), $this->chat->settings->get('date_format'));
-				
-				$post_html = $this->chat->layout->theme->get_message_entry($post_array['message'], $post_user, $post_type, $color, $date);
-
-				
-				$new_posts[$post_array['channel']][] = $post_html;
-				$new_post_users[$post_array['channel']][] = $post_user;
-				$new_post_messages[$post_array['channel']][] = $message_no_html;
+				$post_array = array("message"=>$post['message'], "type"=>$post['type'], "channel"=>$post['channel'],"user"=>$post['user'],"time"=>$post['time'], "style" => $post['style'], "last_posts" => $posts);
+				$post_array = $this->chat->proxy->check($post_array, "client", true);
+				$posts = $post_array["last_posts"];
+				unset($post_array["last_posts"]);
+				$posts[$post['channel']][] = $post_array;
 			}
 			//save the highest id
 			$updated_last_id = $post['id'];
 		}
+		
+		
+		//remove join and left message, when nothing was written
+		$online_times = [];
+		foreach ($posts as $channel => $channel_posts)
+		{
+			foreach ($channel_posts as $key => $last_post)
+			{
+				if (strpos($last_post['message'], "<||user-join") !== false AND $last_post['type'] == 1)
+				{
+					$online_times[$last_post['channel']][$last_post['user']]['from'] = $last_post['time'];
+					$online_times[$last_post['channel']][$last_post['user']]['join-key'] = $key;
+				}
+				else if (strpos($last_post['message'], "<||user-left") !== false AND $last_post['type'] == 1)
+				{
+					$user = explode("|",$last_post['message'])[3];
+					$online_times[$last_post['channel']][$last_post['user']]['to'] = $last_post['time'];
+					
+					if (isset($online_times[$last_post['channel']][$last_post['user']]['from']))
+					{
+						$from = $this->chat->layout->theme->get_post_date($online_times[$last_post['channel']][$last_post['user']]['from'],$this->chat->settings->get('time_format'), $this->chat->settings->get('date_format'));
+						$to = $this->chat->layout->theme->get_post_date($online_times[$last_post['channel']][$last_post['user']]['to'],$this->chat->settings->get('time_format'), $this->chat->settings->get('date_format'));
+						
+						$posts[$last_post['channel']][$key]['message'] = "<||user-was-online-notification|$user|".$from."|".$to."||>";
+						
+						$join_key = $online_times[$last_post['channel']][$user]['join-key'];
+						
+						$posts[$last_post['channel']][$join_key] = false;
+						unset($online_times[$last_post['channel']][$user]);
+					}
+				}
+				else
+					$online_times[$last_post['channel']] = [];
+			
+			}
+		}
+		
+		//process posts
+		$new_posts = array();
+		$new_post_users = array();
+		$new_post_messages = array();
+		foreach ($posts as $channel => $channel_posts)
+		{
+			foreach ($channel_posts as $post)
+			{
+				if ($post !== false)
+				{
+					$message_no_html = $post['message'];
+						
+					if ($post['type'] == 0) //normal post
+					{
+						$post_user = $post['user'];
+						
+						if ($post['user'] == $this->chat->nickname)
+							$post_type = "own";
+						else
+							$post_type = "others";
+					}
+					else if ($post['type'] == 1) //notify
+					{
+						$post_user = "";
+						$post_type = "notify";
+						$post['message'] = $this->chat->language->translate($post['message']);
+						$post['message'] =   preg_replace('#\[user\](.*)\[/user\]#isU', $this->chat->layout->theme->get_nickname("$1"), $post['message']);
+						$message_no_html = $this->chat->language->translate($message_no_html);
+						$message_no_html =   preg_replace('#\[user\](.*)\[/user\]#isU', "$1", $message_no_html);
+					}
+						
+						
+					$message_style = explode("|||", $post['style']);
+					$color = $message_style[0];
+						
+					$date = $this->chat->layout->theme->get_post_date($post['time'], $this->chat->settings->get('time_format'), $this->chat->settings->get('date_format'));
+						
+					$post_html = $this->chat->layout->theme->get_message_entry($post['message'], $post_user, $post_type, $color, $date);
+
+						
+					$new_posts[$post['channel']][] = $post_html;
+					$new_post_users[$post['channel']][] = $post_user;
+					$new_post_messages[$post['channel']][] = $message_no_html;
+				}
+			}
+		}
+		
 		foreach ($this->chat->channel->ids as $channel)
 		{
 			if (isset($new_posts[$channel]) AND count($new_posts[$channel]) > 0)

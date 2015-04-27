@@ -18,6 +18,7 @@ $chat_text = array(
 "user-left-notification" =>"[user]%1[/user] ist gegangen",
 "user-left-timeout-notification" => "[user]%1[/user] hat einen Timeout",
 "user-join-notification" => "[user]%1[/user] ist beigetreten",
+"user-was-online-notification" => "[user]%1[/user] war von %2 bis %3 online",
 "user-kicked-user-notification" => "[user]%1[/user] wurde von [user]%2[/user] gekickt (%3)",
 "user-kicked-notification" => "[user]%1[/user] wurde gekickt (%2)",
 "user-banned-user-notification" => "[user]%2[/user] hat [user]%1[/user]  gebannt (%3)",
