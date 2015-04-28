@@ -81,7 +81,8 @@ SiPac.prototype.check_return = function(e)
 SiPac.prototype.add_messages = function (channel, users, messages, sending_id, message_texts)
 {
 	var chat_window = this.chat.getElementsByClassName("chat_conversation_channel_" + channel)[0];
-
+	var channel_key = this.get_channel_key(channel);
+	
 	for (var i = 0; i < messages.length; i++)
 	{
 		var message = document.createElement("span");
@@ -91,14 +92,14 @@ SiPac.prototype.add_messages = function (channel, users, messages, sending_id, m
 		message.innerHTML = messages[i];
 		chat_window.appendChild(message);
 		
-		if (users[i] != this.nickname && this.notifications_enabled == true && !this.first_start)
+		if (users[i] != this.nickname && this.notifications_enabled == true && !this.first_start && !this.channels[channel_key]['new'])
 			this.show_notification(users[i] + " (" + this.channels[this.get_channel_key(channel)]['title'] + ")", message_texts[i]);
 	}
 
 	//if (channel != this.active_channel && !this.first_start)
 		//this.channel_new_messages(channel, this.channel_titles[this.channels.indexOf(channel)]);
 		
-	if (this.channels[this.get_channel_key(channel)]['new'] === false)
+	if (this.channels[channel_key]['new'] === false)
 	{
 		var no_sound = true;
 		for (var i = 0; i < users.length; i++)
