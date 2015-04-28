@@ -325,6 +325,12 @@ class SiPacTheme_default extends SiPacTheme
 				this.SiPac.chat.getElementsByClassName("chat_invite_checkbox")[0].checked = true;
 		}
 		';
+		$functions['channel_new_messages'] = '
+		function (channel_tab, channel_title)
+		{
+			channel_tab.className = "chat_channel_unread";
+		};
+		';
 		$functions['layout_tasks'] ='
 		function ()
 		{
