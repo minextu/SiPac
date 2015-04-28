@@ -75,7 +75,7 @@ SiPac.prototype.change_user = function(users, user_ids, channel, userlist)
 		var user = document.createElement("span");
 		user.id = this.id + "_" + channel + "_user_" + user_ids[i];
 		user.innerHTML += users[i];
-		userlist.replaceChild(document.getElementById(user.id), user);
+		userlist.replaceChild(user, document.getElementById(user.id));
 	}
 };
 
