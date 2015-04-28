@@ -10,9 +10,10 @@ class SiPacTheme_example extends SiPacTheme
 		return $settings;
 	}
 	
-	public function get_layout($user_num, $smileys, $settings)
+	public function get_layout($nickname, $user_num, $smileys, $settings)
 	{
 		$js = $this->js_chat;
+		$theme = $this->theme_js;
 		
 		return "
 			<div class='chat_main'>
@@ -29,7 +30,7 @@ class SiPacTheme_example extends SiPacTheme
 							<div>$smileys</div>
 							<input type='text' class='chat_message' placeholder='<||message-input-placeholder||>'>
 							<button class='chat_send_button'><||send-button-text||></button>
-							<button onclick='$js.layout_test('blubb');'>layout function test</button>
+							<button onclick='$theme.test(\"blubb\");'>layout function test</button>
 						</div>
 							
 			</div><!-- end: chat_main-class -->
@@ -38,7 +39,7 @@ class SiPacTheme_example extends SiPacTheme
 	
 	public function get_js_functions()
 	{
-		$functions['layout_init'] = '
+		$functions['init'] = '
 		function ()
 		{
 			this.old_user_status = new Array();
@@ -56,7 +57,7 @@ class SiPacTheme_example extends SiPacTheme
 				document.getElementById(user_id).getElementsByClassName("chat_user_status")[0].innerHTML =  this.old_user_status[username];
 		}
 		';
-		$functions['layout_test'] = '
+		$functions['test'] = '
 		function (var1)
 		{
 			alert(var1);
