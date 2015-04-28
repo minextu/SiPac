@@ -129,12 +129,12 @@ class SiPac_Message
 				else if (strpos($last_post['message'], "<||user-left") !== false AND $last_post['type'] == 1)
 				{
 					$user = explode("|",$last_post['message'])[3];
-					$online_times[$last_post['channel']][$last_post['user']]['to'] = $last_post['time'];
+					$online_times[$last_post['channel']][$user]['to'] = $last_post['time'];
 					
-					if (isset($online_times[$last_post['channel']][$last_post['user']]['from']))
+					if (isset($online_times[$last_post['channel']][$user]['from']))
 					{
-						$from = $this->chat->layout->theme->get_post_date($online_times[$last_post['channel']][$last_post['user']]['from'],$this->chat->settings->get('time_format'), $this->chat->settings->get('date_format'));
-						$to = $this->chat->layout->theme->get_post_date($online_times[$last_post['channel']][$last_post['user']]['to'],$this->chat->settings->get('time_format'), $this->chat->settings->get('date_format'));
+						$from = $this->chat->layout->theme->get_post_date($online_times[$last_post['channel']][$user]['from'],$this->chat->settings->get('time_format'), $this->chat->settings->get('date_format'));
+						$to = $this->chat->layout->theme->get_post_date($online_times[$last_post['channel']][$user]['to'],$this->chat->settings->get('time_format'), $this->chat->settings->get('date_format'));
 						
 						$posts[$last_post['channel']][$key]['message'] = "<||user-was-online-notification|$user|".$from."|".$to."||>";
 						
