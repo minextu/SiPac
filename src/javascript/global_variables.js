@@ -45,8 +45,41 @@ function sipac_set_vars()
 		httpobject.send(post);
 	};
 	
+	
+	// Handle page visibility change (reset title to default)
+	document.addEventListener("mousemove", sipac_update_title, false);
+	if (typeof document["hidden"] != "undefined") 
+	{
+		document.addEventListener("visibilitychange", 
+							function() 
+							{ 
+								if (!document["hidden"])
+									sipac_update_title(true) 
+							}, false);
+	}
+	
+	//start sipac ajax request
 	sipac_main_request();
 }
+
+var sipac_new_messages = 0;
+function sipac_update_title(clear)
+{
+	if (!clear)
+	{
+		if (sipac_new_messages == 0)
+			sipac_old_title = document.title;
+		sipac_new_messages++;
+		document.title = " (" + sipac_new_messages + ") " + sipac_old_title;
+	}
+	else if (sipac_new_messages != 0)
+	{
+		document.title = sipac_old_title;
+		sipac_new_messages = 0;
+	}
+}
+
+
 
 if (typeof sipac_objects == 'undefined')
 {

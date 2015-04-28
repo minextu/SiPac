@@ -207,7 +207,8 @@ class SiPac_Layout
 			"layout" => $layout, 
 			"channels" => $this->chat->channel->list,
 			"ajax_timeout" => $this->chat->settings->get('ajax_timeout'),
-			"ajax_reconnect_timeout" => $this->chat->settings->get('ajax_reconnect_timeout'));
+			"ajax_reconnect_timeout" => $this->chat->settings->get('ajax_reconnect_timeout'),
+			"show_unread_messages_in_title" => $this->chat->settings->get('show_unread_messages_in_title'));
 		
 		$json_parameters = addslashes(json_encode($parameter_array));
 	

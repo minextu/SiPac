@@ -93,8 +93,13 @@ SiPac.prototype.add_messages = function (channel, users, messages, sending_id, m
 		message.innerHTML = messages[i];
 		chat_window.appendChild(message);
 		
-		if (users[i] != this.nickname && this.notifications_enabled == true && !this.first_start && !this.channels[channel_key]['new'])
-			this.show_notification(users[i] + " (" + this.channels[channel_key]['title'] + ")", message_texts[i]);
+		if (users[i] != this.nickname && !this.first_start && !this.channels[channel_key]['new'])
+		{
+			if (this.show_unread_messages_in_title == true)
+				sipac_update_title(false);
+			if (this.notifications_enabled == true)
+				this.show_notification(users[i] + " (" + this.channels[channel_key]['title'] + ")", message_texts[i]);
+		}
 	}
 
 	if (channel != this.active_channel && !this.first_start)

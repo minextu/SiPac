@@ -54,6 +54,7 @@ function return_default_settings()
 		"Main"
 	),
 	"show_private_message_link" => true,
+	"show_unread_messages_in_title" => true,
 	
 	"disabled_client_proxies" => array(),
 	"disabled_server_proxies" => array(),

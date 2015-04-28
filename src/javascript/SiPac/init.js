@@ -107,6 +107,7 @@ SiPac.prototype.parse_parameters = function(parameters)
 	this.theme_functions = parameters['theme_functions'];
 	this.default_channels = parameters['channels']
 	
+	this.show_unread_messages_in_title = parameters['show_unread_messages_in_title'];
 	this.ajax_timeout = parameters['ajax_timeout'];
 	this.ajax_reconnect_timeout = parameters['ajax_reconnect_timeout'];
 	this.chat_html_path = parameters['chat_html_path'];
