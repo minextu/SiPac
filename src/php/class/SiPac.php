@@ -308,7 +308,7 @@ class SiPac_Chat
 					}
 					$this->ban($user_info['name'], $task_parts[2], $client_text, $notification_text, $task_parts[3]);
 				}
-				else
+				else if ($task_parts[0] != "terminate")
 					$this->debug->add("Task '". $task_parts[0] . "' is not defined!", 1);
 			
 				if ($task_parts[0] != "ban")
