@@ -130,6 +130,7 @@ class SiPac_Channel
 				if (array_search($channel, $this->list) === false AND $this->settings->get('can_join_channels') == true)
 				{
 					$this->list[] = $channel;
+					$this->ids[] = $channel['id'];
 				}	
 			}
 		}
