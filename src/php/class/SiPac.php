@@ -203,7 +203,7 @@ class SiPac_Chat
 	private function init_important_classes($settings)
 	{
 		$this->debug->init($this->id, $this->is_new);
-		$this->settings->init($this->id, $this->debug);
+		$this->settings->init($this->id, $this->client_num, $this->debug);
 		
 		//load all settings for this chat
 		$settings_return = $this->settings->load($settings);

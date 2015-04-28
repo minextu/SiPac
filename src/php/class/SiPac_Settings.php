@@ -21,23 +21,25 @@ class SiPac_Settings
 {
 	private $settings;
 	private $id;
+	private $client_num;
 	
-	public function __construct($id=false, $debug=false)
+	public function __construct($id=false, $client_num=false, $debug=false)
 	{
-		if ($id !== false AND $debug !== false)
-			$this->init($id, $debug);
+		if ($id !== false AND $debug !== false AND $client_num !== false)
+			$this->init($id, $client_num, $debug);
 	}
 	
-	public function init($id, $debug)
+	public function init($id, $client_num, $debug)
 	{
 		$this->id = $id;
+		$this->client_num = $client_num;
 		$this->debug = $debug;
 	}
 	
 	public function set($setting, $value)
 	{
 		$this->settings[$setting] = $value;
-		$_SESSION['SiPac'][$this->id]['settings'][$setting] = $value;
+		$_SESSION['SiPac'][$this->id][$this->client_num]['settings'][$setting] = $value;
 		return true;
 	}
 	
@@ -54,8 +56,8 @@ class SiPac_Settings
 		//if the settings are already given, load them
 		if ($settings !== false)
 			$this->settings = $settings;
-		else if (isset($_SESSION['SiPac'][$this->id]['settings'])) //else load them from the php session (if set)
-			$this->settings = $_SESSION['SiPac'][$this->id]['settings'];
+		else if (isset($_SESSION['SiPac'][$this->id][$this->client_num]['settings'])) //else load them from the php session (if set)
+			$this->settings = $_SESSION['SiPac'][$this->id][$this->client_num]['settings'];
 		else
 		{
 			$this->debug->error("No settings found!");
@@ -75,7 +77,7 @@ class SiPac_Settings
 			}
 		}
 		//save the settings in the session
-		$_SESSION['SiPac'][$this->id]['settings'] = $this->settings;
+		$_SESSION['SiPac'][$this->id][$this->client_num]['settings'] = $this->settings;
 	}
 	
 }
