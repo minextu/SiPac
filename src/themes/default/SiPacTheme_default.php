@@ -27,6 +27,9 @@ class SiPacTheme_default extends SiPacTheme
 					<div class='chat_left'>
 						<div class='chat_conversation'><noscript><||noscript-text||></noscript></div>
 						<div class='chat_user_input'>
+							<div class='chat_upload'>
+								Drop a picture here, to upload
+							</div>
 							<div class='chat_notice_msg'></div>
 							<input type='text' class='chat_message' placeholder='<||message-input-placeholder||>'>
 							<button class='chat_send_button'><||send-button-text||></button>
@@ -161,6 +164,8 @@ class SiPacTheme_default extends SiPacTheme
 		function ()
 		{
 			this.SiPac = '.$js.';
+			var theme = this;
+			
 			this.old_user_status = new Array();
 			var chat_elements = this.SiPac.chat.getElementsByClassName("chat_element");
 			for (var i = 0; i < chat_elements.length; i++)
@@ -172,8 +177,45 @@ class SiPacTheme_default extends SiPacTheme
 			
 			//autohide settings
 			this.show_hide_element(this.SiPac.chat.getElementsByClassName("chat_settings")[0].parentNode.parentNode.getElementsByClassName("chat_element_head")[0]);
+			
+			';
+			
+		if ($this->settings->get("can_upload") == true)
+		{
+				$functions['init'] = $functions['init']. '
+				var upload = theme.SiPac.chat.getElementsByClassName("chat_upload")[0];
+				this.drop_timeout;
+				
+				document.addEventListener("dragenter", function(event) 
+				{
+					window.clearTimeout(theme.drop_timeout);
+					upload.style.display = "block";
+					theme.drop_timeout = window.setTimeout( function() { upload.style.display = "none"; }, 4000);
+					
+				}, false);
+				
+				upload.ondragover = function () { this.style.background = "#1296bc"; return false; };
+				upload.ondragend = function () { this.style.background = "#E6E6E6"; return false; };
+				
+				upload.ondrop = function (e) 
+				{
+					this.style.background = "#E6E6E6";
+					e.preventDefault();
+
+					var file = e.dataTransfer.files[0];
+					theme.SiPac.upload_picture(file);
+					upload.style.display = "none";
+
+
+					return false;
+				};
+				';
+		}
+		
+		$functions['init'] = $functions['init']. '
 		}
 		';
+		
 		$functions['show_hide_element'] = '
 		function (elem)
 		{

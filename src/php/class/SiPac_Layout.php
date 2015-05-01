@@ -28,7 +28,7 @@ class SiPac_Layout
 	public $theme;
 	public $cache_folder;
 	
-	private $js_files = array("SiPac/init.js", "SiPac/SiPac.js", "SiPac/channel.js", "SiPac/ajax.js", "SiPac/userlist.js", "SiPac/message.js", "SiPac/settings.js", "SiPac/notification.js", "SiPac/layout.js", "SiPac/debug.js", "main_request.js", "global_variables.js");
+	private $js_files = array("SiPac/init.js", "SiPac/SiPac.js", "SiPac/channel.js", "SiPac/ajax.js", "SiPac/userlist.js", "SiPac/message.js", "SiPac/settings.js", "SiPac/notification.js", "SiPac/layout.js", "SiPac/upload.js", "SiPac/debug.js", "main_request.js", "global_variables.js");
 	
 	public function __construct($chat)
 	{
@@ -85,7 +85,7 @@ class SiPac_Layout
 		}
 		
 		$js_chat = "sipac_objects[".$this->chat->chat_num."]";
-		$this->theme->set_variables($layout_path, $js_chat);
+		$this->theme->set_variables($layout_path, $js_chat, $this->chat->settings);
 		
 		$this->settings = $this->theme->get_settings();
 		$this->settings['php_path'] = $layout_php_path;
@@ -116,7 +116,7 @@ class SiPac_Layout
 		$js_functions = $this->theme->get_js_functions();
 		foreach ($js_functions as $name => $function)
 		{
-			$js_function_string = $js_function_string.preg_replace('/function\s*\((.*)\)/','sipac_theme_functions[sipac_new_id]["'.$name.'"] = function ($1)', $function);
+			$js_function_string = $js_function_string.preg_replace('/function\s*\((.*)\)/','sipac_theme_functions[sipac_new_id]["'.$name.'"] = function ($1)', $function, 1);
 		}
 		
 		//update all cached files, if changed

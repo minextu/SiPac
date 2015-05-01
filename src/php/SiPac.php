@@ -169,4 +169,52 @@ else if (isset($_GET['task']) AND $_GET['task'] == "terminate_chat")
 		}
 	}
 }
+else if (isset($_GET['task']) AND $_GET['task'] == "upload_picture")
+{
+	$json = [];
+	$json['status'] = false;
+	
+	if (isset($_GET['id']) AND isset($_GET['client']) AND isset($_FILES['picture']))
+	{
+		$chat_variables = array("id" => $_GET['id'], "client" => $_GET['client']);
+		$SiPac = new SiPac_Chat(false, $chat_variables);
+		
+		if ($SiPac->settings->get("can_upload") == true)
+		{
+			$uploaddir = dirname(__FILE__)."/../../cache/pictures/";
+			
+			if (!is_dir($uploaddir))
+					mkdir($uploaddir);
+			
+			$path_parts = pathinfo($_FILES['picture']['name']); 
+			if (isset($path_parts['extension']))
+				$extension = strtolower($path_parts['extension']);
+			else
+				$extension = "";
+			
+			if ($extension == "jpg" OR $extension == "png" OR $extension == "gif" OR $extension == "jpeg")
+			{
+				$filename = md5(time().mt_rand(0,1000)).".".$extension;  
+				$uploadfile = $uploaddir.$filename;
+
+				if (move_uploaded_file($_FILES['picture']['tmp_name'], $uploadfile))
+				{
+					$json['status'] = true;
+					$json['picture'] = "http://".$_SERVER['SERVER_NAME'].$SiPac->html_path."cache/pictures/".$filename;
+				}
+				else 
+					$json['message'] = "Picture could not be moved to the cache folder. Maybe the permissions are not 777.";
+			}
+			else
+				$json['message'] = "The file is not a picture!";
+		}
+		else
+			$json['message'] = "You aren't allowed to upload!";
+	}
+	else
+		$json['message'] = "Missing Info";
+
+
+	echo json_encode($json);
+}
 ?>

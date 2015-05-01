@@ -93,7 +93,7 @@ function return_default_settings()
 	"can_clear_cache" => true,
 	
 	"max_messages" => 50,
-	
+	"can_upload" => false,
 	
 	"development" => false,
 	"user_color" => false,

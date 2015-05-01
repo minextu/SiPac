@@ -19,11 +19,12 @@
  */
 abstract class SiPacTheme
 {
-	final public function set_variables($path, $js_chat)
+	final public function set_variables($path, $js_chat, $settings)
 	{
 		$this->path = $path;
 		$this->js_chat = $js_chat;
 		$this->theme_js = $js_chat.".theme_functions";
+		$this->settings = $settings;
 	}
 	abstract public function get_layout($nickname, $user_num, $smileys, $settings);
 	abstract public function get_js_functions();

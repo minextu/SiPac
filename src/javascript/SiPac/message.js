@@ -70,6 +70,8 @@ SiPac.prototype.send_message = function(text, channel)
 		)
 		this.add_messages(channel, users, messages, message_id);
 	}
+	
+	return message_id;
 };
 
 SiPac.prototype.check_return = function(e)

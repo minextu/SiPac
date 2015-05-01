@@ -126,6 +126,13 @@
 	height: 45px;
 	padding-top: 10px;
 }
+##CHAT_MAIN## .chat_upload
+{
+	position: absolute;
+	background: #E6E6E6;
+	padding: 10px;
+	display: none;
+}
 ##CHAT_MAIN## .chat_message
 {
 	width: calc(100% - 105px); 
