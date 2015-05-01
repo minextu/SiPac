@@ -27,7 +27,7 @@ SiPac.prototype.upload_picture = function (picture)
 	httpobject.open('POST', sipac_html_path + "src/php/SiPac.php?task=upload_picture&id=" + this.id + "&client=" + this.client_num, true);
 	httpobject.upload.addEventListener('progress',function(e)
 	{ 
-		percent = (e.loaded/e.total)+ '00';
+		percent = (e.loaded/e.total) * 100;
 		var pro = sipac.chat.getElementsByClassName("chat_upload_progress");
 		if (pro[0] != undefined)
 		{
@@ -36,6 +36,8 @@ SiPac.prototype.upload_picture = function (picture)
 			pro[0].value = percent;
 			pro[0].innerHTML = percent + "%";
 		}
+		
+		console.debug("Upload: " + percent + "%");
 		
 	}, false);
 	httpobject.onload = function()
