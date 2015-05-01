@@ -27,6 +27,7 @@ class SiPacTheme_default extends SiPacTheme
 					<div class='chat_left'>
 						<div class='chat_conversation'><noscript><||noscript-text||></noscript></div>
 						<div class='chat_user_input'>
+							<progress value='0' max='100' class='chat_upload_progress'>60%</progress>
 							<div class='chat_upload'>
 								Drop a picture here, to upload
 							</div>

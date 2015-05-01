@@ -25,9 +25,28 @@ SiPac.prototype.upload_picture = function (picture)
 
 	var httpobject = new XMLHttpRequest();
 	httpobject.open('POST', sipac_html_path + "src/php/SiPac.php?task=upload_picture&id=" + this.id + "&client=" + this.client_num, true);
-	httpobject.upload.addEventListener('progress',function(e){ console.log((e.loaded/e.total)+'%');}, false);
+	httpobject.upload.addEventListener('progress',function(e)
+	{ 
+		percent = (e.loaded/e.total)+ '00';
+		var pro = sipac.chat.getElementsByClassName("chat_upload_progress");
+		if (pro[0] != undefined)
+		{
+			pro[0].style.opacity = 1;
+			pro[0].style.display = "block";
+			pro[0].value = percent;
+			pro[0].innerHTML = percent + "%";
+		}
+		
+	}, false);
 	httpobject.onload = function()
 	{
+		var pro = sipac.chat.getElementsByClassName("chat_upload_progress");
+		if (pro[0] != undefined)
+		{
+			pro[0].style.opacity = 0;
+			window.setTimeout(function() {pro[0].style.display = "none"}, 3000);
+		}
+
 		var answer = JSON.parse(httpobject.responseText);
 		if (answer['status'] == true)
 		{

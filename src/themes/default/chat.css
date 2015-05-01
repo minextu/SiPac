@@ -126,6 +126,16 @@
 	height: 45px;
 	padding-top: 10px;
 }
+##CHAT_MAIN## .chat_user_input progress
+{
+	position: absolute;
+	padding-left: 5px; 
+	margin-left: 8px;
+	padding-right: 80px;
+	opacity: 0;
+	transition: all 1s;
+	display: none;
+}
 ##CHAT_MAIN## .chat_upload
 {
 	position: absolute;
