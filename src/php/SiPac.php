@@ -134,6 +134,9 @@ if (isset($_GET['task']) AND $_GET['task'] == "get_chat")
 					//check_changes can contain messages, so merge with the orginal json_answer
 					$tmp_json_answer['get'] = array_merge($tmp_json_answer['get'], $check_changes['get']);
 	  
+					// Check for custom request function
+					$SiPac->proxy->check_custom_request_function();
+					
 					//add debug entries
 					foreach ($SiPac->channel->ids as $channel)
 					{

@@ -17,26 +17,12 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-require_once("class/SiPac.php");
-
-require_once("class/SiPac_MySQL.php");
-require_once("class/SiPac_User.php");
-require_once("class/SiPac_Userlist.php");
-require_once("class/SiPac_Channel.php");
-require_once("class/SiPac_Command.php");
-require_once("class/SiPac_Proxy.php");
-require_once("class/SiPac_Message.php");
-require_once("class/SiPac_Language.php");
-require_once("class/SiPac_Afk.php");
-require_once("class/SiPac_Layout.php");
-require_once("class/SiPac_Settings.php");
-require_once("class/SiPac_Debug.php");
-
-require_once("class/Abstract/SiPacCommand.php");
-require_once("class/Abstract/SiPacProxy.php");
-require_once("class/Abstract/SiPacTheme.php");
-require_once("class/Abstract/SiPacFunction.php");
-
+abstract class SiPacFunction
+{
+	final public function set_variables($chat)
+	{
+		$this->chat = $chat;
+	}
+	abstract public function execute();
+}
 ?>
-

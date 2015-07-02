@@ -124,4 +124,29 @@ class SiPac_Proxy
 		else*/
 			return true;
 	}
+	
+	public function check_custom_request_function()
+	{
+		$function_folder = dirname(__FILE__)."/../../../conf/functions";
+		
+		if (!empty($this->chat->settings->get('custom_request_function')))
+		{
+			$function_name = $this->chat->settings->get('custom_request_function');
+			
+			include_once($function_folder."/SiPacFunction_".$function_name.".php");
+			$class_name = "SiPacFunction_".$function_name;
+			
+			if (class_exists($class_name))
+			{
+				$function = new $class_name;
+				$function->set_variables($this->chat);
+					
+				return $function->execute();
+			}
+			else
+				$this->chat->debug->add('Classname is not "'.$function_name.'"', 0);
+		}
+		else
+			return true;
+	}
 } 
