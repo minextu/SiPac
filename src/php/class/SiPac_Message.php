@@ -57,7 +57,10 @@ class SiPac_Message
 			}
 			else
 			{
-				$message_style = $this->chat->settings->get('user_color')."|||";
+				if ($user === $this->chat->nickname)
+					$message_style = $this->chat->settings->get('user_color')."|||";
+				else
+					$message_style = "|||";
 				
 				$post_array = array("message"=>$message, "type"=>$type, "channel"=>$channel,"user"=>$user, "style" => $message_style, "time"=>$time);
 				
