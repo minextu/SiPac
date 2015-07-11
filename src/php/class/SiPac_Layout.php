@@ -214,7 +214,7 @@ class SiPac_Layout
 	
 	
 		/* call the add_chat() with the generated parameters */
-		$js_chat ="<script type='text/javascript'> add_chat('".$json_parameters."');";
+		$js_chat ="<script type='text/javascript' class='sipac_script'>add_chat('".$json_parameters."');";
 		
 		//initiate the chat, by calling the init function.
 		$js_chat = $js_chat."sipac_objects[sipac_objects.length-1].init();";
