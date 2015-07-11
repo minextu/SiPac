@@ -93,10 +93,6 @@ class SiPac_Chat
 				return false;
 			}
 		}
-		$this->message= new SiPac_Message($this);
-		
-		//obtain a nickname or load the old
-		$this->check_name();
 		
 		if ($this->is_new == true)
 		{
@@ -144,11 +140,16 @@ class SiPac_Chat
 		$this->language = new SiPac_Language($this->settings, $this->debug);
 		$this->language->load();
 		
+		$this->message= new SiPac_Message($this);
+		
 		$this->command = new SiPac_Command($this);
 		$this->proxy = new SiPac_Proxy($this);
 
 		$this->layout = new SiPac_Layout($this);
 		$this->layout->load();
+		
+		//obtain a nickname or load the old
+		$this->check_name();
 			
 		if ($this->check_kick() == true)
 			return false;
