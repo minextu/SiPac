@@ -21,7 +21,7 @@ class SiPac_Command
 {
 	private $chat;
 	private $channel;
-	private $command_list = array();
+	public $command_list = array();
 	
 	public function __construct($chat)
 	{
@@ -35,7 +35,7 @@ class SiPac_Command
 		$files = scandir($command_folder);
 		foreach ($files as $file)
 		{
-			if ($file != "." && $file != "..") 
+			if ($file != "." && $file != ".." && $file != ".htaccess") 
 			{
 				$command_name = str_replace(".php", "", $file);
 					

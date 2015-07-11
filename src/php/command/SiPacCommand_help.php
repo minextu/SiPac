@@ -61,18 +61,13 @@ class SiPacCommand_help extends SiPacCommand
 	private function get_default_commands()
 	{
 		$command_files = array();
-		if ($handle = opendir(dirname(__FILE__)))
+		
+		$command_list = $this->chat->command->command_list;
+		foreach ($command_list as $class_name)
 		{
-			while (false !== ($file = readdir($handle)))
-			{
-				if ($file != "." AND $file != ".." AND $file != ".htaccess") 
-				{
-					$class_name = str_replace(".php", "", $file);
-					$command_files[$class_name] = $file;
-				}
-			}
+			$path = dirname(__FILE__)."/".$class_name.".php";
+			$command_files[$class_name] = $path;
 		}
-		closedir($handle);
 		
 		return $command_files;
 	}
