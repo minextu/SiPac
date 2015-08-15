@@ -45,7 +45,8 @@ class SiPac_Layout
 		
 		$is_mobile = check_mobile();
 			
-		$theme_class = "SiPacTheme_".$this->chat->settings->get('theme');
+		$theme_name = $this->chat->settings->get('theme');
+		$theme_class = "SiPacTheme_".$theme_name;
 		
 		
 		if ($is_mobile == true AND file_exists($custom_layout_php_path."_mobile/$theme_class.php"))
@@ -54,7 +55,6 @@ class SiPac_Layout
 			$layout_php_path = $custom_layout_php_path."_mobile";
 			$layout_path = $custom_layout_path."_mobile";
 			require("$layout_php_path/$theme_class.php");
-			$this->theme = new $theme_class();
 		}
 		else if ($is_mobile == true AND file_exists($default_layout_php_path."_mobile/$theme_class.php"))
 		{
@@ -62,27 +62,29 @@ class SiPac_Layout
 			$layout_php_path = $default_layout_php_path."_mobile";
 			$layout_path = $default_layout_path."_mobile";
 			require("$layout_php_path/$theme_class.php");
-			$this->theme = new $theme_class();
 		}
 		else if (file_exists($custom_layout_php_path."/$theme_class.php"))
 		{
 			$layout_php_path = $custom_layout_php_path;
 			$layout_path = $custom_layout_path;
 			require("$layout_php_path/$theme_class.php");
-			$this->theme = new $theme_class();
 		}
 		else if (file_exists($default_layout_php_path."/$theme_class.php"))
 		{
 			$layout_php_path = $default_layout_php_path;
 			$layout_path = $default_layout_path;
 			require("$layout_php_path/$theme_class.php");
-			$this->theme = new $theme_class();
 		}
 		else
 		{
-			$this->chat->debug->error($layout_php_path."/$theme_class.php not found!");
+			$this->chat->debug->error("File \"$theme_class.php\" was not found in folder \"$theme_name\"!");
 			return false;
 		}
+		
+		if (class_exists($theme_class))
+			$this->theme = new $theme_class();
+		else
+			$this->chat->debug->error("Class of Theme \"$theme_name\" is not \"$theme_class\"!");
 		
 		$js_chat = "sipac_objects[".$this->chat->chat_num."]";
 		$this->theme->set_variables($layout_path, $js_chat, $this->chat->settings);
