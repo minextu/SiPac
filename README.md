@@ -1,7 +1,7 @@
 SiPac
 =====
 
-SiPac will be a highly customizable PHP and AJAX chat, but it's not ready to use, yet.
+SiPac will is highly customizable PHP and AJAX chat. At this time, there aren't any plans to continue this Project. Please don't use it in Production.
 
 If you wan't to try out the chat, download a released version from here: https://github.com/nexttrex/SiPac/releases
 
